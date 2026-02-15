@@ -1,0 +1,227 @@
+{
+  "1": {
+    "word": "vital",
+    "definition": "Extremely important or necessary for life.",
+    "examples": [
+      {
+        "en": "A balanced diet is vital for maintaining good health.",
+        "jp": "バランスの取れた食事は健康を維持するために非常に重要です。"
+      },
+      {
+        "en": "Water is vital for all living organisms.",
+        "jp": "水はすべての生物にとって不可欠です。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "2": {
+    "word": "vivid",
+    "definition": "Producing powerful feelings or strong, clear images in the mind.",
+    "examples": [
+      {
+        "en": "The artist used vivid colors to bring the painting to life.",
+        "jp": "そのアーティストは鮮やかな色を使って絵を生き生きとさせました。"
+      },
+      {
+        "en": "She has a vivid imagination that often inspires her stories.",
+        "jp": "彼女は鮮やかな想像力を持っていて、しばしば彼女の物語にインスピレーションを与えます。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "3": {
+    "word": "revive",
+    "definition": "to bring something back to life, to restore to consciousness",
+    "examples": [
+      {
+        "en": "The doctor worked hard to revive the patient after the heart attack.",
+        "jp": "医者は心臓発作の後、患者を生き返らせるために懸命に働きました。"
+      },
+      {
+        "en": "The festival aims to revive traditional cultural practices.",
+        "jp": "その祭りは伝統的な文化的慣習を生き返らせることを目的としています。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "4": {
+    "word": "essential",
+    "definition": "very important and necessary.",
+    "examples": [
+      {
+        "en": "Water is essential for all living things.",
+        "jp": "水はすべての生き物にとって重要です。"
+      },
+      {
+        "en": "A good education is essential for a successful career.",
+        "jp": "良い教育は成功するキャリアにとって不可欠です。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "5": {
+    "word": "indispensable",
+    "definition": "absolutely necessary; essential.",
+    "examples": [
+      {
+        "en": "The internet has become indispensable in our daily lives.",
+        "jp": "インターネットは私たちの日常生活において必要不可欠になりました。"
+      },
+      {
+        "en": "Her experience is indispensable for this project.",
+        "jp": "彼女の経験はこのプロジェクトにとって不可欠です。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "6": {
+    "word": "crucial",
+    "definition": "extremely important or necessary.",
+    "examples": [
+      {
+        "en": "Making the right decision at this point is crucial.",
+        "jp": "この時点で正しい決定を下すことは決定的に重要です。"
+      },
+      {
+        "en": "Crucial evidence was found that changed the outcome of the trial.",
+        "jp": "裁判の結果を変えた決定的な証拠が見つかりました。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "7": {
+    "word": "significance",
+    "definition": "the importance or meaning of something",
+    "examples": [
+      {
+        "en": "The significance of this discovery cannot be overstated.",
+        "jp": "この発見の重要性は過小評価されるべきではありません。"
+      },
+      {
+        "en": "Understanding its significance is crucial for further studies.",
+        "jp": "その重要性を理解することは、さらなる研究にとって重要です。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "8": {
+    "word": "consequence",
+    "definition": "a result or effect of an action or decision",
+    "examples": [
+      {
+        "en": "The consequence of ignoring the warning could be severe.",
+        "jp": "警告を無視する結果は深刻なものになる可能性があります。"
+      },
+      {
+        "en": "Every choice has a consequence that we must consider.",
+        "jp": "すべての選択には私たちが考慮すべき結果があります。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "9": {
+    "word": "matter",
+    "definition": "a subject or situation that is being considered or dealt with",
+    "examples": [
+      {
+        "en": "This matter needs to be addressed immediately.",
+        "jp": "この問題は直ちに対処する必要があります。"
+      },
+      {
+        "en": "It's a complex matter that requires careful thought.",
+        "jp": "これは慎重な思考を要する複雑な事柄です。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "10": {
+    "word": "count",
+    "definition": "to say numbers in order or to consider something as important.",
+    "examples": [
+      {
+        "en": "Please count the number of students in the classroom.",
+        "jp": "教室の生徒の数を数えてください。"
+      },
+      {
+        "en": "Every vote counts in a democracy.",
+        "jp": "民主主義では、すべての票が重要です。"
+      }
+    ],
+    "difficulty": "英単語帳鉄壁"
+  },
+  "1716": {
+    "word": "embed",
+    "definition": "to fix something firmly and deeply in a surrounding mass.",
+    "examples": [
+      {
+        "en": "The designer decided to embed the logo into the website's background.",
+        "jp": "デザイナーはロゴをウェブサイトの背景に埋め込むことに決めた。"
+      },
+      {
+        "en": "The teacher asked the students to embed quotes from the book in their essays.",
+        "jp": "教師は生徒たちにエッセイに本の引用を埋め込むように求めた。"
+      }
+    ],
+    "difficulty": "OsakaHybrid"
+  },
+  "893": {
+    "word": "immune",
+    "definition": "protected from disease or not affected by something.",
+    "examples": [
+      {
+        "en": "After receiving the vaccine, she felt more immune to the flu.",
+        "jp": "ワクチンを接種した後、彼女はインフルエンザに対してより免疫があると感じた。"
+      },
+      {
+        "en": "He believed that his long experience in the field made him immune to criticism.",
+        "jp": "彼は自分の長い経験が批判に対して自分を免れるものにしていると信じていた。"
+      }
+    ],
+    "difficulty": "OsakaHybrid"
+  },
+  "1699": {
+    "word": "wander",
+    "definition": "to move around without a specific destination or purpose.",
+    "examples": [
+      {
+        "en": "She loves to wander through the city, discovering new places.",
+        "jp": "彼女は新しい場所を発見しながら街をさまようのが好きだ。"
+      },
+      {
+        "en": "During the hike, we decided to wander off the trail for a while.",
+        "jp": "ハイキング中、私たちはしばらくトレイルから外れてさまようことにした。"
+      }
+    ],
+    "difficulty": "OsakaHybrid"
+  },
+  "1443": {
+    "word": "outlet",
+    "definition": "A place where products are sold directly to customers.",
+    "examples": [
+      {
+        "en": "The outlet store offers discounts on brand-name clothing.",
+        "jp": "アウトレットストアではブランド衣料品が割引価格で販売されています。"
+      },
+      {
+        "en": "He found a perfect outlet for his creative ideas in art classes.",
+        "jp": "彼はアートクラスで自分の創造的なアイデアを表現する完璧な出口を見つけました。"
+      }
+    ],
+    "difficulty": "OsakaHybrid"
+  },
+  "189": {
+    "word": "academic",
+    "definition": "Related to education, schools, or scholarly activities.",
+    "examples": [
+      {
+        "en": "She received an academic scholarship to attend university.",
+        "jp": "彼女は大学に通うための学問的奨学金を受け取りました。"
+      },
+      {
+        "en": "The academic performance of students is often measured by their grades.",
+        "jp": "学生の学業成績はしばしば成績によって測定されます。"
+      }
+    ],
+    "difficulty": "OsakaHybrid"
+  }
+}

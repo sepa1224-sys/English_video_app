@@ -1,0 +1,58 @@
+{
+  "英検3級": [
+    {"word": "adventure", "meaning": "冒険", "definition": "An exciting experience.", "example": "They went on an adventure in the forest."},
+    {"word": "traditional", "meaning": "伝統的な", "definition": "Following ideas and methods that have existed for a long time.", "example": "She wore a traditional kimono."},
+    {"word": "popular", "meaning": "人気のある", "definition": "Liked by many people.", "example": "Sushi is popular around the world."},
+    {"word": "environment", "meaning": "環境", "definition": "The natural world around us.", "example": "We must protect the environment."},
+    {"word": "communicate", "meaning": "意思疎通する", "definition": "To share information with others.", "example": "Animals communicate in different ways."}
+  ],
+  "英検準2級": [
+    {"word": "convenient", "meaning": "便利な", "definition": "Useful and easy to use.", "example": "Subways are very convenient."},
+    {"word": "reduce", "meaning": "減らす", "definition": "To make something smaller or less.", "example": "We should reduce plastic waste."},
+    {"word": "pollution", "meaning": "汚染", "definition": "Damage caused to water, air, etc. by harmful substances.", "example": "Air pollution is a big problem in cities."},
+    {"word": "encourage", "meaning": "励ます", "definition": "To give someone support or hope.", "example": "My teacher encouraged me to study abroad."},
+    {"word": "global", "meaning": "世界的な", "definition": "Relating to the whole world.", "example": "Climate change is a global issue."}
+  ],
+  "英検2級": [
+    {"word": "sustainable", "meaning": "持続可能な", "definition": "Able to be maintained at a certain rate or level.", "example": "Sustainable energy is key to our future."},
+    {"word": "economy", "meaning": "経済", "definition": "The system of trade and industry.", "example": "The country's economy is growing fast."},
+    {"word": "opportunity", "meaning": "機会", "definition": "A chance to do something.", "example": "This job is a great opportunity for me."},
+    {"word": "predict", "meaning": "予測する", "definition": "To say what will happen in the future.", "example": "Experts predict a rise in temperatures."},
+    {"word": "influence", "meaning": "影響", "definition": "The power to have an effect on people or things.", "example": "Social media has a big influence on teens."}
+  ],
+  "英検準1級": [
+    {"word": "innovation", "meaning": "革新", "definition": "A new method, idea, or product.", "example": "Technological innovation drives progress."},
+    {"word": "significant", "meaning": "重要な", "definition": "Sufficiently great or important to be worthy of attention.", "example": "There was a significant improvement in sales."},
+    {"word": "controversial", "meaning": "物議を醸す", "definition": "Giving rise or likely to give rise to public disagreement.", "example": "The new policy is quite controversial."},
+    {"word": "emphasize", "meaning": "強調する", "definition": "To give special importance to something.", "example": "He emphasized the need for teamwork."},
+    {"word": "perspective", "meaning": "視点", "definition": "A particular attitude toward or way of regarding something.", "example": "Her perspective on the issue was unique."}
+  ],
+  "英検1級": [
+    {"word": "ubiquitous", "meaning": "至る所にある", "definition": "Present, appearing, or found everywhere.", "example": "Smartphones have become ubiquitous."},
+    {"word": "meticulous", "meaning": "綿密な", "definition": "Showing great attention to detail.", "example": "The project required meticulous planning."},
+    {"word": "exacerbate", "meaning": "悪化させる", "definition": "To make a problem or bad situation worse.", "example": "Stress can exacerbate health problems."},
+    {"word": "advocate", "meaning": "提唱する", "definition": "To publicly support or recommend a particular cause or policy.", "example": "She advocates for human rights."},
+    {"word": "pragmatic", "meaning": "実用的な", "definition": "Dealing with things sensibly and realistically.", "example": "We need a pragmatic solution to this crisis."}
+  ],
+  "TOEIC600": [
+    {"word": "budget", "meaning": "予算", "definition": "An estimate of income and expenditure for a set period of time.", "example": "We need to stick to the budget."},
+    {"word": "client", "meaning": "顧客", "definition": "A person or organization using the services of a lawyer or other professional company.", "example": "The client was satisfied with the proposal."},
+    {"word": "schedule", "meaning": "予定", "definition": "A plan for carrying out a process or procedure.", "example": "The meeting is on schedule."},
+    {"word": "contract", "meaning": "契約", "definition": "A written or spoken agreement.", "example": "Please sign the contract."},
+    {"word": "invoice", "meaning": "請求書", "definition": "A list of goods sent or services provided, with a statement of the sum due.", "example": "I will send the invoice tomorrow."}
+  ],
+  "TOEIC800": [
+    {"word": "negotiation", "meaning": "交渉", "definition": "Discussion aimed at reaching an agreement.", "example": "The negotiation took several hours."},
+    {"word": "strategy", "meaning": "戦略", "definition": "A plan of action designed to achieve a long-term or overall aim.", "example": "Our marketing strategy is effective."},
+    {"word": "competitor", "meaning": "競合他社", "definition": "A person or company that competes with others.", "example": "We must stay ahead of our competitors."},
+    {"word": "revenue", "meaning": "収益", "definition": "Income, especially when of a company or organization.", "example": "Revenue increased by 10% last quarter."},
+    {"word": "executive", "meaning": "重役", "definition": "A person with senior managerial responsibility in a business organization.", "example": "The executive board met yesterday."}
+  ],
+  "TOEIC990": [
+    {"word": "lucrative", "meaning": "儲かる", "definition": "Producing a great deal of profit.", "example": "It was a lucrative business deal."},
+    {"word": "subsidiary", "meaning": "子会社", "definition": "A company controlled by a holding company.", "example": "They opened a subsidiary in Japan."},
+    {"word": "acquisition", "meaning": "買収", "definition": "The purchase of one company by another.", "example": "The acquisition was finalized last week."},
+    {"word": "fluctuate", "meaning": "変動する", "definition": "To rise and fall irregularly in number or amount.", "example": "Stock prices fluctuate daily."},
+    {"word": "discrepancy", "meaning": "不一致", "definition": "A lack of compatibility or similarity between two or more facts.", "example": "There is a discrepancy in the accounts."}
+  ]
+}

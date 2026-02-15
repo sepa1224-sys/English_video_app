@@ -1,0 +1,19 @@
+# 重いデータフォルダを完全に除外
+output/
+output_audio_word/
+output_audio_listening/
+temp/
+assets/*.mp3
+assets/*.mp4
+
+# Python / 環境
+__pycache__/
+.venv/
+.env
+
+# デバッグ用テキスト
+*.txt
+*.log
+client_secrets.json
+token.pickle
+*.db
