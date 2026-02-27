@@ -17,3 +17,11 @@ __pycache__/
 client_secrets.json
 token.pickle
 *.db
+client_secrets.json
+token.pickle
+*.db
+the_juken.db
+output_audio_word/
+temp_*/
+*.mp3
+*.mp4

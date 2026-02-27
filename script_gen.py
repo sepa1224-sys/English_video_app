@@ -18,11 +18,6 @@ try:
 except ImportError:
     OpenAI = None
 
-# Optional pandas for robust CSV loading
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
 def load_vocabulary(level: str, day_number: int = 1) -> list:
     """
     指定されたレベルの単語リストを読み込む。
@@ -44,76 +39,64 @@ def load_vocabulary(level: str, day_number: int = 1) -> list:
         return vocab_list
 
     if level == "ターゲット1900":
-        csv_file = os.path.join("data", "ターゲット1900 - Sheet1.csv")
+        csv_file = os.path.join("data", "vocab", "ターゲット1900.csv")
         if not os.path.exists(csv_file):
             print(f"  ! Warning: {csv_file} not found.")
             return []
-        
-        vocab_list = []
         try:
-            # エンコーディング対応 (utf-8-sig -> cp932 -> utf-8)
-            encodings = ["utf-8-sig", "cp932", "utf-8"]
-            all_rows = []
-            
-            for enc in encodings:
-                try:
-                    with open(csv_file, "r", encoding=enc) as f:
-                        # ヘッダーがない可能性が高いので、csv.readerで読み込む
-                        reader = csv.reader(f)
-                        all_rows_raw = list(reader)
-                        
-                        # 辞書リストに変換
-                        all_rows = []
-                        for i, r in enumerate(all_rows_raw):
-                            if len(r) >= 3:
-                                # col 0: ID, col 1: Word, col 2: Meaning
-                                row_id = r[0].strip()
-                                # 1行目のIDが空なら1とみなす補正 (ターゲット1900の仕様推測)
-                                if i == 0 and not row_id and r[1].strip().lower() == "create":
-                                    row_id = "1"
-                                    
-                                all_rows.append({
-                                    "番号": row_id,
-                                    "英単語": r[1].strip(),
-                                    "意味": r[2].strip()
-                                })
-                                
-                    if all_rows:
-                        print(f"  - CSV loaded successfully with encoding: {enc} (Rows: {len(all_rows)})")
-                        break
-                except UnicodeDecodeError:
-                    continue
-                except Exception:
-                    continue
-            
-            if not all_rows:
-                print("  ! Error: Failed to load CSV with any encoding.")
-                return []
-                
-            # Day番号に基づいて10個選択 (Day 1: 0-9, Day 2: 10-19...)
-            start_idx = (day_number - 1) * 10
-            end_idx = start_idx + 10
-            
-            # 範囲外ならランダムまたはループ、ここではループさせる
-            if start_idx >= len(all_rows):
-                start_idx = start_idx % len(all_rows)
-                end_idx = start_idx + 10
-            
-            selected_rows = all_rows[start_idx:end_idx]
-            
-            for row in selected_rows:
-                vocab_list.append({
-                    "id": row.get("番号", ""),
-                    "word": row.get("英単語", ""),
-                    "meaning": row.get("意味", ""),
-                    "definition": "", # GPTに生成させる
-                    "example": ""     # GPTに生成させる
-                })
-            return vocab_list
-            
+            all_words = load_csv_data(csv_file, "ターゲット1900")
+            start_id = max(1, (day_number - 1) * 10 + 1)
+            end_id = min(1900, start_id + 9)
+            selected = [w for w in all_words if start_id <= w["id"] <= end_id]
+            for v in selected:
+                v["definition"] = ""
+                v["example"] = ""
+            return selected
         except Exception as e:
             print(f"  ! Error loading CSV: {e}")
             return []
+
+def load_reference_corpus(university: str) -> str:
+    category_map = {
+        "todai": "UTokyo_L",
+        "kyoto": "Kyoto_L",
+        "osaka": "Osaka_L"
+    }
+    target_category = category_map.get(university)
+    csv_path = os.path.join("data", "script_learning", "data_reference_corpus.csv - シート1.csv")
+    if not os.path.exists(csv_path) or not target_category:
+        return ""
+    encodings = ["utf-8-sig", "utf-8", "cp932", "shift_jis"]
+    rows = []
+    for enc in encodings:
+        try:
+            with open(csv_path, "r", encoding=enc) as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+            if rows:
+                break
+        except UnicodeDecodeError:
+            continue
+        except Exception as e:
+            print(f"  ! Warning: Failed to read reference corpus with {enc}: {e}")
+            continue
+    if not rows:
+        return ""
+    filtered = [r for r in rows if r.get("Category", "").strip() == target_category]
+    if not filtered:
+        return ""
+    lines = []
+    for r in filtered[:3]:
+        level = r.get("Complexity_Level", "").strip()
+        feats = r.get("Key_Features", "").strip()
+        if level or feats:
+            if level and feats:
+                lines.append(f"- [{level}] {feats}")
+            elif feats:
+                lines.append(f"- {feats}")
+            else:
+                lines.append(f"- [{level}]")
+    return "\n".join(lines)
 
     # 既存のJSON読み込み
     vocab_file = os.path.join("data", "vocabulary.json")
@@ -129,11 +112,18 @@ def load_vocabulary(level: str, day_number: int = 1) -> list:
         print(f"  ! Error loading vocabulary JSON: {e}")
         return []
 
+def _find_vocab_csv(file_name: str) -> str:
+    base_dir = "data"
+    search_roots = [base_dir, os.path.join(base_dir, "vocab")]
+    for root in search_roots:
+        if os.path.isdir(root):
+            for r, _, files in os.walk(root):
+                if file_name in files:
+                    return os.path.join(r, file_name)
+    return os.path.join(base_dir, file_name)
+
 def load_teppeki_words(start_id: int, end_id: int) -> list:
-    """
-    Load words from '英単語帳鉄壁.csv' by ID range.
-    """
-    csv_file = os.path.join("data", "英単語帳鉄壁.csv")
+    csv_file = _find_vocab_csv("英単語帳鉄壁.csv")
     if not os.path.exists(csv_file):
         print(f"  ! Error: {csv_file} not found.")
         return []
@@ -180,54 +170,18 @@ def load_teppeki_words(start_id: int, end_id: int) -> list:
 
 def load_target1900_words(start_id: int, end_id: int) -> list:
     """
-    Load words from 'ターゲット1900 - Sheet1.csv' by ID range.
+    Load words from 'ターゲット1900.csv' by ID range.
     """
-    csv_file = os.path.join("data", "ターゲット1900 - Sheet1.csv")
+    csv_file = os.path.join("data", "vocab", "ターゲット1900.csv")
     if not os.path.exists(csv_file):
         print(f"  ! Error: {csv_file} not found.")
         return []
         
-    words = []
     try:
-        encodings = ["utf-8-sig", "cp932", "utf-8"]
-        all_rows = []
-        for enc in encodings:
-            try:
-                with open(csv_file, "r", encoding=enc) as f:
-                    reader = csv.reader(f)
-                    all_rows = list(reader)
-                if all_rows:
-                    break
-            except:
-                continue
-                
-        if not all_rows:
-            return []
-            
-        for i, row in enumerate(all_rows):
-            if len(row) < 2: continue
-            
-            # Special handling for potentially missing ID in first row or weird formatting
-            try:
-                row_id_str = row[0].strip().replace('"', '')
-                if not row_id_str and i == 0 and row[1].strip().lower() == "create":
-                     row_id = 1
-                elif row_id_str.isdigit():
-                    row_id = int(row_id_str)
-                else:
-                    continue
-                    
-                if start_id <= row_id <= end_id:
-                    words.append({
-                        "id": row_id,
-                        "word": row[1].strip(),
-                        "meaning": row[2].strip() if len(row) > 2 else "",
-                        "source": "ターゲット1900",
-                        "source_label": f"ターゲット1900 #{row_id}"
-                    })
-            except ValueError:
-                continue
-                
+        all_words = load_csv_data(csv_file, "ターゲット1900")
+        start_id = max(1, start_id)
+        end_id = min(1900, end_id)
+        words = [w for w in all_words if start_id <= w["id"] <= end_id]
         words.sort(key=lambda x: x["id"])
         print(f"  - Loaded {len(words)} Target 1900 words (IDs {start_id}-{end_id}).")
         return words
@@ -334,94 +288,6 @@ def load_csv_data(file_path: str, source_name: str) -> list:
             
     parsed_words.sort(key=lambda x: x["id"])
     return parsed_words
-
-def load_reference_corpus(university: str) -> tuple:
-    """
-    Load reference corpus and key features for the specific university.
-    Returns (script_content, key_features) or (None, None) if not found.
-    Target File: data/data_reference_corpus.csv - シート1.csv
-    """
-    csv_file = os.path.join("data", "data_reference_corpus.csv - シート1.csv")
-    if not os.path.exists(csv_file):
-        print(f"  - Note: Reference corpus CSV not found at {csv_file}. Using standard prompts.")
-        return None, None
-        
-    uni_map = {
-        "todai": "UTokyo_L",
-        "kyoto": "Kyoto_L",
-        "osaka": "Osaka_L"
-    }
-    target_category = uni_map.get(university)
-    if not target_category:
-        return None, None
-    
-    # Try pandas first for robust handling of file name/encoding
-    encodings = ["utf-8-sig", "utf-8", "cp932", "shift_jis"]
-    if pd is not None:
-        for enc in encodings:
-            try:
-                df = pd.read_csv(csv_file, encoding=enc)
-                # Normalize columns
-                cols = {c.lower().strip(): c for c in df.columns}
-                col_cat = cols.get("category")
-                col_script = cols.get("script_content") or cols.get("script")
-                col_feat = cols.get("key_features") or cols.get("features") or cols.get("feature")
-                if not col_cat or not col_script:
-                    continue
-                # Filter by category
-                subset = df[df[col_cat].astype(str).str.strip() == target_category]
-                if subset.empty:
-                    continue
-                first_row = subset.iloc[0]
-                script_content = str(first_row[col_script]).strip()
-                key_features = str(first_row[col_feat]).strip() if col_feat else ""
-                print(f"  - Found reference corpus for {university} ({target_category}) via pandas ({enc})")
-                return script_content, key_features
-            except Exception as e:
-                continue
-        # If pandas failed, fall back to csv module
-    
-    # Fallback: csv module
-    try:
-        loaded_rows = []
-        used_enc = ""
-        for enc in encodings:
-            try:
-                with open(csv_file, "r", encoding=enc) as f:
-                    reader = csv.reader(f)
-                    loaded_rows = list(reader)
-                if loaded_rows:
-                    used_enc = enc
-                    break
-            except Exception:
-                continue
-        if not loaded_rows:
-            return None, None
-        header = [h.strip().lower() for h in loaded_rows[0]] if loaded_rows else []
-        idx_cat = -1
-        idx_script = -1
-        idx_feat = -1
-        for i, h in enumerate(header):
-            if "category" in h: idx_cat = i
-            elif "script_content" in h or "script" in h: idx_script = i
-            elif "key_features" in h or "features" in h or "feature" in h: idx_feat = i
-        if idx_cat == -1 or idx_script == -1:
-            print("  ! Warning: Required columns (Category, Script_Content) not found in corpus CSV.")
-            return None, None
-        for row in loaded_rows[1:]:
-            if len(row) <= max(idx_cat, idx_script, idx_feat):
-                continue
-            cat_val = row[idx_cat].strip()
-            if cat_val == target_category:
-                script_content = row[idx_script].strip()
-                key_features = row[idx_feat].strip() if idx_feat != -1 else ""
-                print(f"  - Found reference corpus for {university} ({target_category}) via csv ({used_enc})")
-                return script_content, key_features
-        print(f"  - No reference data found for category {target_category}")
-        return None, None
-    except Exception as e:
-        print(f"  ! Error loading reference corpus: {e}")
-        return None, None
 
 def load_systan_words(start_id: int, end_id: int) -> list:
     """
@@ -580,7 +446,7 @@ def generate_vocalab_script(words: list, target_range: str = None) -> dict:
     
     # 0. Handle Target Range (Target 1900)
     if target_range:
-        csv_file = os.path.join("data", "ターゲット1900 - Sheet1.csv")
+        csv_file = os.path.join("data", "vocab", "ターゲット1900.csv")
         
         if os.path.exists(csv_file):
             print(f"  - Loading from {csv_file} with range {target_range}")
@@ -589,51 +455,14 @@ def generate_vocalab_script(words: list, target_range: str = None) -> dict:
                 start_str, end_str = target_range.split('-')
                 start_idx = int(start_str)
                 end_idx = int(end_str)
+                if start_idx < 1 or end_idx > 1900 or start_idx > end_idx:
+                    raise ValueError("Invalid range for Target 1900. Allowed: 1-1900.")
                 
-                loaded_words = []
-                encodings = ["utf-8-sig", "cp932", "utf-8"]
-                all_rows = []
-                for enc in encodings:
-                    try:
-                        with open(csv_file, "r", encoding=enc) as f:
-                            reader = csv.reader(f)
-                            all_rows = list(reader)
-                        if all_rows:
-                            print(f"    > Successfully read CSV with {enc} (Rows: {len(all_rows)})")
-                            break
-                    except:
-                        continue
-                
-                # Assuming format: ID, Word, Meaning (No header or handle header)
-                for row in all_rows:
-                    if len(row) < 2: continue
-                    
-                    # Try first column as ID
-                    try:
-                        row_id_str = row[0].strip().replace('"', '')
-                        # Check if header
-                        if not row_id_str.isdigit() and row[1] == "create":
-                             # Special case for first line if ID is missing but it's word 1
-                             r_id = 1
-                        elif row_id_str.isdigit():
-                            r_id = int(row_id_str)
-                        else:
-                            continue
-
-                        if start_idx <= r_id <= end_idx:
-                            loaded_words.append({
-                                "id": r_id,
-                                "word": row[1].strip(),
-                                "meaning": row[2].strip() if len(row) > 2 else ""
-                            })
-                    except ValueError:
-                        continue
-                            
-                if loaded_words:
-                    print(f"  - Loaded {len(loaded_words)} words from CSV within range {start_idx}-{end_idx}.")
-                    # Sort by ID just in case
-                    loaded_words.sort(key=lambda x: x["id"])
-                    words = loaded_words
+                loaded_words = load_csv_data(csv_file, "ターゲット1900")
+                words = [w for w in loaded_words if start_idx <= w["id"] <= end_idx]
+                if words:
+                    print(f"  - Loaded {len(words)} words from CSV within range {start_idx}-{end_idx}.")
+                    words.sort(key=lambda x: x["id"])
                 else:
                     print(f"  ! No words found in range {start_idx}-{end_idx} in {csv_file}.")
             except Exception as e:
@@ -756,6 +585,14 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         recent_topics = past_topics[-20:]
         past_topics_str = f"Avoid these past topics: {', '.join(recent_topics)}"
 
+    ref_block = load_reference_corpus(university)
+    if ref_block:
+        ref_text = f"""
+        Reference Corpus Hints ({uni_label} Listening):
+        {ref_block}
+        """
+    else:
+        ref_text = ""
     # 1. Topic Refinement
     if university == "kyoto":
         categories = [
@@ -797,24 +634,9 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
     
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
+        print("  ! Error: OPENAI_API_KEY is missing. Returning None from generate_exam_script.")
         return None
     client = OpenAI(api_key=api_key)
-
-    # Load Reference Corpus for prompt injection
-    ref_script, ref_features = load_reference_corpus(university)
-    corpus_injection = ""
-    if ref_script:
-        corpus_injection = f"""
-        Reference Example (Golden Standard)
-        ---
-        {ref_script}
-        ---
-        """
-    if ref_features:
-        corpus_injection += f"""
-        Specific Instructions for this University
-        {ref_features}
-        """
 
     # If topic is generic, generate a specific one
     if "Word Audio Mode" in topic or not topic:
@@ -831,7 +653,8 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
             )
             topic = res.choices[0].message.content.strip()
             print(f"  - Generated Specific Topic: {topic}")
-        except:
+        except Exception as e:
+            print(f"  ! Error generating specific topic: {e}")
             topic = f"{selected_category} Lecture" if university == "kyoto" else f"{selected_category} Discussion"
 
     # 2. Generate Script
@@ -839,7 +662,6 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         # KYOTO PROMPT (Lecture, Single Speaker)
         system_prompt = f"""
         You are an expert test creator for the Kyoto University (KyotoU) English Listening Exam.
-        {corpus_injection}
         
         Task: Create a high-difficulty academic lecture script (monologue) and questions.
         Topic: {topic}
@@ -860,12 +682,11 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         # Re-constructing the Kyoto prompt to be safe as I am replacing the block start
         system_prompt = f"""
         You are an expert test creator for the Kyoto University (KyotoU) English Listening Exam.
-        {corpus_injection}
         
         Task: Create a high-difficulty academic lecture script (monologue) and questions.
         Topic: {topic}
-        {past_topics_str}
         Target Vocabulary (Teppeki): {vocab_text}
+        {ref_text}
         
         Speaker:
         - Dr. Smith (Male, elderly, authoritative but engaging, "Grandfatherly Professor" tone).
@@ -923,12 +744,12 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         # OSAKA PROMPT (Presentation/Report, Single Speaker)
         system_prompt = f"""
         You are an expert test creator for the Osaka University (OsakaU) English Listening Exam.
-        {corpus_injection}
         
         Task: Create a practical academic presentation script (monologue) and questions.
         Topic: {topic}
         {past_topics_str}
         Target Vocabulary (Teppeki): {vocab_text}
+        {ref_text}
         
         Speaker:
         - Student B (Sarah): Female, clear, articulate, enthusiastic, slightly faster pace (+5%).
@@ -978,15 +799,14 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         }}
         """
     else:
-        # TODAI PROMPT (Discussion, 3 Speakers)
         system_prompt = f"""
         You are an expert test creator for the University of Tokyo (UTokyo) English Listening Exam.
-        {corpus_injection}
         
         Task: Create a highly academic discussion script and questions.
         Topic: {topic}
         {past_topics_str}
         Target Vocabulary (Teppeki): {vocab_text}
+        {ref_text}
         
         Speakers:
         - Student A (Male, logical, critical, challenges details)
@@ -1013,6 +833,12 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
            - Use the target vocabulary in **academic definitions** or **sharp, incisive points**.
            - Do NOT use them in simple, flat sentences. Make them integral to the logic.
            - Example usage: "The *significance* of this data is not in its volume, but its variability."
+           - For especially difficult words, add a brief paraphrase in simpler English nearby.
+        
+        5. **Sentence Structure & Readability**:
+           - Avoid chaining many relative clauses in a single sentence.
+           - Prefer 1 main clause per sentence with clear connectors between sentences.
+           - When expressing complex logic, break it into 2–3 shorter sentences instead of one very long sentence.
         
         Structure:
         1. **Discussion**: Approx 800-1000 words.
@@ -1051,7 +877,11 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
             ]
         }}
         """
-
+    
+    prompt_len = len(system_prompt)
+    approx_tokens = int(prompt_len / 3.5) if prompt_len > 0 else 0
+    print(f"DEBUG: Exam system_prompt length chars={prompt_len}, est_tokens={approx_tokens}, university={university}")
+    
     try:
         response = client.chat.completions.create(
             model="gpt-4o",
@@ -1060,15 +890,26 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
             ],
             response_format={"type": "json_object"}
         )
-        data = json.loads(response.choices[0].message.content)
-        
-        # Inject metadata
+        raw_content = response.choices[0].message.content
+    except Exception as e:
+        print(f"  ! Error generating exam script (API_ERROR): {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+    
+    try:
+        data = json.loads(raw_content)
+    except Exception as e:
+        print(f"  ! Error parsing exam script JSON (PARSE_ERROR): {e}")
+        print(f"  - Raw content prefix: {repr(raw_content[:500])}")
+        return None
+    
+    try:
         if vocab_list is None:
              vocab_list = []
         data["vocabulary"] = vocab_list
         data["university"] = university
         
-        # Ensure title exists and is formatted correctly
         final_topic = data.get("topic", topic)
         if custom_title:
             formatted_title = custom_title
@@ -1079,11 +920,8 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
             
         print(f"DEBUG: GPT Raw Keys: {list(data.keys())}")
         
-        # --- CONVERT TO SECTIONS for Audio Generation ---
         sections = []
         
-        # 1. Dialog Section
-        # Try multiple keys
         dialog_raw = data.get("dialog", [])
         if not dialog_raw:
             dialog_raw = data.get("dialogue", [])
@@ -1102,8 +940,6 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
             })
         
         if dialog_lines:
-            # Split into individual sections to ensure 1-to-1 audio generation
-            # This allows video_gen to display subtitles per line in Part 3
             for line in dialog_lines:
                 sections.append({
                     "type": "listening_part",
@@ -1112,20 +948,13 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         else:
             print("DEBUG: No dialog lines extracted!")
             
-        # 2. Questions Section
         questions_raw = data.get("questions", [])
-        # We don't need to add questions to 'sections' for audio generation 
-        # because generate_exam_video handles questions separately via 'questions' key in script_data.
-        # BUT, if we want audio for questions to be pre-generated by audio_gen, we might need to.
-        # However, video_gen calls generate_section_audio explicitly for questions.
-        # So we just need to ensure 'questions' key is in the returned dict.
         
-        # Final Result Construction
         final_result = {
             "title": data.get("title", topic),
             "topic": topic,
-            "sections": sections, # For Audio Gen (Dialog)
-            "questions": questions_raw, # For Video Gen (Questions)
+            "sections": sections,
+            "questions": questions_raw,
             "vocabulary": vocab_list,
             "university": university
         }
@@ -1133,7 +962,7 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         return final_result
         
     except Exception as e:
-        print(f"  ! Error generating exam script: {e}")
+        print(f"  ! Error post-processing exam script (POSTPROCESS_ERROR): {e}")
         import traceback
         traceback.print_exc()
         return None
@@ -1311,7 +1140,7 @@ def generate_word_audio_script(book: str, target_range: str, use_shuffle: bool =
     csv_map = {
         "t1200": os.path.join("data", "ターゲット1200.csv"),
         "t1400": os.path.join("data", "ターゲット1400.csv"),
-        "t1900": os.path.join("data", "ターゲット1900 - Sheet1.csv"),
+        "t1900": os.path.join("data", "vocab", "ターゲット1900.csv"),
         "teppeki": os.path.join("data", "英単語帳鉄壁.csv"),
         "systan": os.path.join("data", "システム英単語 - シート1.csv"),
         "derujun": os.path.join("data", "でる順準1級 - シート1.csv"),
@@ -1351,6 +1180,9 @@ def generate_word_audio_script(book: str, target_range: str, use_shuffle: bool =
         all_words = load_csv_data(csv_file, source_label)
         
         # Filter by range
+        if book == "t1900":
+            if start_idx < 1 or end_idx > 1900 or start_idx > end_idx:
+                raise ValueError("Invalid range for Target 1900. Allowed: 1-1900.")
         words = [w for w in all_words if start_idx <= w["id"] <= end_idx]
         
         if not words:
@@ -1407,7 +1239,7 @@ def generate_script(topic: str, level: str = "TOEIC600", day_number: int = 1, mo
             selected_vocab = random.sample(vocab_list, min(len(vocab_list), 5))
             
     if not selected_vocab:
-        print("  ! Error: No vocabulary found.")
+        print("  ! Error: No vocabulary found. Returning None from generate_script.")
         return None
 
     # 2. Enrich Vocabulary (Use Cache via example_gen)
@@ -1432,7 +1264,7 @@ def generate_script(topic: str, level: str = "TOEIC600", day_number: int = 1, mo
     client = OpenAI(api_key=api_key) if (OpenAI and api_key) else None
     
     if not client:
-        print("  ! Error: OpenAI client not available.")
+        print("  ! Error: OpenAI client not available. Returning None from generate_script.")
         return None
 
     # --- Mode Branching ---
@@ -1541,9 +1373,17 @@ def generate_script(topic: str, level: str = "TOEIC600", day_number: int = 1, mo
             response_format={"type": "json_object"}
         )
         content = response.choices[0].message.content
+    except Exception as e:
+        print(f"  ! Error generating script (API_ERROR): {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+    
+    try:
         generated_data = json.loads(content)
     except Exception as e:
-        print(f"  ! Error generating script: {e}")
+        print(f"  ! Error parsing script JSON (PARSE_ERROR): {e}")
+        print(f"  - Raw content prefix: {repr(content[:500])}")
         return None
 
     # 4. Construct Final Sections

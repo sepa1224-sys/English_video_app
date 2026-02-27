@@ -20,6 +20,33 @@ OUTPUT_BASE_DIR = Path("output")
 DEV_MODE = False  # Set to True to limit audio/video generation for testing
 # --------------
 
+def get_university_hashtags(university: str) -> str:
+    m = {
+        "kyoto": "#京都大学 #京大英語",
+        "todai": "#東大 #東大英語",
+        "osaka": "#阪大 #阪大英語",
+    }
+    return m.get(university, "#大学受験英語")
+
+def apply_university_hashtags(desc_path: str, university: str):
+    try:
+        with open(desc_path, "r", encoding="utf-8") as f:
+            lines = f.read().splitlines()
+        hashtags = get_university_hashtags(university)
+        replaced = False
+        for i in range(len(lines) - 1, -1, -1):
+            if lines[i].startswith("#"):
+                lines[i] = hashtags
+                replaced = True
+                break
+        if not replaced:
+            lines.append("")
+            lines.append(hashtags)
+        with open(desc_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+    except Exception:
+        pass
+
 def run_word_audio_generation(
     book: str,
     target_range: str,
@@ -91,7 +118,12 @@ def run_word_audio_generation(
                     "use_countdown": use_countdown,
                     "end_left": end_left_text,
                     "end_right": end_right_text,
-                    "end_duration": end_duration
+                    "end_duration": end_duration,
+                    # UIのギャップ設定をvideo側のインターバル名にも重複で渡す
+                    "gap_eng_to_jap": gap_eng_to_jap,
+                    "gap_between_jap": gap_between_jap,
+                    "interval_eng_jap": gap_eng_to_jap,
+                    "interval_between_jap": gap_between_jap
                 }
             )
         else:
@@ -135,28 +167,48 @@ def run_podcast_generation(
         if university:
             print(f"University: {university}")
         
-        # 2. 原稿生成
+        # 2. 原稿生成（最大3回リトライ）
         update_progress("Step 1: Generating Script (with Vocabulary)...", 10)
-        script_data = script_gen.generate_script(
-            topic, 
-            level, 
-            day_number=day_number, 
-            mode=mode, 
-            university=university, 
-            custom_title=custom_title
-        )
+        max_attempts = 3
+        script_data = None
+        last_error = None
+        for attempt in range(1, max_attempts + 1):
+            print(f"  - Attempt {attempt}/{max_attempts}: Calling script_gen.generate_script...")
+            try:
+                script_data = script_gen.generate_script(
+                    topic, 
+                    level, 
+                    day_number=day_number, 
+                    mode=mode, 
+                    university=university, 
+                    custom_title=custom_title
+                )
+            except Exception as e:
+                last_error = e
+                print(f"  ! Error on script_gen.generate_script (attempt {attempt}): {e}")
+                continue
+            
+            if not script_data:
+                print(f"  ! script_gen.generate_script returned None (attempt {attempt}).")
+                continue
+            
+            sections_count = len(script_data.get("sections", []))
+            print(f"  - Script generated with {sections_count} sections (attempt {attempt}).")
+            
+            if sections_count == 0:
+                print("  ! Error: Script has no sections.")
+                print(f"  - Script Data: {json.dumps(script_data, ensure_ascii=False, indent=2)[:500]}...")
+                script_data = None
+                continue
+            
+            break
         
         if not script_data:
-            print("  ! Error: script_gen.generate_script returned None.")
-            raise RuntimeError("Failed to generate script data (None returned).")
-        
-        sections_count = len(script_data.get("sections", []))
-        print(f"  - Script generated with {sections_count} sections.")
-        
-        if sections_count == 0:
-            print("  ! Error: Script has no sections.")
-            print(f"  - Script Data: {json.dumps(script_data, ensure_ascii=False, indent=2)[:500]}...") # Show partial data
-            raise RuntimeError("Failed to generate script data (No sections).")
+            msg = "[Step 1: Script Error] Failed to generate script data after 3 attempts."
+            if last_error:
+                msg = f"{msg} Last error: {last_error}"
+            print(f"  ! {msg}")
+            raise RuntimeError(msg)
         
         # 3. 音声生成 (セクション別)
         update_progress("Step 2: Generating Audio Segments...", 40)
@@ -304,6 +356,7 @@ Date: {datetime.datetime.now().strftime('%Y-%m-%d')}
             
             # Generate Clean Script
             generate_clean_script(script_data, str_final_script_path)
+            apply_university_hashtags(str_final_desc_path, university)
             
             # Save History
             history_manager.save_exam_history(

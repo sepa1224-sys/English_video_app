@@ -547,6 +547,13 @@ def generate_audio_sections(script_data: dict, output_dir: str = None) -> List[D
                         if silence:
                             section_clips.append(silence)
             
+            university_all = script_data.get("university")
+            if university_all == "todai":
+                extra_pause = make_silence(0.8)
+                if extra_pause:
+                    section_clips.append(extra_pause)
+                    current_section_time += 0.8
+            
             # セクション結合と保存
             if section_clips:
                 final_section_clip = None
