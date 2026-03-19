@@ -23,5 +23,9 @@ token.pickle
 the_juken.db
 output_audio_word/
 temp_*/
+test_audio_*/
+test_vocalab_audio/
+debug_audio_output/
+*.TEMP_MPY_wvf_snd.mp4
 *.mp3
 *.mp4
