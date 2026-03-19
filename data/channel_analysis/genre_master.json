@@ -1,0 +1,96 @@
+{
+  "version": "1.0",
+  "description": "気合イングリッシュ チャンネル ジャンルマスター（自動生成・要人間確認）",
+  "genres": {
+    "listening_todai": {
+      "genre_id": "listening_todai",
+      "name": "東大リスニング対策 — 東大入試のリスニング対策動画",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 3,
+      "total_views": 462,
+      "avg_views": 154
+    },
+    "vocab_target1200": {
+      "genre_id": "vocab_target1200",
+      "name": "英単語聞き流し（ターゲット1200）— ターゲット1200の英単語聞き流し",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 3,
+      "total_views": 10683,
+      "avg_views": 3561
+    },
+    "vocab_leap": {
+      "genre_id": "vocab_leap",
+      "name": "英単語聞き流し（LEAP）— 必携英単語LEAPの聞き流し",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 2,
+      "total_views": 849,
+      "avg_views": 424
+    },
+    "vocab_target1400": {
+      "genre_id": "vocab_target1400",
+      "name": "英単語聞き流し（ターゲット1400）— ターゲット1400の英単語聞き流し",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 4,
+      "total_views": 3432,
+      "avg_views": 858
+    },
+    "vocab_teppeki": {
+      "genre_id": "vocab_teppeki",
+      "name": "英単語聞き流し（鉄壁）— 鉄壁の英単語を英語音声で聞き流す動画",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 11,
+      "total_views": 59006,
+      "avg_views": 5364
+    },
+    "vocab_target1900": {
+      "genre_id": "vocab_target1900",
+      "name": "英単語聞き流し（ターゲット1900）— ターゲット1900の英単語聞き流し",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 3,
+      "total_views": 19303,
+      "avg_views": 6434
+    },
+    "vocab_other": {
+      "genre_id": "vocab_other",
+      "name": "英単語聞き流し（その他）— 上記以外の単語帳の聞き流し",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 1,
+      "total_views": 240,
+      "avg_views": 240
+    },
+    "listening_teppeki": {
+      "genre_id": "listening_teppeki",
+      "name": "英文リスニング（鉄壁ベース）— 鉄壁の単語を使った英文リスニング・問題付き動画",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 10,
+      "total_views": 1694,
+      "avg_views": 169
+    },
+    "listening_toeic": {
+      "genre_id": "listening_toeic",
+      "name": "TOEICリスニング対策 — TOEIC向けリスニング練習",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 3,
+      "total_views": 524,
+      "avg_views": 175
+    },
+    "channel_intro": {
+      "genre_id": "channel_intro",
+      "name": "チャンネル紹介・コンセプト動画",
+      "playlist_id": "",
+      "auto_tags": [],
+      "video_count": 1,
+      "total_views": 670,
+      "avg_views": 670
+    }
+  }
+}
