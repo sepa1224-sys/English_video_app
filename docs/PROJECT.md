@@ -104,6 +104,14 @@ PROJECT.md 作成（Claude）
 役割分担確定：Claude（設計）、Manus（実行）、GitHub（共通記憶）
 次のアクション：ManusにYouTube Data API取得スクリプトを実行させる
 
+2026-03-19（続き）
+
+- YouTube Data API v3 APIキー作成（Manus）: englishpodcast プロジェクトで発行
+- fetch_channel_data.py 作成・実行（Manus）
+- 気合イングリッシュ チャンネル全41動画のデータ取得完了
+- 出力: data/channel_analysis/kiiai_english_channel.json / .csv
+- 次のアクション：ClaudeにCSVを渡して分析（Priority 2）
+
 
 7. Manusへの初回指示
 このプロジェクトに参加する際は以下を実行してください：
