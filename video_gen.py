@@ -573,9 +573,9 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                         except Exception:
                             lh = 80
                         try:
-                            draw.text((x, y), line, font=jp_font, fill="#CCCCCC")
+                            draw.text((x, y), line, font=jp_font, fill="#FFFFFF")
                         except Exception:
-                            draw.text((x, y), line, fill="#CCCCCC")
+                            draw.text((x, y), line, fill="#FFFFFF")
                         y += int(lh * 1.5)
                 
                 return np.array(img)
