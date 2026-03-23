@@ -286,7 +286,7 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
             logo_clip = ImageClip(np.array(resized_logo))
             logo_clip = with_duration_compat(logo_clip, duration)
             x = 1280 - new_w - 20
-            y = 20
+            y = 720 - new_h - 20
             logo_clip = with_position_compat(logo_clip, (x, y))
             base_clip = CompositeVideoClip([base_clip, logo_clip])
         return base_clip
@@ -511,9 +511,9 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                         resized_logo = logo_img
                         new_w, new_h = lw, lh
                     try:
-                        img.paste(resized_logo, (1280 - new_w - 20, 20), mask=resized_logo)
+                        img.paste(resized_logo, (1280 - new_w - 20, 720 - new_h - 20), mask=resized_logo)
                     except Exception:
-                        img.paste(resized_logo, (1280 - new_w - 20, 20))
+                        img.paste(resized_logo, (1280 - new_w - 20, 720 - new_h - 20))
                 
                 if id_text:
                     try:
