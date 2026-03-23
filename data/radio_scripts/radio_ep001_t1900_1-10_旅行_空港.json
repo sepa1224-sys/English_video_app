@@ -1,0 +1,234 @@
+{
+  "mode": "radio_conversation",
+  "title": "At the Airport: Planning a Vacation",
+  "title_jp": "空港で：休暇の計画",
+  "topic": "旅行・空港",
+  "vocab_source": "ターゲット1900",
+  "vocab_range": "1-10",
+  "target_words": [
+    {
+      "id": 1,
+      "word": "create",
+      "meaning": "を創り出す、を引き起こす"
+    },
+    {
+      "id": 2,
+      "word": "increase",
+      "meaning": "増加する、を増やす"
+    },
+    {
+      "id": 3,
+      "word": "improve",
+      "meaning": "を向上させる、よくなる"
+    },
+    {
+      "id": 4,
+      "word": "mean",
+      "meaning": "を意味する、するつもりである"
+    },
+    {
+      "id": 5,
+      "word": "own",
+      "meaning": "を所有している、事実や罪などを認める"
+    },
+    {
+      "id": 6,
+      "word": "include",
+      "meaning": "を含む"
+    },
+    {
+      "id": 7,
+      "word": "consider",
+      "meaning": "を見なす、について考える"
+    },
+    {
+      "id": 8,
+      "word": "allow",
+      "meaning": "を許す、を与える、考慮に入れる"
+    },
+    {
+      "id": 9,
+      "word": "suggest",
+      "meaning": "を提案する、を暗示する"
+    },
+    {
+      "id": 10,
+      "word": "produce",
+      "meaning": "を生産する、を取り出す"
+    }
+  ],
+  "sections": [
+    {
+      "type": "intro",
+      "text": "Alex and Sarah are at the airport, discussing their vacation plans. They want to create a perfect trip and consider all the details carefully.",
+      "translation": "アレックスとサラは空港にいて、休暇の計画について話しています。彼らは完璧な旅を創り出したくて、すべての細かいことをよく考えています。",
+      "speaker": "Narrator"
+    },
+    {
+      "type": "dialogue",
+      "lines": [
+        {
+          "speaker": "Alex",
+          "text": "I think we should create an itinerary that includes all the places we want to visit.",
+          "translation": "僕たちは行きたい場所をすべて含む旅程を作ったほうがいいと思うよ。"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "That sounds great. It will increase our chances of enjoying the trip without missing anything.",
+          "translation": "いいね。それで何も見逃さずに旅行を楽しめる可能性が高まるわね。"
+        },
+        {
+          "speaker": "Alex",
+          "text": "Exactly. Also, I want to improve our packing strategy to avoid last-minute stress.",
+          "translation": "その通り。それに、直前のストレスを避けるために荷造りの方法も向上させたいんだ。"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "Good idea. By the way, do you mean to fly directly to our destination or make a stopover?",
+          "translation": "いい考えね。ところで、目的地まで直行便で行くつもり？それとも途中で乗り換える？"
+        },
+        {
+          "speaker": "Alex",
+          "text": "I mean a direct flight to save time. It’s more convenient.",
+          "translation": "時間を節約するために直行便のつもりだよ。ずっと便利だしね。"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "I agree. Also, I own a travel app that can help us find good deals on hotels.",
+          "translation": "私もそう思う。それと、ホテルのお得な情報を見つけられる旅行アプリを持っているの。"
+        },
+        {
+          "speaker": "Alex",
+          "text": "Perfect. Does it include customer reviews? That would be helpful.",
+          "translation": "それは最高だ。お客さんのレビューも含まれている？それがあると助かるな。"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "Yes, it does. We should consider those reviews before booking anything.",
+          "translation": "うん、含まれているわ。予約する前にそういうレビューを考慮したほうがいいね。"
+        },
+        {
+          "speaker": "Alex",
+          "text": "Absolutely. Also, does the app allow us to save our favorite places for easy access?",
+          "translation": "まったくその通りだ。それと、そのアプリはお気に入りの場所を保存しておけるの？簡単にアクセスできるように。"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "Yes, it does allow that. Plus, it can suggest nearby restaurants and attractions.",
+          "translation": "そうよ。しかも近くのレストランや観光地も提案してくれるの。"
+        },
+        {
+          "speaker": "Alex",
+          "text": "That will definitely produce a better travel experience for us.",
+          "translation": "それは間違いなく僕たちの旅行体験をより良くしてくれるね。"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "I’m happy we’re planning this carefully. It should create wonderful memories.",
+          "translation": "こうやってしっかり計画できて嬉しいわ。素敵な思い出を作れるはずよ。"
+        },
+        {
+          "speaker": "Alex",
+          "text": "Me too. Let’s make sure to increase our photo collection during the trip!",
+          "translation": "僕もそう思う。旅行中は写真をたくさん撮ってコレクションを増やそう！"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "Definitely. And we should improve our language skills before we go.",
+          "translation": "もちろん。そして出発前に語学力も向上させておきましょう。"
+        },
+        {
+          "speaker": "Alex",
+          "text": "Good plan. Considering all these points, I feel we’re well prepared.",
+          "translation": "いい計画だね。こうしたことを全部考えると、僕たちは十分準備できている気がするよ。"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "Yes, and that will allow us to relax and enjoy every moment.",
+          "translation": "ええ、そうすればリラックスして一瞬一瞬を楽しめるわね。"
+        },
+        {
+          "speaker": "Alex",
+          "text": "I can’t wait to start this adventure with you.",
+          "translation": "君とこの冒険を始めるのが待ちきれないよ。"
+        },
+        {
+          "speaker": "Sarah",
+          "text": "Me neither. Let’s make it the best trip ever!",
+          "translation": "私もよ。最高の旅にしましょう！"
+        }
+      ]
+    },
+    {
+      "type": "explanation",
+      "words": [
+        {
+          "word": "create",
+          "meaning": "を創り出す、を引き起こす",
+          "example": "They want to create a perfect vacation plan.",
+          "example_jp": "彼らは完璧な休暇の計画を創り出したいと思っている。"
+        },
+        {
+          "word": "increase",
+          "meaning": "増加する、を増やす",
+          "example": "Making a detailed plan can increase your chances of success.",
+          "example_jp": "詳細な計画を立てることで成功の可能性を高めることができる。"
+        },
+        {
+          "word": "improve",
+          "meaning": "を向上させる、よくなる",
+          "example": "She wants to improve her packing skills before the trip.",
+          "example_jp": "彼女は旅行前に荷造りのスキルを向上させたい。"
+        },
+        {
+          "word": "mean",
+          "meaning": "を意味する、するつもりである",
+          "example": "I mean to take a direct flight to save time.",
+          "example_jp": "時間を節約するために直行便を使うつもりだ。"
+        },
+        {
+          "word": "own",
+          "meaning": "を所有している、事実や罪などを認める",
+          "example": "She owns a travel app that helps with bookings.",
+          "example_jp": "彼女は予約に役立つ旅行アプリを所有している。"
+        },
+        {
+          "word": "include",
+          "meaning": "を含む",
+          "example": "The app includes customer reviews for hotels.",
+          "example_jp": "そのアプリにはホテルのカスタマーレビューが含まれている。"
+        },
+        {
+          "word": "consider",
+          "meaning": "を見なす、について考える",
+          "example": "We should consider the reviews before booking.",
+          "example_jp": "予約する前にレビューを考慮したほうがいい。"
+        },
+        {
+          "word": "allow",
+          "meaning": "を許す、を与える、考慮に入れる",
+          "example": "The app allows users to save favorite places.",
+          "example_jp": "そのアプリはユーザーがお気に入りの場所を保存できるようにしている。"
+        },
+        {
+          "word": "suggest",
+          "meaning": "を提案する、を暗示する",
+          "example": "The app suggests nearby restaurants and attractions.",
+          "example_jp": "そのアプリは近くのレストランや観光スポットを提案してくれる。"
+        },
+        {
+          "word": "produce",
+          "meaning": "を生産する、を取り出す",
+          "example": "Good planning can produce a better travel experience.",
+          "example_jp": "良い計画はより良い旅行体験を生み出すことができる。"
+        }
+      ]
+    }
+  ],
+  "hashtags": [
+    "#英会話",
+    "#英語学習",
+    "#ターゲット1900"
+  ],
+  "generated_at": "2026-03-23T02:04:05.638884"
+}
