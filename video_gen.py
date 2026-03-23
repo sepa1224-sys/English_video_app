@@ -766,13 +766,38 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         else:
             log_debug("    > Assets background not found. Using generated black background.")
             bg_img_base = Image.new('RGB', (1280, 720), color=(0, 0, 0))
-        
+
+        exam_logo_img = None
+        exam_logo_image_path = "assets/logo_kiai.png"
+        if os.path.exists(exam_logo_image_path):
+            try:
+                exam_logo_img = Image.open(exam_logo_image_path).convert("RGBA")
+            except Exception as e:
+                log_debug(f"Exam logo load error: {e}")
+
         def create_bg_clip(duration, overlay_func=None):
             img = bg_img_base.copy()
             if overlay_func:
                 draw = ImageDraw.Draw(img)
                 overlay_func(draw, img)
-            
+            if exam_logo_img is not None:
+                try:
+                    lw, lh = exam_logo_img.size
+                except Exception:
+                    lw, lh = (200, 80)
+                target_width = 200
+                scale = min(1.0, float(target_width) / float(lw)) if lw > 0 else 1.0
+                new_w = int(lw * scale)
+                new_h = int(lh * scale)
+                try:
+                    resized_logo = exam_logo_img.resize((new_w, new_h), Image.LANCZOS)
+                except Exception:
+                    resized_logo = exam_logo_img
+                    new_w, new_h = lw, lh
+                try:
+                    img.paste(resized_logo, (1280 - new_w - 20, 720 - new_h - 20), mask=resized_logo)
+                except Exception:
+                    img.paste(resized_logo, (1280 - new_w - 20, 720 - new_h - 20))
             clip = ImageClip(np.array(img))
             clip = with_duration_compat(clip, duration)
             return clip
