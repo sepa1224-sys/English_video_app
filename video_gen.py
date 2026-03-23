@@ -1336,18 +1336,16 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
             
         part3_video = concatenate_videoclips(part3_clips)
         
-        log_debug("    > Assembling Final Video (Listening -> Questions -> Review -> Questions)...")
+        log_debug("    > Assembling Final Video (Intro -> Listening -> Questions -> Review)...")
         final_clips_list = []
         if intro_clip:
             final_clips_list.append(intro_clip)
-        
+
         final_clips_list.append(part1_video)
-        
+
         final_clips_list.append(part2_video)
-        
+
         final_clips_list.append(part3_video)
-        
-        final_clips_list.append(part2_video)
         
         log_debug(f"DEBUG: final_clips_list length: {len(final_clips_list)}")
         final_video = concatenate_videoclips(final_clips_list)
@@ -1376,10 +1374,7 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         
         timestamps_log.append({"type": "Review (Script)", "start": current_time})
         current_time += part3_video.duration
-        
-        timestamps_log.append({"type": "Questions (Review)", "start": current_time})
-        current_time += part2_video.duration
-        
+
         return output_file, timestamps_log
 
     except Exception as e:
