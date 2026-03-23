@@ -234,7 +234,26 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
         print(f"!!! CRITICAL ERROR: No BGM audio file found in assets !!!")
         return None
     outro_audio_path = extras.get("outro_audio") or detect_bgm_path()
-    
+
+    def detect_word_se_path():
+        assets_dir = "assets"
+        candidates = []
+        if os.path.isdir(assets_dir):
+            for name in os.listdir(assets_dir):
+                lower = name.lower()
+                if not (lower.endswith(".mp3") or lower.endswith(".wav")):
+                    continue
+                if any(kw in name for kw in ["シュ", "shu", "wind", "woosh", "whoosh"]):
+                    candidates.append(os.path.join(assets_dir, name))
+        if candidates:
+            return candidates[0]
+        fallback = os.path.join(assets_dir, "Accent08-1.mp3")
+        if os.path.exists(fallback):
+            return fallback
+        return None
+
+    word_se_path = detect_word_se_path()
+
     clips = []
     
     font_path_jp = get_font_path() or "C:\\Windows\\Fonts\\msgothic.ttc"
@@ -478,6 +497,17 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                 else:
                     audio_elements.append(jp_audio.set_start(jp_trigger))
             
+            if word_se_path:
+                try:
+                    se_clip = AudioFileClip(word_se_path)
+                    se_clip = apply_se_settings(se_clip, volume=0.4, fade_duration=0.1)
+                    if hasattr(se_clip, "with_start"):
+                        audio_elements.insert(0, se_clip.with_start(0))
+                    else:
+                        audio_elements.insert(0, se_clip.set_start(0))
+                except Exception as e:
+                    log_debug(f"Word SE load error: {e}")
+
             try:
                 mixed_audio = CompositeAudioClip(audio_elements)
             except Exception as e:
