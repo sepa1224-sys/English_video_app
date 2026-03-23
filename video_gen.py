@@ -521,6 +521,7 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                     except Exception:
                         draw.text((50, 50), id_text, fill="gray")
                 
+                tw, th, ty = 0, 0, 300
                 text = w_text or ""
                 if text:
                     try:
@@ -532,7 +533,7 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                             tw, th = font_word.getsize(text)
                     except Exception:
                         tw, th = (0, 0)
-                    
+
                     if t < jp_trigger:
                         ty = 300 - th // 2
                     else:
@@ -561,17 +562,18 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                     except Exception:
                         jp_font = font_mean
                     
-                    y = 450
-                    x = 200
+                    y = ty + th + 30
                     for line in lines:
                         try:
                             if hasattr(draw, "textbbox"):
                                 x1, y1, x2, y2 = draw.textbbox((0, 0), line, font=jp_font)
+                                lw_line = x2 - x1
                                 lh = y2 - y1
                             else:
-                                lh = jp_font.getsize(line)[1]
+                                lw_line, lh = jp_font.getsize(line)
                         except Exception:
-                            lh = 80
+                            lw_line, lh = 0, 80
+                        x = (1280 - lw_line) // 2
                         try:
                             draw.text((x, y), line, font=jp_font, fill="#FFFFFF")
                         except Exception:
