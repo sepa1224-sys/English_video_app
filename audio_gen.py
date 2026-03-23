@@ -1,6 +1,7 @@
 import os
 import re
 import io
+import sys
 import tempfile
 import numpy as np
 import random
@@ -118,7 +119,7 @@ def generate_audio_segment_edge(text: str, voice: str, output_path: str, speed: 
             rate_str = f"{sign}{abs(diff_pct)}%"
 
         cmd = [
-            "py", "-m", "edge_tts", # Use python module call instead of direct executable
+            sys.executable, "-m", "edge_tts",
             "--text", text,
             "--write-media", output_path,
             "--voice", voice,
