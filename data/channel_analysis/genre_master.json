@@ -5,7 +5,7 @@
     "listening_todai": {
       "genre_id": "listening_todai",
       "name": "東大リスニング対策 — 東大入試のリスニング対策動画",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQagzPXLh4hSc1ykbrOblqZz",
       "auto_tags": [],
       "video_count": 3,
       "total_views": 462,
@@ -14,7 +14,7 @@
     "vocab_target1200": {
       "genre_id": "vocab_target1200",
       "name": "英単語聞き流し（ターゲット1200）— ターゲット1200の英単語聞き流し",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQZqKlcyaKwPPLmmmx6gr75k",
       "auto_tags": [],
       "video_count": 3,
       "total_views": 10683,
@@ -23,7 +23,7 @@
     "vocab_leap": {
       "genre_id": "vocab_leap",
       "name": "英単語聞き流し（LEAP）— 必携英単語LEAPの聞き流し",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQZvjzUNe-130hRVha-_n2aI",
       "auto_tags": [],
       "video_count": 2,
       "total_views": 849,
@@ -32,7 +32,7 @@
     "vocab_target1400": {
       "genre_id": "vocab_target1400",
       "name": "英単語聞き流し（ターゲット1400）— ターゲット1400の英単語聞き流し",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQa7a9zTQhk3o8-y-ipPWu0O",
       "auto_tags": [],
       "video_count": 4,
       "total_views": 3432,
@@ -41,7 +41,7 @@
     "vocab_teppeki": {
       "genre_id": "vocab_teppeki",
       "name": "英単語聞き流し（鉄壁）— 鉄壁の英単語を英語音声で聞き流す動画",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQa6WG2m9dA9A96mSm_ppNdt",
       "auto_tags": [],
       "video_count": 11,
       "total_views": 59006,
@@ -50,7 +50,7 @@
     "vocab_target1900": {
       "genre_id": "vocab_target1900",
       "name": "英単語聞き流し（ターゲット1900）— ターゲット1900の英単語聞き流し",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQayPEDIvYqpfToR0drn8A22",
       "auto_tags": [],
       "video_count": 3,
       "total_views": 19303,
@@ -59,7 +59,7 @@
     "vocab_other": {
       "genre_id": "vocab_other",
       "name": "英単語聞き流し（その他）— 上記以外の単語帳の聞き流し",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQaZZPVVx7W11Qlfgv-gnrq6",
       "auto_tags": [],
       "video_count": 1,
       "total_views": 240,
@@ -68,7 +68,7 @@
     "listening_teppeki": {
       "genre_id": "listening_teppeki",
       "name": "英文リスニング（鉄壁ベース）— 鉄壁の単語を使った英文リスニング・問題付き動画",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQbYiSxe7AcGpfKO_ov_Kkn_",
       "auto_tags": [],
       "video_count": 10,
       "total_views": 1694,
@@ -77,7 +77,7 @@
     "listening_toeic": {
       "genre_id": "listening_toeic",
       "name": "TOEICリスニング対策 — TOEIC向けリスニング練習",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQbZMyBnfMbjl1ZYaUyJuTeg",
       "auto_tags": [],
       "video_count": 3,
       "total_views": 524,
@@ -86,7 +86,7 @@
     "channel_intro": {
       "genre_id": "channel_intro",
       "name": "チャンネル紹介・コンセプト動画",
-      "playlist_id": "",
+      "playlist_id": "PL0wZoBmJsWQZK3HbNVQLyME-W1W4BzI0z",
       "auto_tags": [],
       "video_count": 1,
       "total_views": 670,
