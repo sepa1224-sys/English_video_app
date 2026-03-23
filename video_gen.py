@@ -517,9 +517,9 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                 
                 if id_text:
                     try:
-                        draw.text((50, 50), id_text, font=font_id, fill="gray")
+                        draw.text((50, 50), id_text, font=font_id, fill="white")
                     except Exception:
-                        draw.text((50, 50), id_text, fill="gray")
+                        draw.text((50, 50), id_text, fill="white")
                 
                 tw, th, ty = 0, 0, 300
                 text = w_text or ""
