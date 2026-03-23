@@ -540,9 +540,15 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                         ty = 220 - th // 2
                     tx = (1280 - tw) // 2
                     try:
-                        draw.text((tx, ty), text, font=font_word, fill="white")
+                        stroke_w = 3
+                        for ox in range(-stroke_w, stroke_w + 1):
+                            for oy in range(-stroke_w, stroke_w + 1):
+                                if ox == 0 and oy == 0:
+                                    continue
+                                draw.text((tx + ox, ty + oy), text, font=font_word, fill="white")
+                        draw.text((tx, ty), text, font=font_word, fill="#2060C0")
                     except Exception:
-                        draw.text((tx, ty), text, fill="white")
+                        draw.text((tx, ty), text, fill="#2060C0")
                 
                 if t >= jp_trigger and m_text:
                     segments_local = [s.strip() for s in re.split(r'[、/;；／\n]', m_text) if s.strip()]
