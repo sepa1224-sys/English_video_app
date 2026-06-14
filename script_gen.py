@@ -1158,13 +1158,13 @@ def generate_word_audio_script(book: str, target_range: str, use_shuffle: bool =
     print(f"  - Generating Word Audio Mode script (Book: {book}, Range: {target_range}, Shuffle: {use_shuffle})...")
     
     csv_map = {
-        "t1200": os.path.join("data", "ターゲット1200.csv"),
-        "t1400": os.path.join("data", "ターゲット1400.csv"),
+        "t1200": os.path.join("data", "vocab", "ターゲット1200.csv"),
+        "t1400": os.path.join("data", "vocab", "ターゲット1400.csv"),
         "t1900": os.path.join("data", "vocab", "ターゲット1900.csv"),
-        "teppeki": os.path.join("data", "英単語帳鉄壁.csv"),
-        "systan": os.path.join("data", "システム英単語 - シート1.csv"),
-        "derujun": os.path.join("data", "でる順準1級 - シート1.csv"),
-        "leap": "LEAP.csv"
+        "teppeki": os.path.join("data", "vocab", "英単語帳鉄壁.csv"),
+        "systan": os.path.join("data", "vocab", "システム英単語 - シート1.csv"),
+        "derujun": os.path.join("data", "vocab", "でる順準1級 - シート1.csv"),
+        "leap": os.path.join("data", "vocab", "LEAP.csv"),
     }
     
     csv_file = csv_map.get(book)

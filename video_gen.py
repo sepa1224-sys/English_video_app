@@ -450,66 +450,51 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
             print(f"[DEBUG] Meaning segments after split (word={word_text}): {meaning_lines}")
             
             audio_clip = AudioFileClip(audio_path)
-            
+            total_audio_dur = audio_clip.duration
+
+            # --- Parse per-segment timing from audio metadata ---
+            # audio_gen emits items with: label ("en"/"jp"/"gap"...), part_index
+            # (for jp meanings), absolute "start"/"end", and "text".
             meta_segments = item.get("metadata") or []
-            eng_start = 0.0
-            eng_end = audio_clip.duration
-            jp_start = None
-            jp_end = None
-            
-            if isinstance(meta_segments, list) and len(meta_segments) > 0:
-                eng_starts = []
-                eng_ends = []
-                jp_starts = []
-                jp_ends = []
+            jp_reveals = []  # (start_time, part_index, text)
+            if isinstance(meta_segments, list):
                 for s in meta_segments:
-                    mode = str(s.get("display_mode"))
-                    st = float(s.get("start", 0.0))
-                    en = float(s.get("end", 0.0))
-                    if en <= st:
-                        continue
-                    if mode in ["step1", "step3", "step4"]:
-                        eng_starts.append(st)
-                        eng_ends.append(en)
-                    elif mode == "step2":
-                        jp_starts.append(st)
-                        jp_ends.append(en)
-                if eng_starts and eng_ends:
-                    eng_start = min(eng_starts)
-                    eng_end = max(eng_ends)
-                if jp_starts and jp_ends:
-                    jp_start = min(jp_starts)
-                    jp_end = max(jp_ends)
-            
-            try:
-                eng_audio = audio_clip.subclip(eng_start, eng_end)
-            except Exception:
-                eng_audio = audio_clip
-                eng_start = 0.0
-                eng_end = audio_clip.duration
-            
-            jp_audio = None
-            if jp_start is not None and jp_end is not None and jp_end > jp_start:
-                try:
-                    jp_audio = audio_clip.subclip(jp_start, jp_end)
-                except Exception:
-                    jp_audio = None
-            
-            eng_dur = eng_audio.duration
-            gap_eng_jap = float(extras.get("gap_eng_to_jap", extras.get("interval_eng_jap", 0.5)))
-            jp_trigger = eng_dur + gap_eng_jap if jp_audio is not None else eng_dur
-            
+                    label = str(s.get("label", ""))
+                    seg_type = str(s.get("type", ""))
+                    try:
+                        seg_start = float(s.get("start", 0.0))
+                    except Exception:
+                        seg_start = 0.0
+                    if label == "jp" and seg_type in ("content", "silent_text"):
+                        try:
+                            pidx = int(s.get("part_index", len(jp_reveals)))
+                        except Exception:
+                            pidx = len(jp_reveals)
+                        jp_reveals.append((seg_start, pidx, str(s.get("text", ""))))
+
+            # Sort by spoken order, attach circled numbers (①②③...)
+            jp_reveals.sort(key=lambda x: (x[1], x[0]))
+            reveal_lines = []  # (reveal_time, display_text)
+            for order, (seg_start, pidx, txt) in enumerate(jp_reveals):
+                circled = chr(0x2460 + order) if order < 20 else f"{order + 1}."
+                clean = re.sub(r'[①-⑳]', '', txt).strip()
+                reveal_lines.append((seg_start, f"{circled} {clean}"))
+
+            # Fallback when metadata lacks per-meaning timing: reveal all at once
+            # after the English word + the EN->JP gap.
+            if not reveal_lines and meaning_lines:
+                gap_eng_jap = float(extras.get("gap_eng_to_jap", extras.get("interval_eng_jap", 1.0)))
+                fallback_trigger = min(total_audio_dur, max(0.0, gap_eng_jap))
+                for line in meaning_lines:
+                    reveal_lines.append((fallback_trigger, line))
+
+            # --- Audio: play the pre-concatenated clip as-is (EN + gaps + JP) ---
             audio_elements = []
-            if hasattr(eng_audio, "with_start"):
-                audio_elements.append(eng_audio.with_start(0))
+            if hasattr(audio_clip, "with_start"):
+                audio_elements.append(audio_clip.with_start(0))
             else:
-                audio_elements.append(eng_audio.set_start(0))
-            if jp_audio is not None:
-                if hasattr(jp_audio, "with_start"):
-                    audio_elements.append(jp_audio.with_start(jp_trigger))
-                else:
-                    audio_elements.append(jp_audio.set_start(jp_trigger))
-            
+                audio_elements.append(audio_clip.set_start(0))
+
             if word_se_path:
                 try:
                     se_clip = AudioFileClip(word_se_path)
@@ -525,17 +510,23 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                 mixed_audio = CompositeAudioClip(audio_elements)
             except Exception as e:
                 print(f"    ! Error mixing audio for word {i+1} ({word_text}): {e}")
-                mixed_audio = eng_audio
+                mixed_audio = audio_clip
+
+            total_duration = total_audio_dur + 0.5
+
+            # --- Layout (English word raised; meanings lowered for clear spacing) ---
+            WORD_CENTER_Y = 190
+            MEANING_START_Y = 370
+            MEANING_LINE_STEP = 115
             
-            if jp_audio is not None:
-                total_duration = jp_trigger + jp_audio.duration + 0.5
-            else:
-                total_duration = eng_dur + 0.5
-            
-            def make_frame(t, id_text=id_text, w_text=word_text, m_text=meaning_text):
-                img = Image.new("RGB", (1280, 720), (0, 0, 0))
+            def make_frame(t, id_text=id_text, w_text=word_text, reveal_lines=reveal_lines):
+                # Use the same textured background as the countdown / end screen
+                if bg_img is not None:
+                    img = bg_img.copy()
+                else:
+                    img = Image.new("RGB", (1280, 720), (0, 0, 0))
                 draw = ImageDraw.Draw(img)
-                
+
                 if logo_img is not None:
                     try:
                         lw, lh = logo_img.size
@@ -557,14 +548,14 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                         img.paste(resized_logo, (1280 - new_w - 20, 20), mask=resized_logo)
                     except Exception:
                         img.paste(resized_logo, (1280 - new_w - 20, 20))
-                
+
                 if id_text:
                     try:
                         draw.text((50, 50), id_text, font=font_id, fill="white")
                     except Exception:
                         draw.text((50, 50), id_text, fill="white")
-                
-                tw, th, ty = 0, 0, 300
+
+                # English word: always visible at a fixed (raised) position
                 text = w_text or ""
                 if text:
                     try:
@@ -577,10 +568,7 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                     except Exception:
                         tw, th = (0, 0)
 
-                    if t < jp_trigger:
-                        ty = 300 - th // 2
-                    else:
-                        ty = 220 - th // 2
+                    ty = WORD_CENTER_Y - th // 2
                     tx = (1280 - tw) // 2
                     try:
                         stroke_w = 3
@@ -592,43 +580,31 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                         draw.text((tx, ty), text, font=font_word, fill="#2060C0")
                     except Exception:
                         draw.text((tx, ty), text, fill="#2060C0")
-                
-                if t >= jp_trigger and m_text:
-                    segments_local = [s.strip() for s in re.split(r'[、/;；／\n]', m_text) if s.strip()]
-                    lines = []
-                    if segments_local:
-                        for idx, seg in enumerate(segments_local, start=1):
-                            try:
-                                circled = chr(0x2460 + (idx - 1))
-                            except Exception:
-                                circled = f"{idx}."
-                            lines.append(f"{circled} {seg}")
-                    else:
-                        lines = [m_text]
-                    
-                    try:
-                        jp_font = ImageFont.truetype(regular_path, 80)
-                    except Exception:
-                        jp_font = font_mean
-                    
-                    y = ty + th + 30
-                    for line in lines:
+
+                # Japanese meanings: progressive reveal synced to each meaning's audio.
+                # Each meaning keeps a fixed slot so earlier lines never shift.
+                try:
+                    jp_font = ImageFont.truetype(regular_path, 80)
+                except Exception:
+                    jp_font = font_mean
+                y = MEANING_START_Y
+                for reveal_t, line in reveal_lines:
+                    if t >= reveal_t:
                         try:
                             if hasattr(draw, "textbbox"):
                                 x1, y1, x2, y2 = draw.textbbox((0, 0), line, font=jp_font)
                                 lw_line = x2 - x1
-                                lh = y2 - y1
                             else:
-                                lw_line, lh = jp_font.getsize(line)
+                                lw_line, _ = jp_font.getsize(line)
                         except Exception:
-                            lw_line, lh = 0, 80
+                            lw_line = 0
                         x = (1280 - lw_line) // 2
                         try:
                             draw.text((x, y), line, font=jp_font, fill="#FFFFFF")
                         except Exception:
                             draw.text((x, y), line, fill="#FFFFFF")
-                        y += int(lh * 1.5)
-                
+                    y += MEANING_LINE_STEP
+
                 return np.array(img)
             
             dynamic_clip = VideoClip(make_frame).with_duration(total_duration)
