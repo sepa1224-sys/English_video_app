@@ -96,6 +96,11 @@ def prepare(video_path: str, part: int):
     desc = open(dp, encoding="utf-8").read()
     desc = re.sub(r"第\d+回", f"第{part}回", desc, count=1)
     title = desc.splitlines()[0].strip() if desc.strip() else f"【東大リスニング】第{part}回"
+    # YouTube title limit is 100 chars: drop the suffix, then word-trim the topic.
+    if len(title) > 100:
+        title = title.split(" | ")[0].strip()
+        if len(title) > 100:
+            title = title[:97].rsplit(" ", 1)[0].rstrip() + "…"
 
     # YouTube descriptions are capped at 5000 chars. Trim the (long) Script tail
     # but preserve the trailing hashtag line for discovery.
