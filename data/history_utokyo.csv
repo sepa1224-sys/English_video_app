@@ -4,3 +4,349 @@ Date,No,Title,Topic,YouTube_Status,VideoID
 2026-02-17,3,【東大リスニング】第3回：The Role of Economic Globalization in the Diffusion and Absorption of Cultural Practices,"""The Role of Economic Globalization in the Diffusion and Absorption of Cultural Practices""",Generated,
 2026-02-23,4,【東大リスニング】第4回：Psychological Impacts of Body Language: How Posture and Gestures Influence Human Behavior,"""Psychological Impacts of Body Language: How Posture and Gestures Influence Human Behavior""",Generated,
 2026-02-24,5,【東大リスニング】第5回：The Dynamics of Free Will and Coercion: Psychological Mechanisms Behind Voluntary and Compelled Actions,"""The Dynamics of Free Will and Coercion: Psychological Mechanisms Behind Voluntary and Compelled Actions""",Generated,
+2026-05-15,6,【東大リスニング】第6回：The Vital Role of Biodiversity in Ecosystem Resilience: Consequences of Species Loss for Planetary Health,"I need to propose a topic first, then generate content. Let me think of a suitable topic.
+
+Topic: ""The Vital Role of Biodiversity in Ecosystem Resilience: Consequences of Species Loss for Planetary Health""
+
+Now let me generate the JSON content for a University of Tokyo listening exam.
+
+```json
+{
+  ""topic"": ""The Vital Role of Biodiversity in Ecosystem Resilience: Consequences of Species Loss for Planetary Health"",
+  ""category"": ""Science & Technology"",
+  ""vocabulary"": [
+    {""word"": ""vital"", ""reading"": ""にとって非常に重要な, 生命の""},
+    {""word"": ""vivid"", ""reading"": ""生き生きとした, 鮮やかな""},
+    {""word"": ""revive"", ""reading"": ""を生き返らせる, 生き返る""},
+    {""word"": ""essential"", ""reading"": ""にとって重要な, 必要不可欠な, 本質的な""},
+    {""word"": ""indispensable"", ""reading"": ""にとって重要な, 必要不可欠な""},
+    {""word"": ""crucial"", ""reading"": ""決定的な, 極めて重要な""},
+    {""word"": ""significance"", ""reading"": ""重要性""},
+    {""word"": ""consequence"", ""reading"": ""結果, 重要さ""},
+    {""word"": ""matter"", ""reading"": ""事柄, 問題, 重要である""},
+    {""word"": ""count"", ""reading"": ""を数える, 重要である""}
+  ],
+  ""listening_passage"": {
+    ""title"": ""The Vital Role of Biodiversity in Ecosystem Resilience: Consequences of Species Loss for Planetary Health"",
+    ""passage"": ""Good morning, everyone. Today's lecture addresses one of the most pressing scientific and environmental issues of our time: the significance of biodiversity and the profound consequences of its decline for the health of our planet.\n\nBiodiversity, in its most essential form, refers to the variety of life on Earth — from the smallest microorganisms in the soil to the largest mammals in the ocean. Scientists have long recognized that this variety is not merely decorative. It is vital to the functioning of ecosystems that sustain all life, including human civilization.\n\nTo understand why biodiversity matters so deeply, consider the concept of ecosystem services. These are the processes by which natural environments produce resources and conditions that are indispensable to human survival. Clean air, fresh water, fertile soil, and climate regulation are all consequences of healthy, biodiverse ecosystems. When species are lost, these services begin to deteriorate — sometimes gradually, sometimes with alarming speed.\n\nOne of the most vivid illustrations of this principle is the phenomenon known as trophic cascade. In the 1990s, wolves were reintroduced into Yellowstone National Park in the United States after being absent for nearly seventy years. What followed was a crucial demonstration of how a single species can reshape an entire landscape. The wolves reduced the population of overgrazing deer, which allowed riverbank vegetation to revive. The return of trees and shrubs stabilized the riverbanks, changed the course of rivers, and ultimately revived entire habitats that had been degraded for decades. This example makes it count — every species, no matter how seemingly minor, plays a role in the larger network of life.\n\nHowever, today we face an extinction crisis of unprecedented scale. Scientists estimate that species are disappearing at rates one hundred to one thousand times higher than natural background rates. The causes are well-documented: habitat destruction, pollution, climate change, invasive species, and overexploitation. Each of these factors compounds the others, creating feedback loops that are increasingly difficult to reverse.\n\nThe significance of this crisis extends beyond ecology into economics and public health. Research has shown that many essential medicines — including treatments for cancer, bacterial infections, and neurological disorders — were derived from compounds found in wild species. As species vanish, so too do potential cures that we may never even have had the chance to discover. This is not a matter of sentimental attachment to nature; it is a matter of survival.\n\nFurthermore, ecosystems with higher biodiversity tend to be more resilient. They can absorb disturbances — such as floods, droughts, and disease outbreaks — and recover more quickly. A forest with dozens of tree species, for instance, is far less vulnerable to a single pathogen than a monoculture plantation. Diversity, in this sense, is not just desirable — it is indispensable for long-term stability.\n\nEfforts to address biodiversity loss are crucial and must operate at multiple levels. At the policy level, international agreements such as the Kunming-Montreal Global Biodiversity Framework, adopted in 2022, set targets to protect thirty percent of the Earth's land and ocean by 2030. At the scientific level, technologies such as environmental DNA sampling and satellite monitoring are revolutionizing our ability to count and track species in real time. At the community level, indigenous knowledge systems — which have sustained vivid traditions of ecological stewardship for millennia — are increasingly recognized as essential partners in conservation.\n\nYet challenges remain. Funding for biodiversity conservation is chronically insufficient compared to the scale of the problem. Political will is often undermined by short-term economic pressures. And public awareness, though growing, has not yet translated into the systemic changes that scientists say are essential.\n\nIn conclusion, the consequences of biodiversity loss are not confined to distant rainforests or obscure species that few people have heard of. They touch every aspect of human well-being, from the food we eat to the air we breathe to the medicines we rely upon. Every species counts, not merely as a number in a census, but as a thread in a web of life that has taken billions of years to weave. To revive and protect that web is not an option — it is a vital necessity for the future of life on this planet.\n\nThank you."",
+    ""word_count"": 680
+  },
+  ""questions"": [
+    {
+      ""question_number"": 1,
+      ""question"": ""According to the lecture, what are 'ecosystem services'?"",
+      ""options"": {
+        ""A"": ""Programs designed by governments to protect endangered species"",
+        ""B"": ""Processes by which natural environments produce resources and conditions indispensable to human survival"",
+        ""C"": ""Scientific methods used to count the number of species in a given area"",
+        ""D"": ""Technologies developed to revive extinct species through genetic engineering""
+      },
+      ""answer"": ""B"",
+      ""explanation"": ""The lecturer defines ecosystem services as 'the processes by which natural environments produce resources and conditions that are indispensable to human survival,' citing clean air, fresh water, and climate regulation as examples.""
+    },
+    {
+      ""question_number"": 2,
+      ""question"": ""What crucial consequence followed the reintroduction of wolves into Yellowstone National Park?"",
+      ""options"": {
+        ""A"": ""The deer population was completely eliminated from the park"",
+        ""B"": ""Rivers dried up due to increased predation pressure on aquatic species"",
+        ""C"": ""Riverbank vegetation revived and habitats that had been degraded for decades were restored"",
+        ""D"": ""The wolf population quickly expanded beyond the park's boundaries""
+      },
+      ""answer"": ""C"",
+      ""explanation"": ""The lecturer explains that wolves reduced overgrazing by deer, which allowed riverbank vegetation to revive, stabilized riverbanks, changed river courses, and ultimately revived entire degraded habitats — a vivid example of a trophic cascade.""
+    },
+    {
+      ""question_number"": 3,
+      ""question"": ""According to the lecturer, at what rate are species currently disappearing compared to natural background rates?"",
+      ""options"": {
+        ""A"": ""Ten to fifty times higher"",
+        ""B"": ""Exactly equal to natural background rates"",
+        ""C"": ""One hundred to one thousand times higher"",
+        ""D"": ""Two to five times higher""
+      },
+      ""answer"": ""C"",
+      ""explanation"": ""The lecturer states that 'species are disappearing at rates one hundred to one thousand times higher than natural background rates,' indicating the unprecedented scale of the current extinction crisis.""
+    },
+    {
+      ""question_number"": 4,
+      ""question"": ""Why does the lecturer argue that biodiversity loss matters for medicine?"",
+      ""options"": {
+        ""A"": ""Wild species are used directly as food sources for hospital patients"",
+        ""B"": ""Many essential medicines were derived from compounds found in wild species, and extinctions eliminate potential cures"",
+        ""C"": ""Biodiversity loss increases the risk of pandemics caused by domesticated animals"",
+        ""D"": ""Medical researchers rely on wild ecosystems as outdoor laboratories for clinical trials""
+      },
+      ""answer"": ""B"",
+      ""explanation"": ""The lecturer notes that 'many essential medicines — including treatments for cancer, bacterial infections, and neurological disorders — were derived from compounds found in wild species,' and that as species vanish, potential cures are lost permanently.""
+    },
+    {
+      ""question_number"": 5,
+      ""question"": ""What does the lecturer identify as an indispensable partner in conservation efforts at the community level?"",
+      ""options"": {
+        ""A"": ""Corporate sustainability programs funded by multinational companies"",
+        ""B"": ""Satellite monitoring systems operated by national space agencies"",
+        ""C"": ""Indigenous knowledge systems and traditions of ecological stewardship"",
+        ""D"": ""University research departments specializing in genetic biodiversity""
+      },
+      ""answer"": ""C"",
+      ""explanation"": ""The lecturer states that 'indigenous knowledge systems — which have sustained vivid traditions of ecological stewardship for millennia — are increasingly recognized as essential partners in conservation,' highlighting their crucial role at the community level.""
+    },
+    {
+      ""question_number"": 6,
+      ""question"": ""According to the lecture, what is the significance of having higher biodiversity in an ecosystem?"",
+      ""options"": {
+        ""A"": ""It increases the commercial value of natural resources extracted from the ecosystem"",
+        ""B"": ""It makes the ecosystem more aesthetically appealing for ecotourism"",
+        ""C"": ""It makes the ecosystem more resilient, allowing it to absorb disturbances and recover more quickly"",
+        ""D"": ""It reduces the need for human intervention in managing natural resources""
+      },
+      ""answer"": ""C"",
+      ""explanation"": ""The lecturer explains that 'ecosystems with higher biodiversity tend to be more resilient,' able to absorb disturbances such as floods, droughts, and disease outbreaks, and recover more quickly — making biodiversity indispensable for long-term stability.""
+    },
+    {
+      ""question_number"": 7,
+      ""question"": ""Which of the following best summarizes the lecturer's overall argument about biodiversity loss?"",
+      ""options"": {
+        ""A"": ""Biodiversity loss is a serious concern primarily for ecologists, but its impact on human society is limited"",
+        ""B"": ""The consequences of biodiversity loss are far-reaching, affecting human well-being in vital ways, and protecting biodiversity is an essential necessity"",
+        ""C"": ""International agreements have successfully reversed biodiversity loss, and the situation is improving steadily"",
+        ""D"": ""The most crucial response to biodiversity loss is the development of artificial ecosystems to replace natural ones""
+      },
+      ""answer"": ""B"",
+      ""explanation"": ""Throughout the lecture, the speaker argues that biodiversity loss has profound consequences for food, medicine, air, and water — all vital aspects of human well-being. The lecturer concludes that protecting biodiversity 'is not an option — it is a vital necessity for the future of life on this planet.'""
+    }
+  ],
+  ""vocabulary_in_context"": [
+    {
+      ""word"": ""vital"",
+      ""sentence_from_passage"": ""It is vital to the functioning of ecosystems that sustain all life, including human civilization."",
+      ""japanese_meaning"": ""にとって非常に重要な"",
+      ""usage_note"": ""Here 'vital' emphasizes that biodiversity is not merely useful but absolutely necessary for ecosystem function.""
+    },
+    {
+      ""word"": ""vivid"",
+      ""sentence_from_passage"": ""One of the most vivid illustrations of this principle is the phenomenon known as trophic cascade."",
+      ""japanese_meaning"": ""生き生きとした, 鮮やかな"",
+      ""usage_note"": ""'Vivid' is used to describe how the Yellowstone wolf example is a striking and memorable demonstration of ecological interdependence.""
+    },
+    {
+      ""word"": ""revive"",
+      ""sentence_from_passage"": ""The return of trees and shrubs stabilized the riverbanks, changed the course of rivers, and ultimately revived entire habitats that had been degraded for decades."",
+      ""japanese_meaning"": ""を生き返らせる, 生き返る"",
+      ""usage_note"": ""'Revive' describes the restoration of degraded ecosystems to a living, functioning state, as if bringing them back to life.""
+    },
+    {
+      ""word"": ""essential"",
+      ""sentence_from_passage"": ""Research has shown that many essential medicines — including treatments for cancer, bacterial infections, and neurological disorders — were derived from compounds found in wild species."",
+      ""japanese_meaning"": ""にとって重要な, 必要不可欠な"",
+      ""usage_note"": ""'Essential' highlights that these medicines are not optional but critically necessary for treating serious diseases.""
+    },
+    {
+      ""word"": ""indispensable"",
+      ""sentence_from_passage"": ""These are the processes by which natural environments produce resources and conditions that are indispensable to human survival."",
+      ""japanese_meaning"": ""にとって重要な, 必要不可欠な"",
+      ""usage_note"": ""'Indispensable' stresses that ecosystem services cannot be done without — human survival depends on them absolutely.""
+    },
+    {
+      ""word"": ""crucial"",
+      ""sentence_from_passage"": ""What followed was a crucial demonstration of how a single species can reshape an entire landscape."",
+      ""japanese_meaning"": ""決定的な, 極めて重要な"",
+      ""usage_note"": ""'Crucial' indicates that the Yellowstone experiment was not just interesting but a decisive, landmark example in ecology.""
+    },
+    {
+      ""word"": ""significance"",
+      ""sentence_from_passage"": ""The significance of this crisis extends beyond ecology into economics and public health."",
+      ""japanese_meaning"": ""重要性"",
+      ""usage_note"": ""'Significance' refers to the far-reaching importance and implications of the biodiversity crisis across multiple fields.""
+    },
+    {
+      ""word"": ""consequence"",
+      ""sentence_from_passage"": ""The consequences of biodiversity loss are not confined to distant rainforests or obscure species that few people have heard of."",
+      ""japanese_meaning"": ""結果, 重要さ"",
+      ""usage_note"": ""'Consequence' here means the results or outcomes of biodiversity loss, emphasizing that its effects are universal and unavoidable.""
+    },
+    {
+      ""word"": ""matter"",
+      ""sentence_from_passage"": ""This is not a matter of sentimental attachment to nature; it is a matter of survival."",
+      ""japanese_meaning"": ""事柄, 問題, 重要である"",
+      ""usage_note"": ""'Matter' is used as a noun meaning 'issue' or 'concern,' framing biodiversity protection as a practical necessity rather than an emotional preference.""
+    },
+    {
+      ""word"": ""count"",
+      ""sentence_from_passage"": ""Every species counts, not merely as a number in a census, but as a thread in a web of life that has taken billions of years to weave."",
+      ""japanese_meaning"": ""を数える, 重要である"",
+      ""usage_note"": ""'Count' is cleverly used in its dual sense: literally counting species in a census, and figuratively meaning that every species is important and has value.""
+    }
+  ]
+}
+```",Generated,
+2026-05-15,7,【東大リスニング】第7回：The Vital Role of Biodiversity in Ecosystem Resilience: Consequences of Species Loss for Planetary Health,"{
+  ""topic"": ""The Vital Role of Biodiversity in Ecosystem Resilience: Consequences of Species Loss for Planetary Health"",
+  ""category"": ""Philosophy & Thought"",
+  ""vocabulary"": [
+    {""word"": ""vital"", ""reading"": ""にとって非常に重要な, 生命の""},
+    {""word"": ""vivid"", ""reading"": ""生き生きとした, 鮮やかな""},
+    {""word"": ""revive"", ""reading"": ""を生き返らせる, 生き返る""},
+    {""word"": ""essential"", ""reading"": ""にとって重要な, 必要不可欠な, 本質的な""},
+    {""word"": ""indispensable"", ""reading"": ""にとって重要な, 必要不可欠な""},
+    {""word"": ""crucial"", ""reading"": ""決定的な, 極めて重要な""},
+    {""word"": ""significance"", ""reading"": ""重要性""},
+    {""word"": ""consequence"", ""reading"": ""結果, 重要さ""},
+    {""word"": ""matter"", ""reading"": ""事柄, 問題, 重要である""},
+    {""word"": ""count"", ""reading"": ""を数える, 重要である""}
+  ],
+  ""listening_passage"": {
+    ""title"": ""The Vital Role of Biodiversity in Ecosystem Resilience: Consequences of Species Loss for Planetary Health"",
+    ""passage"": ""Good morning, everyone. Today I want to explore a question that sits at the intersection of philosophy and environmental science: Does nature have intrinsic value, or does it matter only insofar as it serves human purposes? This is not merely an abstract philosophical puzzle. The answer we give has crucial consequences for how we treat the living world around us.\n\nPhilosophers have long debated the foundations of value. Anthropocentric thinkers argue that value is always relative to human interests. On this view, biodiversity is significant because it provides ecosystem services — clean water, fertile soil, climate regulation — that are indispensable to human survival and flourishing. Biodiversity matters, in short, because we need it. This is a vivid and persuasive argument, and it has driven much of the policy discourse around conservation.\n\nHowever, a growing tradition in environmental ethics challenges this anthropocentric framework. Thinkers such as Aldo Leopold and Holmes Rolston III argue that wild species and ecosystems possess intrinsic worth — a value that does not depend on human recognition or use. On this account, a species counts not merely as a resource but as a participant in what Leopold called the 'biotic community.' The extinction of a species is a moral loss regardless of whether any human ever benefits from its existence or even knows it existed.\n\nThis distinction has vital philosophical implications. If biodiversity has only instrumental value, then in principle it could be replaced by artificial systems that deliver the same services. If a synthetic forest could provide the same oxygen and carbon sequestration as a natural one, there would be no essential reason to preserve the original. But if biodiversity has intrinsic value, then no such substitution is acceptable, regardless of its functional consequences.\n\nThe philosopher Peter Singer approaches this question from a utilitarian perspective. For Singer, what counts morally is the capacity to suffer or experience well-being. Many animals, he argues, possess this capacity, and their suffering and flourishing are of direct moral significance. This view expands the circle of moral concern beyond humans without abandoning the idea that value is ultimately tied to conscious experience.\n\nBy contrast, deep ecologists revive an older, more holistic vision: that the whole of nature — not just its sentient members — has value. On this view, to speak of the significance of biodiversity is to speak of something that transcends individual organisms. It is to recognize that the intricate web of relationships constituting an ecosystem has a kind of integrity that is essential in its own right.\n\nThese philosophical positions are not merely academic. They shape real debates about policy and ethics. Consider the question of de-extinction — the proposal to revive species such as the woolly mammoth or the passenger pigeon through genetic technology. From a purely anthropocentric standpoint, the crucial question is whether reviving these species would benefit humans or restore ecosystem function. From the perspective of intrinsic value, however, we must also ask whether it is ethically appropriate to revive a species into a world that may no longer support it — whether doing so serves the species itself or merely satisfies human curiosity.\n\nFurthermore, philosophical reflection on biodiversity forces us to confront what we mean by 'life.' Is it the individual organism that matters most? The species? The ecosystem? Or the ongoing evolutionary process itself? Each answer leads to different ethical conclusions. If the evolutionary process is what counts, then our moral obligation may be not simply to preserve existing species but to protect the conditions that allow new forms of life to emerge over geological time.\n\nIn recent decades, indigenous philosophical traditions have contributed vivid and essential perspectives to these debates. Many indigenous worldviews hold that humans are not the masters of nature but its relatives — participants in a community of beings that includes animals, plants, rivers, and mountains. On this view, the significance of biodiversity is not something that requires philosophical proof; it is a living truth embedded in centuries of relational knowledge and practice.\n\nAs we face an accelerating biodiversity crisis, these philosophical questions are not luxuries we can afford to postpone. The consequences of getting our values wrong are irreversible. Species once lost cannot be truly revived. Ecosystems once destroyed may never recover their former complexity. Philosophy, at its best, helps us see what is vital before it disappears, and to count as precious what the market has declared worthless.\n\nIn conclusion, whether we approach biodiversity through utilitarian ethics, intrinsic value theory, or indigenous relational philosophies, the central message is the same: every living being is indispensable to a whole that is greater than the sum of its parts. To protect that whole is not only a scientific imperative — it is a moral one. Thank you."",
+    ""word_count"": 720
+  },
+  ""questions"": [
+    {
+      ""question_number"": 1,
+      ""question"": ""According to the lecturer, what is the central philosophical question explored in this lecture?"",
+      ""options"": {
+        ""A"": ""Whether human beings have a biological duty to preserve other species"",
+        ""B"": ""Whether nature has intrinsic value or matters only insofar as it serves human purposes"",
+        ""C"": ""Whether modern science can revive extinct species through genetic technology"",
+        ""D"": ""Whether utilitarian ethics is superior to deontological ethics in environmental policy""
+      },
+      ""answer"": ""B"",
+      ""explanation"": ""The lecturer opens by stating the central question: 'Does nature have intrinsic value, or does it matter only insofar as it serves human purposes?' and frames this as having crucial consequences for how we treat the living world.""
+    },
+    {
+      ""question_number"": 2,
+      ""question"": ""According to the lecture, what is the crucial philosophical implication of biodiversity having only instrumental value?"",
+      ""options"": {
+        ""A"": ""It means humans have an absolute moral duty to prevent all extinctions"",
+        ""B"": ""It means biodiversity could in principle be replaced by artificial systems delivering the same services"",
+        ""C"": ""It means the significance of biodiversity can never be measured scientifically"",
+        ""D"": ""It means intrinsic value theory must be abandoned entirely in philosophical discourse""
+      },
+      ""answer"": ""B"",
+      ""explanation"": ""The lecturer states: 'If biodiversity has only instrumental value, then in principle it could be replaced by artificial systems that deliver the same services,' contrasting this with the intrinsic value position that no such substitution would be acceptable.""
+    },
+    {
+      ""question_number"": 3,
+      ""question"": ""How does Peter Singer's utilitarian perspective define what counts morally, according to the lecturer?"",
+      ""options"": {
+        ""A"": ""The degree to which a species contributes to ecosystem stability"",
+        ""B"": ""The evolutionary age and complexity of a given organism"",
+        ""C"": ""The capacity of a being to suffer or experience well-being"",
+        ""D"": ""The cultural significance a species holds for human communities""
+      },
+      ""answer"": ""C"",
+      ""explanation"": ""The lecturer explains that for Singer, 'what counts morally is the capacity to suffer or experience well-being,' expanding the circle of moral concern beyond humans while tying value to conscious experience.""
+    },
+    {
+      ""question_number"": 4,
+      ""question"": ""What does the lecturer identify as an essential philosophical question raised by de-extinction technology?"",
+      ""options"": {
+        ""A"": ""Whether the cost of genetic research is justified by its economic consequences"",
+        ""B"": ""Whether reviving a species into a world that may no longer support it serves the species itself or merely satisfies human curiosity"",
+        ""C"": ""Whether governments have the legal authority to fund de-extinction programs"",
+        ""D"": ""Whether vivid media coverage of de-extinction projects increases public support for conservation""
+      },
+      ""answer"": ""B"",
+      ""explanation"": ""From the intrinsic value perspective, the lecturer argues we must ask 'whether it is ethically appropriate to revive a species into a world that may no longer support it — whether doing so serves the species itself or merely satisfies human curiosity.'""
+    },
+    {
+      ""question_number"": 5,
+      ""question"": ""According to the lecturer, what is the significance of indigenous philosophical traditions in the biodiversity debate?"",
+      ""options"": {
+        ""A"": ""They provide vivid and essential perspectives, viewing humans as participants in a community of beings rather than masters of nature"",
+        ""B"": ""They demonstrate that intrinsic value theory was first developed outside Western philosophy"",
+        ""C"": ""They argue that biodiversity loss is an inevitable consequence of human cultural evolution"",
+        ""D"": ""They hold that only humans and large mammals count as morally significant beings""
+      },
+      ""answer"": ""A"",
+      ""explanation"": ""The lecturer states that indigenous worldviews contribute 'vivid and essential perspectives,' holding that 'humans are not the masters of nature but its relatives — participants in a community of beings,' making biodiversity's significance a living truth rather than a philosophical abstraction.""
+    },
+    {
+      ""question_number"": 6,
+      ""question"": ""What does the lecturer suggest is the most expansive moral obligation if the evolutionary process itself is what counts?"",
+      ""options"": {
+        ""A"": ""To revive as many extinct species as possible using modern genetic technology"",
+        ""B"": ""To preserve only the species that are indispensable to current ecosystem function"",
+        ""C"": ""To protect the conditions that allow new forms of life to emerge over geological time"",
+        ""D"": ""To count all currently living species and document them before they disappear""
+      },
+      ""answer"": ""C"",
+      ""explanation"": ""The lecturer states: 'If the evolutionary process is what counts, then our moral obligation may be not simply to preserve existing species but to protect the conditions that allow new forms of life to emerge over geological time.'""
+    },
+    {
+      ""question_number"": 7,
+      ""question"": ""Which of the following best summarizes the lecturer's concluding argument?"",
+      ""options"": {
+        ""A"": ""Scientific conservation is more vital than philosophical reflection for addressing the biodiversity crisis"",
+        ""B"": ""Regardless of one's philosophical framework, every living being is indispensable to a greater whole, making biodiversity protection both a scientific and moral imperative"",
+        ""C"": ""Utilitarian ethics provides the most crucial and practical foundation for biodiversity conservation policy"",
+        ""D"": ""The consequences of biodiversity loss matter only when they directly affect human health and economic well-being""
+      },
+      ""answer"": ""B"",
+      ""explanation"": ""The lecturer concludes that across utilitarian, intrinsic value, and indigenous philosophical frameworks, 'every living being is indispensable to a whole that is greater than the sum of its parts,' and that protecting biodiversity 'is not only a scientific imperative — it is a moral one.'""
+    }
+  ],
+  ""vocabulary_in_context"": [
+    {
+      ""word"": ""vital"",
+      ""sentence_from_passage"": ""Philosophy, at its best, helps us see what is vital before it disappears, and to count as precious what the market has declared worthless."",
+      ""japanese_meaning"": ""にとって非常に重要な"",
+      ""usage_note"": ""'Vital' here carries a double resonance: something critically important and something connected to life itself — appropriate in a lecture about living beings whose loss would be irreversible.""
+    },
+    {
+      ""word"": ""vivid"",
+      ""sentence_from_passage"": ""Many indigenous philosophical traditions have contributed vivid and essential perspectives to these debates."",
+      ""japanese_meaning"": ""生き生きとした, 鮮やかな"",
+      ""usage_note"": ""'Vivid' describes the qualities of indigenous perspectives as immediate, alive, and striking — not abstract theories but living traditions embedded in practice.""
+    },
+    {
+      ""word"": ""revive"",
+      ""sentence_from_passage"": ""Deep ecologists revive an older, more holistic vision: that the whole of nature — not just its sentient members — has value."",
+      ""japanese_meaning"": ""を生き返らせる, 生き返る"",
+      ""usage_note"": ""'Revive' is used metaphorically to describe bringing an older philosophical tradition back into contemporary relevance, as if restoring it to active life in current debate.""
+    },
+    {
+      ""word"": ""essential"",
+      ""sentence_from_passage"": ""It is to recognize that the intricate web of relationships constituting an ecosystem has a kind of integrity that is essential in its own right."",
+      ""japanese_meaning"": ""本質的な, 必要不可欠な"",
+      ""usage_note"": ""'Essential' is used in its philosophical sense of 'intrinsic' or 'belonging to the very nature of something,' not merely as a synonym for 'necessary.'""
+    },
+    {
+      ""word"": ""indispensable"",
+      ""sentence_from_passage"": ""Every living being is indispensable to a whole that is greater than the sum of its parts."",
+      ""japanese_meaning"": ""にとって重要な, 必要不可欠な"",
+      ""usage_note"": ""'Indispensable' emphasizes that no living being can be removed from the web of life without consequence — each is irreplaceable within the larger whole.""
+    },
+    {
+      ""word"": ""crucial"",
+      ""sentence_from_passage"": ""This is not merely an abstract philosophical puzzle. The answer we give has crucial consequences for how we treat the living world around us."",
+      ""japanese_meaning"": ""決定的な, 極めて重要な"",
+      ""usage_note"": ""'Crucial' signals that the philosophical question is not merely academic but has decisive, real-world implications for environmental ethics and policy.""
+    },
+    {
+      ""word"": ""significance"",
+      ""sentence_from_passage"": ""Their suffering and flourishing are of direct moral significance."",
+      ""japanese_meaning"": ""重要性"",
+      ""usage_note"": ""'Significance' in this philosophical context means moral weight or importance — the property of being worthy of ethical consideration.""
+    },
+    {
+      ""word"": ""consequence"",
+      ""sentence_from_passage"": ""The consequences of getting our values wrong are irreversible."",
+      ""japanese_meaning"": ""結果"",
+      ""usage_note"": ""'Consequence' here stresses the irreversible outcomes of philosophical and ethical errors, giving urgency to the abstract debate about value and biodiversity.""
+    },
+    {
+      ""word"": ""matter"",
+      ""sentence_from_passage"": ""Biodiversity matters, in short, because we need it."",
+      ""japanese_meaning"": ""重要である"",
+      ""usage_note"": ""'Matter' is used as an intransitive verb meaning 'to be of importance,' a common philosophical usage when asking what has moral or practical weight.""
+    },
+    {
+      ""word"": ""count"",
+      ""sentence_from_passage"": ""Philosophy, at its best, helps us see what is vital before it disappears, and to count as precious what the market has declared worthless."",
+      ""japanese_meaning"": ""重要である"",
+      ""usage_note"": ""'Count' is used in the sense of 'to regard as' or 'to value as,' echoing the lecture's recurring theme that every species counts — both in the sense of being numbered and in the sense of mattering morally.""
+    }
+  ]
+}",Generated,

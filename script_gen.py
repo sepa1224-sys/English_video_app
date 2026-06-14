@@ -18,6 +18,58 @@ try:
 except ImportError:
     OpenAI = None
 
+# Anthropic library (Claude API fallback)
+try:
+    import anthropic as _anthropic_module
+except ImportError:
+    _anthropic_module = None
+
+
+def _call_llm(system_prompt: str, user_prompt: str = None, json_mode: bool = True) -> str:
+    """
+    LLM呼び出しの統一関数。OpenAI があれば GPT-4o、なければ Claude API を使う。
+    Returns: raw JSON string from the LLM.
+    """
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    openai_key = os.environ.get("OPENAI_API_KEY")
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+
+    # --- OpenAI ---
+    if openai_key and OpenAI:
+        client = OpenAI(api_key=openai_key)
+        messages = [{"role": "system", "content": system_prompt}]
+        if user_prompt:
+            messages.append({"role": "user", "content": user_prompt})
+        kwargs = {"model": "gpt-4o", "messages": messages}
+        if json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+        response = client.chat.completions.create(**kwargs)
+        return response.choices[0].message.content
+
+    # --- Anthropic (Claude) ---
+    if anthropic_key and _anthropic_module:
+        client = _anthropic_module.Anthropic(api_key=anthropic_key)
+        user_text = user_prompt or "Generate the content as specified. Output JSON only."
+        if json_mode:
+            user_text += "\n\nIMPORTANT: Output valid JSON only. No markdown code blocks, no explanations."
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=8192,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_text}],
+        )
+        raw = response.content[0].text
+        # Strip markdown code blocks if present
+        if raw.startswith("```"):
+            lines = raw.split("\n")
+            lines = [l for l in lines if not l.startswith("```")]
+            raw = "\n".join(lines)
+        return raw
+
+    raise RuntimeError("No LLM API key available. Set OPENAI_API_KEY or ANTHROPIC_API_KEY in .env")
+
 def load_vocabulary(level: str, day_number: int = 1) -> list:
     """
     指定されたレベルの単語リストを読み込む。
@@ -388,43 +440,28 @@ def generate_listening_story(words: list) -> dict:
     Returns a dict with 'en' and 'jp' keys.
     """
     print("  - Generating listening story...", flush=True)
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key or not OpenAI:
-        print("  ! OpenAI API key missing or library not loaded. Using dummy story.")
-        return {
-            "en": "This is a dummy story because OpenAI API is not available. " + " ".join([w['word'] for w in words]),
-            "jp": "これはOpenAI APIが利用できないためのダミーストーリーです。"
-        }
-
-    client = OpenAI(api_key=api_key)
     word_list_str = ", ".join([f"{w['word']} ({w['meaning']})" for w in words])
-    
+
+    system_prompt = "You are an expert English teacher creating learning materials."
     prompt = f"""
     Create a short, coherent story (approx. 100-150 words) that naturally includes ALL of the following English words:
     {word_list_str}
-    
+
     Requirements:
     1. The story should be interesting and easy to follow (CEFR B1/B2 level).
     2. Highlight the usage of the provided words.
     3. Provide a natural Japanese translation.
-    
+
     Output format (JSON):
     {{
         "story_en": "English story text...",
         "story_jp": "Japanese translation..."
     }}
     """
-    
+
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are an expert English teacher creating learning materials."},
-                {"role": "user", "content": prompt}
-            ],
-            response_format={"type": "json_object"}
-        )
-        result = json.loads(response.choices[0].message.content)
+        raw = _call_llm(system_prompt, prompt, json_mode=True)
+        result = json.loads(raw)
         return {
             "en": result.get("story_en", ""),
             "jp": result.get("story_jp", "")
@@ -632,12 +669,6 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
     # Format vocab list for prompt
     vocab_text = "\n".join([f"- {v['word']} ({v['meaning']})" for v in vocab_list])
     
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        print("  ! Error: OPENAI_API_KEY is missing. Returning None from generate_exam_script.")
-        return None
-    client = OpenAI(api_key=api_key)
-
     # If topic is generic, generate a specific one
     if "Word Audio Mode" in topic or not topic:
         topic_prompt = f"""
@@ -647,11 +678,7 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         Output just the topic title.
         """
         try:
-            res = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": topic_prompt}]
-            )
-            topic = res.choices[0].message.content.strip()
+            topic = _call_llm(topic_prompt, json_mode=False).strip().strip('"')
             print(f"  - Generated Specific Topic: {topic}")
         except Exception as e:
             print(f"  ! Error generating specific topic: {e}")
@@ -883,14 +910,7 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
     print(f"DEBUG: Exam system_prompt length chars={prompt_len}, est_tokens={approx_tokens}, university={university}")
     
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": system_prompt}
-            ],
-            response_format={"type": "json_object"}
-        )
-        raw_content = response.choices[0].message.content
+        raw_content = _call_llm(system_prompt, json_mode=True)
     except Exception as e:
         print(f"  ! Error generating exam script (API_ERROR): {e}")
         import traceback
@@ -1263,10 +1283,6 @@ def generate_script(topic: str, level: str = "TOEIC600", day_number: int = 1, mo
     api_key = os.environ.get("OPENAI_API_KEY")
     client = OpenAI(api_key=api_key) if (OpenAI and api_key) else None
     
-    if not client:
-        print("  ! Error: OpenAI client not available. Returning None from generate_script.")
-        return None
-
     # --- Mode Branching ---
     if mode == "university_listening":
         # === Exam Listening Mode Logic (Todai / Kyoto) ===
@@ -1361,18 +1377,9 @@ def generate_script(topic: str, level: str = "TOEIC600", day_number: int = 1, mo
         - Outro: Thank the listener, ask to subscribe.
         """
 
-    print("  - Generating script content with GPT-4o...")
+    print("  - Generating script content with LLM...")
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            temperature=0.7,
-            response_format={"type": "json_object"}
-        )
-        content = response.choices[0].message.content
+        content = _call_llm(system_prompt, user_prompt, json_mode=True)
     except Exception as e:
         print(f"  ! Error generating script (API_ERROR): {e}")
         import traceback

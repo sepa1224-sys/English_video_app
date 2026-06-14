@@ -29,6 +29,11 @@ debug_audio_output/
 *.TEMP_MPY_wvf_snd.mp4
 *.mp3
 *.mp4
+*.pyc
+
+# デバッグ/テスト出力PNG（ルート直下）
+/*.png
+
 # OAuth認証情報（セキュリティのためGitHub管理外）
 config/token.json
 config/client_secret.json

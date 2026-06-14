@@ -47,11 +47,15 @@ def get_font(size: int, font_path: str = None):
         except Exception:
             pass
 
-    # Windows font paths
+    # Font paths (macOS + Windows)
     candidates = [
+        "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
+        "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
         "C:\\Windows\\Fonts\\meiryo.ttc",
         "C:\\Windows\\Fonts\\msgothic.ttc",
-        "C:\\Windows\\Fonts\\arial.ttf"
+        "C:\\Windows\\Fonts\\arial.ttf",
     ]
     path = None
     for p in candidates:

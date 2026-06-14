@@ -144,3 +144,11 @@ Step 3: 取得完了後、CSVの先頭10行をClaudeに共有する
   - `video_gen.py` の Word Audio Mode 描画ロジックを解析し、二重描画バグが解消されていること（`Image.new` によるフレームごとの完全初期化）を確認
   - チャンネル分析データを元に `docs/content_plan.md` を作成し、長時間聞き流し動画へのリソース集中を提案
   - `docs/adr/001_word_audio_mode_rendering.md` を作成し、現在の描画ロジックの設計判断を記録
+
+2026-04-23
+- Podcast Mode 仕様策定開始（Claude）
+  - 既存仕様（data_structure.md, video_gen_current_spec.md, video_target_spec.md, ADR 001×2, content_plan.md）を全て確認
+  - `docs/specs/podcast_mode_spec.md` を新規作成 — 動画構成、画面レイアウト、音声仕様、台本データ構造、処理フロー、環境変数を定義
+  - `docs/adr/002_podcast_mode_introduction.md` を新規作成 — 独立ファイル方式（選択肢B）の採用判断を記録
+  - ステータス: ドラフト（ユーザーレビュー待ち）
+  - 次のアクション: ユーザーが仕様をレビュー → 承認後に実装着手

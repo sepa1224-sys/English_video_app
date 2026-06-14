@@ -6,7 +6,10 @@ import numpy as np
 import subprocess
 import asyncio
 import edge_tts
-from gtts import gTTS
+try:
+    from gtts import gTTS
+except ImportError:
+    gTTS = None
 
 try:
     from openai import OpenAI
@@ -27,6 +30,7 @@ PAUSE_DURATION = 1.5 # seconds between steps
 # Edge-TTS Voices
 EDGE_VOICE_MALE = "en-US-ChristopherNeural"
 EDGE_VOICE_FEMALE = "en-US-AriaNeural"
+EDGE_VOICE_NARRATOR = "en-US-AvaNeural"
 EDGE_VOICE_JP = "ja-JP-NanamiNeural"
 
 async def _generate_edge_tts_async(text, voice, output_path, rate_str):
@@ -34,6 +38,9 @@ async def _generate_edge_tts_async(text, voice, output_path, rate_str):
     await communicate.save(output_path)
 
 def generate_audio_segment_gtts(text: str, output_path: str, lang: str = 'en') -> bool:
+    if gTTS is None:
+        print("      ! gTTS not available (not installed). Skipping fallback.")
+        return False
     try:
         tts = gTTS(text=text, lang=lang)
         tts.save(output_path)
@@ -105,9 +112,9 @@ def generate_intro_audio(text: str, output_path: str) -> bool:
 
 def generate_section_audio(text: str, output_path: str) -> bool:
     """
-    Generate section title audio using English voice.
+    Generate section title / question audio using narrator voice.
     """
-    return generate_audio_segment_edge(text, EDGE_VOICE_MALE, output_path)
+    return generate_audio_segment_edge(text, EDGE_VOICE_NARRATOR, output_path)
 
 def make_silence(duration):
     try:

@@ -16,6 +16,11 @@ except ImportError:
     generate_intro_audio = None
     generate_section_audio = None
 
+# --- Bundled Font Paths (OS-independent) ---
+_FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "fonts")
+FONT_PATH_BOLD = os.path.join(_FONT_DIR, "NotoSansCJKjp-Bold.otf")
+FONT_PATH_BLACK = os.path.join(_FONT_DIR, "NotoSansCJKjp-Black.otf")
+
 def log_debug(msg):
     try:
         with open("video_gen_debug.log", "a", encoding="utf-8") as f:
@@ -61,7 +66,17 @@ def apply_se_settings(clip, volume=0.3, fade_duration=0.5):
     return clip
 
 def get_font_path():
+    # Bundled fonts (top priority — OS-independent)
+    if os.path.exists(FONT_PATH_BOLD):
+        return FONT_PATH_BOLD
     candidates = [
+        # macOS (Japanese + English)
+        "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
+        "/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc",
+        "/Library/Fonts/Arial Unicode.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
+        # Windows
         "C:\\Windows\\Fonts\\Montserrat-ExtraBold.ttf",
         "C:\\Windows\\Fonts\\Montserrat-Bold.ttf",
         "C:\\Windows\\Fonts\\NotoSans-Black.ttf",
@@ -72,7 +87,7 @@ def get_font_path():
         "C:\\Windows\\Fonts\\NotoSansJP-Regular.otf",
         "C:\\Windows\\Fonts\\meiryo.ttc",
         "C:\\Windows\\Fonts\\msgothic.ttc",
-        "C:\\Windows\\Fonts\\arial.ttf"
+        "C:\\Windows\\Fonts\\arial.ttf",
     ]
     for p in candidates:
         if os.path.exists(p):
@@ -256,7 +271,7 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
 
     clips = []
     
-    font_path_jp = get_font_path() or "C:\\Windows\\Fonts\\msgothic.ttc"
+    font_path_jp = get_font_path() or FONT_PATH_BOLD
     
     bg_image_path = "assets/background_black.png"
     bg_img = None
@@ -366,32 +381,30 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
 
     print("  - Generating Word Cards...")
     
-    black_candidates = [
-        "C:\\Windows\\Fonts\\Montserrat-ExtraBold.ttf",
-        "C:\\Windows\\Fonts\\Montserrat-Bold.ttf",
-        "C:\\Users\\PC_User\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NotoSansJP-Black.otf",
-        "C:\\Windows\\Fonts\\NotoSansJP-Black.otf",
-        "C:\\Users\\PC_User\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NotoSansJP-ExtraBold.otf",
-        "C:\\Windows\\Fonts\\NotoSansJP-ExtraBold.otf",
-        "C:\\Users\\PC_User\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NotoSansJP-Bold.otf",
-        "C:\\Windows\\Fonts\\NotoSansJP-Bold.otf"
-    ]
-    regular_candidates = [
-        "C:\\Windows\\Fonts\\Montserrat-SemiBold.ttf",
-        "C:\\Windows\\Fonts\\Montserrat-Regular.ttf",
-        "C:\\Users\\PC_User\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NotoSansJP-Regular.otf",
-        "C:\\Windows\\Fonts\\NotoSansJP-Regular.otf"
-    ]
-    black_path = None
-    regular_path = None
-    for p in black_candidates:
-        if os.path.exists(p):
-            black_path = p
-            break
-    for p in regular_candidates:
-        if os.path.exists(p):
-            regular_path = p
-            break
+    # Bundled fonts first, then system fallbacks
+    black_path = FONT_PATH_BLACK if os.path.exists(FONT_PATH_BLACK) else None
+    regular_path = FONT_PATH_BOLD if os.path.exists(FONT_PATH_BOLD) else None
+    if black_path is None:
+        black_candidates = [
+            "C:\\Windows\\Fonts\\Montserrat-ExtraBold.ttf",
+            "C:\\Windows\\Fonts\\Montserrat-Bold.ttf",
+            "C:\\Windows\\Fonts\\NotoSansJP-Black.otf",
+            "C:\\Windows\\Fonts\\NotoSansJP-Bold.otf",
+        ]
+        for p in black_candidates:
+            if os.path.exists(p):
+                black_path = p
+                break
+    if regular_path is None:
+        regular_candidates = [
+            "C:\\Windows\\Fonts\\Montserrat-SemiBold.ttf",
+            "C:\\Windows\\Fonts\\Montserrat-Regular.ttf",
+            "C:\\Windows\\Fonts\\NotoSansJP-Regular.otf",
+        ]
+        for p in regular_candidates:
+            if os.path.exists(p):
+                regular_path = p
+                break
     if black_path is None:
         black_path = font_path_jp
     if regular_path is None:
@@ -734,7 +747,7 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         if vocab_list is None:
             vocab_list = []
         
-        font_path_jp = get_font_path() or "C:\\Windows\\Fonts\\msgothic.ttc"
+        font_path_jp = get_font_path() or FONT_PATH_BOLD
         font_path_en = font_path_jp
 
         highlight_words_en = [v.get("word", "") for v in vocab_list if v.get("word")]
@@ -1071,29 +1084,90 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
 
         listening_segments = [s for s in audio_segments if s.get("type") == "listening_part"]
         questions_segments = [s for s in audio_segments if s.get("type") == "questions_part"]
-        
+
+        # --- Pre-Listening: Show questions for silent reading ---
+        log_debug("    > Building Pre-Listening Q&A...")
+        pre_listening_clips = []
+        PRE_Q_DURATION = 20.0
+
+        for pi, q in enumerate(questions):
+            def draw_pre_q(draw, img, qi=pi, qq=q):
+                q_text = f"Q{qi+1}: {qq['question']}"
+                choices = qq.get("choices", [])
+                total_chars = len(q_text) + sum(len(c) for c in choices)
+                q_size = 50
+                c_size = 40
+                if total_chars > 200:
+                    q_size = 35
+                    c_size = 30
+                max_total_height = 630
+                while True:
+                    try:
+                        q_font = ImageFont.truetype(font_path_en, q_size)
+                        c_font = ImageFont.truetype(font_path_en, c_size)
+                    except:
+                        q_font = ImageFont.load_default()
+                        c_font = ImageFont.load_default()
+                    max_w = 1280 * 0.85
+                    _, h_q, _ = get_text_layout(q_text, q_font, max_w, draw)
+                    h_choices = []
+                    for c in choices:
+                        _, h_c, _ = get_text_layout(c, c_font, max_w, draw)
+                        h_choices.append(h_c)
+                    total_h = h_q + 40 + sum(h_choices) + (25 * (len(choices) - 1))
+                    if total_h <= max_total_height or q_size <= 15:
+                        break
+                    q_size = max(15, q_size - 2)
+                    c_size = max(15, c_size - 2)
+                start_y = max(30, (720 - total_h) // 2)
+                current_y = start_y
+                current_y = draw_centered_text_inner(draw, q_text, q_font, start_y=current_y, img_w=1280)
+                current_y += 40
+                for choice in choices:
+                    current_y = draw_centered_text_inner(draw, choice, c_font, start_y=current_y, color=(200, 255, 200), spacing=15, img_w=1280)
+                    current_y += 10
+
+            pq_clip = create_bg_clip(PRE_Q_DURATION, draw_pre_q)
+
+            # Q1 only: add narrator instruction
+            if pi == 0 and generate_section_audio:
+                pq_audio_path = "temp/pre_listening_instruction.mp3"
+                if not os.path.exists(pq_audio_path):
+                    generate_section_audio("Please read the questions carefully before listening.", pq_audio_path)
+                if os.path.exists(pq_audio_path):
+                    pq_audio = AudioFileClip(pq_audio_path)
+                    resources_to_close.append(pq_audio)
+                    pq_clip = with_audio_compat(pq_clip, pq_audio)
+
+            pre_listening_clips.append(pq_clip)
+
+        pre_listening_video = concatenate_videoclips(pre_listening_clips) if pre_listening_clips else None
+
         log_debug("    > Building Part 1: Listening Focus...")
         
         if not listening_segments:
             log_debug("  ! Warning: No listening_part segments found. Using all segments as fallback (deprecated).")
             listening_segments = audio_segments
 
-        audio_clips_list = []
         valid_segments = [s for s in listening_segments if os.path.exists(s["audio_path"])]
-        for seg in valid_segments:
-            try:
-                ac = AudioFileClip(seg["audio_path"])
-                resources_to_close.append(ac)
-                audio_clips_list.append(ac)
-            except:
-                pass
-                
-        if not audio_clips_list:
+        if not valid_segments:
             return None
-        full_dialog_audio = concatenate_audioclips(audio_clips_list)
-        
-        part1_audio_elements = []
-        
+
+        # SE path (shared with Part 2/3)
+        se_complete_path = special_clips.get("se_complete", "assets/完了4.mp3")
+        if not os.path.exists(se_complete_path):
+            if os.path.exists("assets/完了4.mp3"):
+                se_complete_path = "assets/完了4.mp3"
+            elif os.path.exists("assets/パッ.mp3"):
+                se_complete_path = "assets/パッ.mp3"
+            elif os.path.exists("assets/next_word.mp3"):
+                se_complete_path = "assets/next_word.mp3"
+
+        # --- Part 1: Title clip + per-segment speaker-label clips ---
+        part1_clips = []
+
+        # 1a. Title clip: "Listening Section" text + title audio + SE
+        title_audio_elements = []
         sec_list_audio_path = special_clips.get("sec_listening", "assets/listening_section.mp3")
         if not os.path.exists(sec_list_audio_path) and generate_section_audio:
             log_debug("      (Generating Listening Section Audio...)")
@@ -1103,38 +1177,89 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         if os.path.exists(sec_list_audio_path):
             ac_sec = AudioFileClip(sec_list_audio_path)
             resources_to_close.append(ac_sec)
-            part1_audio_elements.append(ac_sec)
-        
-        se_complete_path = special_clips.get("se_complete", "assets/完了4.mp3")
-        if not os.path.exists(se_complete_path):
-            if os.path.exists("assets/完了4.mp3"):
-                se_complete_path = "assets/完了4.mp3"
-            elif os.path.exists("assets/パッ.mp3"):
-                se_complete_path = "assets/パッ.mp3"
-            elif os.path.exists("assets/next_word.mp3"):
-                se_complete_path = "assets/next_word.mp3"
-             
+            title_audio_elements.append(ac_sec)
+
         if os.path.exists(se_complete_path):
             ac_se = AudioFileClip(se_complete_path)
             ac_se = apply_se_settings(ac_se)
             resources_to_close.append(ac_se)
-            part1_audio_elements.append(ac_se)
-            
-        part1_audio_elements.append(full_dialog_audio)
-        
-        full_part1_audio = concatenate_audioclips(part1_audio_elements)
-        duration_part1 = full_part1_audio.duration
-        
-        def draw_part1(draw, img):
+            title_audio_elements.append(ac_se)
+
+        if title_audio_elements:
+            title_audio = concatenate_audioclips(title_audio_elements)
+            title_dur = title_audio.duration + 0.5
+        else:
+            title_audio = None
+            title_dur = 3.0
+
+        def draw_listening_title(draw, img):
             try:
                 f_title = ImageFont.truetype(font_path_en, 80)
             except:
                 f_title = ImageFont.load_default()
-                
             draw_centered_text_inner(draw, "Listening Section", f_title)
-        
-        part1_video = create_bg_clip(duration_part1, draw_part1)
-        part1_video = with_audio_compat(part1_video, full_part1_audio)
+
+        title_clip = create_bg_clip(title_dur, draw_listening_title)
+        if title_audio:
+            title_clip = with_audio_compat(title_clip, title_audio)
+        part1_clips.append(title_clip)
+
+        # 1b. Helper: extract speaker from segment
+        def _get_speaker(seg):
+            sp = seg.get("speaker")
+            if sp:
+                return sp
+            lines = seg.get("lines") or []
+            if lines and isinstance(lines, list):
+                sp = lines[0].get("speaker")
+                if sp:
+                    return sp
+            lt = seg.get("line_timings") or []
+            if lt and isinstance(lt, list):
+                sp = lt[0].get("speaker")
+                if sp:
+                    return sp
+            return "Speaker"
+
+        # 1c. Per-segment clips with speaker labels (merge consecutive same-speaker)
+        merged_groups = []
+        for seg in valid_segments:
+            sp = _get_speaker(seg)
+            if merged_groups and merged_groups[-1]["speaker"] == sp:
+                merged_groups[-1]["segments"].append(seg)
+            else:
+                merged_groups.append({"speaker": sp, "segments": [seg]})
+
+        for group in merged_groups:
+            sp = group["speaker"]
+            group_audio_clips = []
+            for seg in group["segments"]:
+                try:
+                    ac = AudioFileClip(seg["audio_path"])
+                    resources_to_close.append(ac)
+                    group_audio_clips.append(ac)
+                except:
+                    pass
+            if not group_audio_clips:
+                continue
+            group_audio = concatenate_audioclips(group_audio_clips) if len(group_audio_clips) > 1 else group_audio_clips[0]
+            group_dur = group_audio.duration
+
+            def draw_speaker_label(draw, img, speaker=sp):
+                try:
+                    f_sub = ImageFont.truetype(font_path_en, 50)
+                    f_speaker = ImageFont.truetype(font_path_en, 90)
+                except:
+                    f_sub = ImageFont.load_default()
+                    f_speaker = ImageFont.load_default()
+                draw_centered_text_inner(draw, "Listening Section", f_sub, start_y=200, color=(180, 180, 180))
+                draw_centered_text_inner(draw, speaker, f_speaker, start_y=340)
+
+            seg_clip = create_bg_clip(group_dur, draw_speaker_label)
+            seg_clip = with_audio_compat(seg_clip, group_audio)
+            part1_clips.append(seg_clip)
+
+        part1_video = concatenate_videoclips(part1_clips)
         
         log_debug("    > Building Part 2: Questions...")
         part2_clips = []
@@ -1241,6 +1366,7 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
                 
                 max_total_height = 630
                 
+                total_h = 0
                 while True:
                     try:
                         q_font = ImageFont.truetype(font_path_en, q_size)
@@ -1248,8 +1374,7 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
                     except:
                         q_font = ImageFont.load_default()
                         c_font = ImageFont.load_default()
-                        break
-                        
+
                     max_w = 1280 * 0.85
                     
                     _, h_q, _ = get_text_layout(q_text, q_font, max_w, draw)
@@ -1330,7 +1455,27 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
             
         part3_clips.append(trans_clip3)
         
-        valid_review_segments = [s for s in listening_segments if os.path.exists(s["audio_path"])]
+        # Filter review to segments containing highlighted vocab words
+        def _seg_has_highlight(seg, hw_list):
+            text = (seg.get("text") or "").lower()
+            if not text:
+                lines = seg.get("lines") or []
+                if lines and isinstance(lines, list):
+                    text = (lines[0].get("text") or "").lower()
+            return any(w.lower() in text for w in hw_list if w)
+
+        all_review = [s for s in listening_segments if os.path.exists(s["audio_path"])]
+        if highlight_words_en:
+            filtered = [s for s in all_review if _seg_has_highlight(s, highlight_words_en)]
+        else:
+            filtered = []
+
+        if not filtered:
+            filtered = all_review[:3]
+            log_debug(f"    [WARNING] No highlighted segments found, using first 3")
+
+        valid_review_segments = filtered
+        log_debug(f"    [INFO] Review: {len(valid_review_segments)}/{len(all_review)} segments selected")
         
         for seg in valid_review_segments:
             seg_dur = seg["duration"]
@@ -1358,32 +1503,34 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
                         jp_text = first_line.get("translation") or first_line.get("japanese")
 
                 if not speaker or speaker == "Unknown":
-                    speaker = "Student A" 
+                    speaker = "Student A"
 
                 if not en_text:
                     en_text = ""
                 if not jp_text:
                     jp_text = ""
-                
+
                 en_text_display = en_text
-                
+
+                # Section title + Speaker label (top area)
                 try:
-                    s_font = ImageFont.truetype(font_path_en, 40)
-                    e_font = ImageFont.truetype(font_path_en, 35)
-                    j_font = ImageFont.truetype(font_path_jp, 35)
+                    f_section = ImageFont.truetype(font_path_en, 30)
+                    f_speaker = ImageFont.truetype(font_path_en, 50)
                 except:
-                    s_font = ImageFont.load_default()
-                    e_font = ImageFont.load_default()
-                    j_font = ImageFont.load_default()
-                    
+                    f_section = ImageFont.load_default()
+                    f_speaker = ImageFont.load_default()
+                draw_centered_text_inner(draw, "Review Section", f_section, start_y=30, color=(150, 150, 150), shadow=False)
+                draw_centered_text_inner(draw, speaker, f_speaker, start_y=75)
+
+                # English script (below speaker label)
                 max_width = 1280 * 0.85
-                max_height = 600
-                initial_size = 65
-                min_size = 30
-                
+                max_height = 480
+                initial_size = 55
+                min_size = 25
+
                 e_font = get_fitted_font(draw, en_text_display, font_path_en, max_width, max_height, initial_size, min_size)
 
-                draw_centered_text_inner(draw, en_text_display, e_font, start_y=None, color="white", highlight_words=highlight_words_en)
+                draw_centered_text_inner(draw, en_text_display, e_font, start_y=160, color="white", highlight_words=highlight_words_en)
                 
             clip = create_bg_clip(seg_dur, draw_script)
             clip = with_audio_compat(clip, ac)
@@ -1391,10 +1538,13 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
             
         part3_video = concatenate_videoclips(part3_clips)
         
-        log_debug("    > Assembling Final Video (Intro -> Listening -> Questions -> Review)...")
+        log_debug("    > Assembling Final Video (Intro -> PreQ -> Listening -> Questions -> Review)...")
         final_clips_list = []
         if intro_clip:
             final_clips_list.append(intro_clip)
+
+        if pre_listening_video:
+            final_clips_list.append(pre_listening_video)
 
         final_clips_list.append(part1_video)
 
@@ -1420,7 +1570,11 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         if intro_clip:
             timestamps_log.append({"type": "Intro", "start": current_time})
             current_time += intro_clip.duration
-            
+
+        if pre_listening_video:
+            timestamps_log.append({"type": "Pre-Listening Questions", "start": current_time})
+            current_time += pre_listening_video.duration
+
         timestamps_log.append({"type": "Listening Section", "start": current_time})
         current_time += part1_video.duration
         
