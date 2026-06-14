@@ -868,15 +868,20 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
            - When expressing complex logic, break it into 2–3 shorter sentences instead of one very long sentence.
         
         Structure:
-        1. **Discussion**: Approx 800-1000 words.
+        1. **Discussion**: Write between 500 and 600 words — aim for ~550. Do NOT go below 500 and do NOT exceed 620 words. Keep the discussion tight within this range (this is the length of ONE section of the real UTokyo listening exam; going over makes it too easy).
            - Dense, academic, fast-paced.
            - "Hard to understand on first hearing, but convincing when read."
-           
-        2. **Questions**: 3 Questions.
+           - **MANDATORY**: All information required to answer Q1, Q2 and Q3 MUST be explicitly contained within this discussion.
+
+        2. **Questions**: 5 Questions (UTokyo gives 5 questions per section).
            - Q1: Specific Detail (Fact retrieval).
-           - Q2: Inference (Logic/Intent).
-           - Q3: Main Idea/Summary.
-           
+           - Q2: Specific Detail (a different fact).
+           - Q3: Inference (Logic/Intent).
+           - Q4: Speaker's attitude / why a particular point is raised.
+           - Q5: Main Idea / Summary.
+           - **Each question MUST have EXACTLY 5 choices, labelled "A) ", "B) ", "C) ", "D) ", "E) "** (UTokyo uses 5 options, not 4).
+           - Every question MUST be answerable solely from the discussion above (no outside knowledge needed).
+
         CRITICAL RULE:
         - The CORRECT ANSWER for at least 2 questions MUST paraphrase a Target Vocabulary word.
         
@@ -893,11 +898,12 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
             "questions": [
                 {{
                     "question": "Question text...",
-                    "choices": ["A) ...", "B) ...", "C) ...", "D) ..."],
+                    "choices": ["A) ...", "B) ...", "C) ...", "D) ...", "E) ..."],
                     "correct_answer": "A",
                     "explanation": "...",
                     "explanation_jp": "..."
                 }}
+                // Provide 5 questions total, each with 5 choices (A-E).
             ],
             "vocab_paraphrases": [
                 {{"word": "vital", "paraphrase": "crucial", "usage_in_question": "Q1"}}

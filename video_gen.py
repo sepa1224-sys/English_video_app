@@ -764,29 +764,86 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
             except Exception as e:
                 log_debug(f"Exam logo load error: {e}")
 
+        # --- Phase 5: optional animated (discussion-style) background ---
+        # Set env EXAM_MOTION_BG=false to fall back to the static image (much
+        # faster render). The motion clip is dimmed with a dark scrim so all
+        # text stays readable.
+        motion_bg_enabled = os.environ.get("EXAM_MOTION_BG", "false").lower() == "true"
+        motion_bg_src = None
+        SCRIM_ALPHA = 150
+        if motion_bg_enabled and os.path.exists("background_video.mp4"):
+            try:
+                _mbg = VideoFileClip("background_video.mp4")
+                try:
+                    motion_bg_src = _mbg.resized((1280, 720))
+                except Exception:
+                    motion_bg_src = _mbg.resize((1280, 720))
+                try:
+                    motion_bg_src = motion_bg_src.without_audio()
+                except Exception:
+                    pass
+                resources_to_close.append(motion_bg_src)
+                log_debug("    > Motion background ENABLED (background_video.mp4)")
+            except Exception as e:
+                log_debug(f"    ! Motion bg load failed, using static: {e}")
+                motion_bg_src = None
+
+        def _paste_logo(target_img):
+            if exam_logo_img is None:
+                return
+            try:
+                lw, lh = exam_logo_img.size
+            except Exception:
+                lw, lh = (200, 80)
+            target_width = 200
+            scale = min(1.0, float(target_width) / float(lw)) if lw > 0 else 1.0
+            new_w = int(lw * scale)
+            new_h = int(lh * scale)
+            try:
+                resized_logo = exam_logo_img.resize((new_w, new_h), Image.LANCZOS)
+            except Exception:
+                resized_logo = exam_logo_img
+                new_w, new_h = lw, lh
+            try:
+                target_img.paste(resized_logo, (1280 - new_w - 20, 20), mask=resized_logo)
+            except Exception:
+                target_img.paste(resized_logo, (1280 - new_w - 20, 20))
+
+        def _looped_bg(duration):
+            try:
+                from moviepy import vfx
+                return motion_bg_src.with_effects([vfx.Loop(duration=duration)])
+            except Exception:
+                try:
+                    return motion_bg_src.subclipped(0, min(duration, motion_bg_src.duration))
+                except Exception:
+                    return with_duration_compat(motion_bg_src, duration)
+
         def create_bg_clip(duration, overlay_func=None):
+            # Motion background: dark scrim + text drawn on a transparent overlay,
+            # composited over the looped video.
+            if motion_bg_src is not None:
+                try:
+                    overlay_img = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
+                    draw = ImageDraw.Draw(overlay_img)
+                    draw.rectangle([0, 0, 1280, 720], fill=(0, 0, 0, SCRIM_ALPHA))
+                    if overlay_func:
+                        overlay_func(draw, overlay_img)
+                    _paste_logo(overlay_img)
+                    bg = _looped_bg(duration)
+                    ov = ImageClip(np.array(overlay_img), transparent=True)
+                    ov = with_duration_compat(ov, duration)
+                    comp = CompositeVideoClip([bg, ov])
+                    return with_duration_compat(comp, duration)
+                except Exception as e:
+                    log_debug(f"    ! Motion composite failed, static fallback: {e}")
+
+            # Static background fallback
             img = bg_img_base.copy()
             if overlay_func:
                 draw = ImageDraw.Draw(img)
                 overlay_func(draw, img)
-            if exam_logo_img is not None:
-                try:
-                    lw, lh = exam_logo_img.size
-                except Exception:
-                    lw, lh = (200, 80)
-                target_width = 200
-                scale = min(1.0, float(target_width) / float(lw)) if lw > 0 else 1.0
-                new_w = int(lw * scale)
-                new_h = int(lh * scale)
-                try:
-                    resized_logo = exam_logo_img.resize((new_w, new_h), Image.LANCZOS)
-                except Exception:
-                    resized_logo = exam_logo_img
-                    new_w, new_h = lw, lh
-                try:
-                    img.paste(resized_logo, (1280 - new_w - 20, 20), mask=resized_logo)
-                except Exception:
-                    img.paste(resized_logo, (1280 - new_w - 20, 20))
+            _paste_logo(img)
             clip = ImageClip(np.array(img))
             clip = with_duration_compat(clip, duration)
             return clip
@@ -1061,63 +1118,10 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         listening_segments = [s for s in audio_segments if s.get("type") == "listening_part"]
         questions_segments = [s for s in audio_segments if s.get("type") == "questions_part"]
 
-        # --- Pre-Listening: Show questions for silent reading ---
-        log_debug("    > Building Pre-Listening Q&A...")
-        pre_listening_clips = []
-        PRE_Q_DURATION = 20.0
-
-        for pi, q in enumerate(questions):
-            def draw_pre_q(draw, img, qi=pi, qq=q):
-                q_text = f"Q{qi+1}: {qq['question']}"
-                choices = qq.get("choices", [])
-                total_chars = len(q_text) + sum(len(c) for c in choices)
-                q_size = 50
-                c_size = 40
-                if total_chars > 200:
-                    q_size = 35
-                    c_size = 30
-                max_total_height = 630
-                while True:
-                    try:
-                        q_font = ImageFont.truetype(font_path_en, q_size)
-                        c_font = ImageFont.truetype(font_path_en, c_size)
-                    except:
-                        q_font = ImageFont.load_default()
-                        c_font = ImageFont.load_default()
-                    max_w = 1280 * 0.85
-                    _, h_q, _ = get_text_layout(q_text, q_font, max_w, draw)
-                    h_choices = []
-                    for c in choices:
-                        _, h_c, _ = get_text_layout(c, c_font, max_w, draw)
-                        h_choices.append(h_c)
-                    total_h = h_q + 40 + sum(h_choices) + (25 * (len(choices) - 1))
-                    if total_h <= max_total_height or q_size <= 15:
-                        break
-                    q_size = max(15, q_size - 2)
-                    c_size = max(15, c_size - 2)
-                start_y = max(30, (720 - total_h) // 2)
-                current_y = start_y
-                current_y = draw_centered_text_inner(draw, q_text, q_font, start_y=current_y, img_w=1280)
-                current_y += 40
-                for choice in choices:
-                    current_y = draw_centered_text_inner(draw, choice, c_font, start_y=current_y, color=(200, 255, 200), spacing=15, img_w=1280)
-                    current_y += 10
-
-            pq_clip = create_bg_clip(PRE_Q_DURATION, draw_pre_q)
-
-            # Q1 only: add narrator instruction
-            if pi == 0 and generate_section_audio:
-                pq_audio_path = "temp/pre_listening_instruction.mp3"
-                if not os.path.exists(pq_audio_path):
-                    generate_section_audio("Please read the questions carefully before listening.", pq_audio_path)
-                if os.path.exists(pq_audio_path):
-                    pq_audio = AudioFileClip(pq_audio_path)
-                    resources_to_close.append(pq_audio)
-                    pq_clip = with_audio_compat(pq_clip, pq_audio)
-
-            pre_listening_clips.append(pq_clip)
-
-        pre_listening_video = concatenate_videoclips(pre_listening_clips) if pre_listening_clips else None
+        # --- Phase 5-A: Pre-Listening question screen removed ---
+        # Start directly with the Listening Section (the question-preview screen
+        # made viewers drop off). Questions are now shown twice later instead.
+        pre_listening_video = None
 
         log_debug("    > Building Part 1: Listening Focus...")
         
@@ -1283,7 +1287,8 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
                 if generate_section_audio:
                     log_debug(f"      (Generating Question {i+1} Audio...)")
                     q_audio_path = f"temp/q_{i+1}_{int(time.time())}.mp3"
-                    generate_section_audio(q["question"], q_audio_path)
+                    # Phase 5: announce "Question N" before reading, slightly slower pace.
+                    generate_section_audio(f"Question {i+1}. {q['question']}", q_audio_path, speed=0.92)
             
             if q_audio_path and os.path.exists(q_audio_path):
                 q_main_audio = AudioFileClip(q_audio_path)
@@ -1309,7 +1314,7 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
                     if not c_path:
                         c_path = f"temp/q_{i+1}_c_{j+1}_{int(time.time())}.mp3"
                         if generate_section_audio:
-                            generate_section_audio(choice_text, c_path)
+                            generate_section_audio(choice_text, c_path, speed=0.92)
                     
                     if c_path and os.path.exists(c_path):
                         try:
@@ -1332,15 +1337,15 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
                 choices = q.get("choices", [])
                 
                 total_chars = len(q_text) + sum(len(c) for c in choices)
-                
-                q_size = 50
-                c_size = 40
-                
+
+                q_size = 56
+                c_size = 46
+
                 if total_chars > 200:
-                    q_size = 35
-                    c_size = 30
-                
-                max_total_height = 630
+                    q_size = 40
+                    c_size = 34
+
+                max_total_height = 650
                 
                 total_h = 0
                 while True:
@@ -1431,134 +1436,200 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
             
         part3_clips.append(trans_clip3)
         
-        # Filter review to segments containing highlighted vocab words
-        def _seg_has_highlight(seg, hw_list):
-            text = (seg.get("text") or "").lower()
-            if not text:
-                lines = seg.get("lines") or []
-                if lines and isinstance(lines, list):
-                    text = (lines[0].get("text") or "").lower()
-            return any(w.lower() in text for w in hw_list if w)
-
+        # Phase 5-C: Review shows the FULL script (every listening segment),
+        # not an excerpt. Red highlighting of target vocab is preserved below.
         all_review = [s for s in listening_segments if os.path.exists(s["audio_path"])]
-        if highlight_words_en:
-            filtered = [s for s in all_review if _seg_has_highlight(s, highlight_words_en)]
-        else:
-            filtered = []
-
-        if not filtered:
-            filtered = all_review[:3]
-            log_debug(f"    [WARNING] No highlighted segments found, using first 3")
-
-        valid_review_segments = filtered
-        log_debug(f"    [INFO] Review: {len(valid_review_segments)}/{len(all_review)} segments selected")
+        valid_review_segments = all_review
+        log_debug(f"    [INFO] Review (full script): {len(valid_review_segments)} segments")
         
+        # Slightly larger review font; paginate so long turns never overflow.
+        REVIEW_FONT_SIZE = 60          # was 55 (user: a bit larger)
+        REVIEW_MAX_LINES = 7           # lines per slide that fit below the speaker label
+        REVIEW_TEXT_TOP = 150
+        review_max_width = 1280 * 0.85
+
         for seg in valid_review_segments:
             seg_dur = seg["duration"]
             if seg_dur <= 0:
                 continue
-            
+
             try:
-                ac = AudioFileClip(seg["audio_path"])
-                resources_to_close.append(ac)
+                ac_full = AudioFileClip(seg["audio_path"])
+                resources_to_close.append(ac_full)
             except:
                 continue
-            
-            def draw_script(draw, img):
-                speaker = seg.get("speaker")
-                en_text = seg.get("text") or seg.get("content") or seg.get("dialog")
-                jp_text = seg.get("japanese") or seg.get("translation")
 
-                if (not speaker or not en_text) and seg.get("lines") and len(seg["lines"]) > 0:
-                    first_line = seg["lines"][0]
-                    if not speaker:
-                        speaker = first_line.get("speaker")
-                    if not en_text:
-                        en_text = first_line.get("text")
-                    if not jp_text:
-                        jp_text = first_line.get("translation") or first_line.get("japanese")
+            # Extract speaker / English text (once, outside the draw closure)
+            speaker = seg.get("speaker")
+            en_text = seg.get("text") or seg.get("content") or seg.get("dialog")
+            if (not speaker or not en_text) and seg.get("lines"):
+                fl = seg["lines"][0]
+                speaker = speaker or fl.get("speaker")
+                en_text = en_text or fl.get("text")
+            if not speaker or speaker == "Unknown":
+                speaker = "Student A"
+            en_text = en_text or ""
 
-                if not speaker or speaker == "Unknown":
-                    speaker = "Student A"
+            try:
+                r_font = ImageFont.truetype(font_path_en, REVIEW_FONT_SIZE)
+            except:
+                r_font = ImageFont.load_default()
 
-                if not en_text:
-                    en_text = ""
-                if not jp_text:
-                    jp_text = ""
+            wrapped = get_text_layout(en_text, r_font, review_max_width)[0]
+            pages = []
+            if wrapped:
+                for k in range(0, len(wrapped), REVIEW_MAX_LINES):
+                    pages.append(" ".join(wrapped[k:k + REVIEW_MAX_LINES]))
+            else:
+                pages = [en_text]
+            n_pages = max(1, len(pages))
 
-                en_text_display = en_text
-
-                # Section title + Speaker label (top area)
+            for pi, page_text in enumerate(pages):
+                a0 = seg_dur * pi / n_pages
+                a1 = seg_dur * (pi + 1) / n_pages
+                page_dur = max(0.1, a1 - a0)
                 try:
-                    f_section = ImageFont.truetype(font_path_en, 30)
-                    f_speaker = ImageFont.truetype(font_path_en, 50)
-                except:
-                    f_section = ImageFont.load_default()
-                    f_speaker = ImageFont.load_default()
-                draw_centered_text_inner(draw, "Review Section", f_section, start_y=30, color=(150, 150, 150), shadow=False)
-                draw_centered_text_inner(draw, speaker, f_speaker, start_y=75)
+                    sub_ac = ac_full.subclipped(a0, a1)
+                except Exception:
+                    try:
+                        sub_ac = ac_full.subclip(a0, a1)
+                    except Exception:
+                        sub_ac = ac_full
 
-                # English script (below speaker label)
-                max_width = 1280 * 0.85
-                max_height = 480
-                initial_size = 55
-                min_size = 25
+                def draw_script(draw, img, speaker=speaker, page_text=page_text, r_font=r_font):
+                    try:
+                        f_section = ImageFont.truetype(font_path_en, 32)
+                        f_speaker = ImageFont.truetype(font_path_en, 56)
+                    except:
+                        f_section = ImageFont.load_default()
+                        f_speaker = ImageFont.load_default()
+                    draw_centered_text_inner(draw, "Review Section", f_section, start_y=30, color=(150, 150, 150), shadow=False)
+                    draw_centered_text_inner(draw, speaker, f_speaker, start_y=78)
+                    draw_centered_text_inner(draw, page_text, r_font, start_y=REVIEW_TEXT_TOP, color="white", highlight_words=highlight_words_en)
 
-                e_font = get_fitted_font(draw, en_text_display, font_path_en, max_width, max_height, initial_size, min_size)
+                clip = create_bg_clip(page_dur, draw_script)
+                clip = with_audio_compat(clip, sub_ac)
+                part3_clips.append(clip)
 
-                draw_centered_text_inner(draw, en_text_display, e_font, start_y=160, color="white", highlight_words=highlight_words_en)
-                
-            clip = create_bg_clip(seg_dur, draw_script)
-            clip = with_audio_compat(clip, ac)
-            part3_clips.append(clip)
-            
         part3_video = concatenate_videoclips(part3_clips)
         
-        log_debug("    > Assembling Final Video (Intro -> PreQ -> Listening -> Questions -> Review)...")
+        # Phase 5-D (improved): "Answers & Explanations" section after the Review.
+        # Re-showing identical questions risks YouTube's repetitious-content flag,
+        # so the second pass reveals the correct answer + a Japanese explanation
+        # (higher learning value, safer for monetization).
+        log_debug("    > Building Part 4: Answers & Explanations...")
+        part4_clips = []
+
+        sec_ans_audio_path = "temp/sec_answers.mp3"
+        if generate_section_audio and not os.path.exists(sec_ans_audio_path):
+            generate_section_audio("Answers and Explanations", sec_ans_audio_path, speed=0.92)
+        a_trans_clips = []
+        if os.path.exists(sec_ans_audio_path):
+            a_title_audio = AudioFileClip(sec_ans_audio_path)
+            resources_to_close.append(a_title_audio)
+            a_trans_clips.append(a_title_audio)
+        if os.path.exists(se_complete_path):
+            ac_se_a = AudioFileClip(se_complete_path)
+            ac_se_a = apply_se_settings(ac_se_a)
+            resources_to_close.append(ac_se_a)
+            a_trans_clips.append(ac_se_a)
+        a_trans_audio = concatenate_audioclips(a_trans_clips) if a_trans_clips else None
+        a_title_dur = (a_trans_audio.duration + 1.0) if a_trans_audio else 3.0
+
+        def draw_a_title(draw, img):
+            try:
+                f = ImageFont.truetype(font_path_en, 70)
+            except:
+                f = ImageFont.load_default()
+            draw_centered_text_inner(draw, "Answers & Explanations", f)
+        a_trans_clip = create_bg_clip(a_title_dur, draw_a_title)
+        if a_trans_audio:
+            a_trans_clip = with_audio_compat(a_trans_clip, a_trans_audio)
+        part4_clips.append(a_trans_clip)
+
+        for i, q in enumerate(questions):
+            correct = str(q.get("correct_answer", "")).strip()
+            choices = q.get("choices", []) or q.get("options", [])
+            correct_text = ""
+            for c in choices:
+                cs = str(c).strip()
+                if correct and cs[:1].upper() == correct[:1].upper():
+                    correct_text = cs
+                    break
+            exp_jp = q.get("explanation_jp") or q.get("explanation") or ""
+            exp_en = q.get("explanation") or ""
+
+            ans_audio = None
+            ans_path = f"temp/ans_{i+1}_{int(time.time())}.mp3"
+            if generate_section_audio:
+                # Final explanation is spoken in Japanese (ja-JP voice).
+                spoken = f"第{i+1}問。正解は {correct} です。{exp_jp}"
+                generate_section_audio(spoken, ans_path, speed=0.95, voice="ja-JP-NanamiNeural")
+            if os.path.exists(ans_path):
+                ans_audio = AudioFileClip(ans_path)
+                resources_to_close.append(ans_audio)
+            ans_dur = (ans_audio.duration + 2.0) if ans_audio else 8.0
+
+            def draw_answer(draw, img, idx=i, correct=correct, correct_text=correct_text, exp_jp=exp_jp):
+                try:
+                    f_head = ImageFont.truetype(font_path_en, 52)
+                except:
+                    f_head = ImageFont.load_default()
+                y = draw_centered_text_inner(draw, f"Q{idx+1}   Answer: {correct}", f_head, start_y=40, color=(120, 255, 120))
+                if correct_text:
+                    cf = get_fitted_font(draw, correct_text, font_path_en, 1280 * 0.85, 130, 46, 28)
+                    y = draw_centered_text_inner(draw, correct_text, cf, start_y=y + 20, color=(120, 255, 120))
+                if exp_jp:
+                    ef = get_fitted_font(draw, exp_jp, font_path_en, 1280 * 0.85, 360, 46, 26)
+                    draw_centered_text_inner(draw, exp_jp, ef, start_y=max(y + 40, 280), color="white")
+
+            a_clip = create_bg_clip(ans_dur, draw_answer)
+            if ans_audio:
+                a_clip = with_audio_compat(a_clip, ans_audio)
+            part4_clips.append(a_clip)
+
+        part4_video = concatenate_videoclips(part4_clips)
+
+        log_debug("    > Assembling Final Video (Intro -> Listening -> Questions -> Review -> Answers & Explanations)...")
         final_clips_list = []
         if intro_clip:
             final_clips_list.append(intro_clip)
 
-        if pre_listening_video:
-            final_clips_list.append(pre_listening_video)
+        final_clips_list.append(part1_video)     # Listening
+        final_clips_list.append(part2_video)     # Questions (attempt)
+        final_clips_list.append(part3_video)     # Review (full script)
+        final_clips_list.append(part4_video)     # Answers & Explanations
 
-        final_clips_list.append(part1_video)
-
-        final_clips_list.append(part2_video)
-
-        final_clips_list.append(part3_video)
-        
         log_debug(f"DEBUG: final_clips_list length: {len(final_clips_list)}")
         final_video = concatenate_videoclips(final_clips_list)
         log_debug(f"DEBUG: final_video duration: {final_video.duration}")
         log_debug(f"DEBUG: Writing video to {output_file}")
-        
+
         final_video.write_videofile(output_file, fps=24, codec="libx264", audio_codec="aac")
-        
+
         if os.path.exists(output_file):
             log_debug(f"DEBUG: Video file successfully created at {output_file}")
         else:
             log_debug(f"DEBUG: Video file NOT FOUND at {output_file} after write_videofile call")
-        
+
         timestamps_log = []
         current_time = 0.0
-        
+
         if intro_clip:
             timestamps_log.append({"type": "Intro", "start": current_time})
             current_time += intro_clip.duration
 
-        if pre_listening_video:
-            timestamps_log.append({"type": "Pre-Listening Questions", "start": current_time})
-            current_time += pre_listening_video.duration
-
         timestamps_log.append({"type": "Listening Section", "start": current_time})
         current_time += part1_video.duration
-        
-        timestamps_log.append({"type": "Questions", "start": current_time})
+
+        timestamps_log.append({"type": "Questions (1st)", "start": current_time})
         current_time += part2_video.duration
-        
-        timestamps_log.append({"type": "Review (Script)", "start": current_time})
+
+        timestamps_log.append({"type": "Review (Full Script)", "start": current_time})
         current_time += part3_video.duration
+
+        timestamps_log.append({"type": "Answers & Explanations", "start": current_time})
+        current_time += part4_video.duration
 
         return output_file, timestamps_log
 

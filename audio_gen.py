@@ -376,7 +376,12 @@ def generate_audio_sections(script_data: dict, output_dir: str = None) -> List[D
                         voice = EDGE_VOICE_MALE
                     else:
                         voice = EDGE_VOICE_FEMALE
-                        
+
+                    # Phase 5: deliver the listening passage slightly slower (~8%).
+                    # Excludes the section Narrator (kept at its forced pace).
+                    if speaker != "Narrator":
+                        speed = speed * 0.92
+
                     print(f"      [{j+1}/{len(lines)}] Edge-TTS ({speaker}): {text[:30]}... (Voice: {voice})")
                     if generate_audio_segment_edge(text, voice, temp_path, speed=speed):
                         try:

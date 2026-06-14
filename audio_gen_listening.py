@@ -110,11 +110,14 @@ def generate_intro_audio(text: str, output_path: str) -> bool:
     """
     return generate_audio_segment_edge(text, EDGE_VOICE_JP, output_path)
 
-def generate_section_audio(text: str, output_path: str) -> bool:
+def generate_section_audio(text: str, output_path: str, speed: float = 1.0, voice: str = None) -> bool:
     """
-    Generate section title / question audio using narrator voice.
+    Generate section title / question audio.
+    voice=None uses the English narrator; pass a ja-JP-* voice for Japanese.
+    speed < 1.0 slows the reading down (e.g. 0.92 = ~8% slower).
     """
-    return generate_audio_segment_edge(text, EDGE_VOICE_NARRATOR, output_path)
+    use_voice = voice or EDGE_VOICE_NARRATOR
+    return generate_audio_segment_edge(text, use_voice, output_path, speed=speed)
 
 def make_silence(duration):
     try:

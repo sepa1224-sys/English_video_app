@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import json
 import random
@@ -6,6 +7,16 @@ import datetime
 import traceback
 import pathlib
 from pathlib import Path
+
+# Windows console defaults to cp932, which cannot encode characters like the
+# em-dash (—) the LLM produces -> print() crashes. Force UTF-8 output so
+# logging (and the difficulty judge) never dies on a stray character.
+for _stream in ("stdout", "stderr"):
+    try:
+        getattr(sys, _stream).reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 from dotenv import load_dotenv
 import history_manager
 
@@ -200,7 +211,22 @@ def run_podcast_generation(
                 print(f"  - Script Data: {json.dumps(script_data, ensure_ascii=False, indent=2)[:500]}...")
                 script_data = None
                 continue
-            
+
+            # Quality gate: judge exam scripts against UTokyo-level criteria and
+            # regenerate weak ones (last attempt is accepted regardless).
+            if mode == "university_listening":
+                try:
+                    import difficulty_judge
+                    verdict = difficulty_judge.judge_exam_script(script_data, university=university or "todai")
+                    score = verdict.get("llm", {}).get("difficulty_score")
+                    print(f"  - Difficulty judge: passes={verdict['passes']} score={score} issues={verdict['issues']}")
+                    if not verdict["passes"] and attempt < max_attempts:
+                        print(f"  ! Below UTokyo bar (attempt {attempt}/{max_attempts}); regenerating...")
+                        script_data = None
+                        continue
+                except Exception as e:
+                    print(f"  ! Difficulty judge error (non-fatal, accepting script): {e}")
+
             break
         
         if not script_data:
