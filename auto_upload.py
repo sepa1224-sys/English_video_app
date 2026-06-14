@@ -1,17 +1,18 @@
 """
-Auto-upload a Todai listening video to YouTube, set the "Part N" thumbnail,
-and add it to the Todai listening playlist.
+Auto-upload a university listening video to YouTube, set the "Part N" thumbnail,
+and add it to that university's listening playlist.
 
-Auth (new JSON method, matches scripts/upload_video.py):
+Auth (JSON method, matches scripts/upload_video.py):
   1. Put config/client_secret.json   (GCP project: englishpodcast)
   2. Run: py scripts/oauth_setup.py   -> creates config/token.json
-Thumbnail base:
-  assets/thumbnail_base_todai.png     (gate + catch copy, WITHOUT the "Part N")
+Thumbnail base (per university, WITHOUT the "Part N"):
+  assets/thumbnail_base_{todai|kyoto|osaka}.png
 
 Usage:
-  py auto_upload.py "output/exam/todai/Todai_Listening_XXXX.mp4"   # upload existing
-  py auto_upload.py --generate                                      # generate then upload
-  py auto_upload.py --privacy public "<file>"                       # override privacy
+  py auto_upload.py --university todai --generate          # generate then upload
+  py auto_upload.py --university kyoto "<existing.mp4>"     # upload existing
+  py auto_upload.py --generate                             # defaults to todai
+  py auto_upload.py --privacy public --university osaka --generate
 """
 import os
 import sys
@@ -46,21 +47,33 @@ from googleapiclient.http import MediaFileUpload
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TOKEN_FILE = os.path.join(BASE_DIR, "config", "token.json")
 MASTER_FILE = os.path.join(BASE_DIR, "data", "channel_analysis", "genre_master.json")
-PART_FILE = os.path.join(BASE_DIR, "data", "todai_publish_part.txt")
-THUMB_BASE = os.path.join(BASE_DIR, "assets", "thumbnail_base_todai.png")
-GENRE = "listening_todai"
-DEFAULT_TAGS = ["東大リスニング", "大学受験", "英語リスニング", "東大英語", "リスニング対策"]
+
+# Per-university settings. seq=True -> 鉄壁 advances by part number (day_number=part);
+# seq=False (Osaka hybrid) -> vocab is randomized each run (day_number ignored).
+UNI_CONFIG = {
+    "todai": {"label": "東大", "level": "英単語帳鉄壁", "genre": "listening_todai", "seq": True,  "default_part": 6},
+    "kyoto": {"label": "京大", "level": "英単語帳鉄壁", "genre": "listening_kyoto", "seq": True,  "default_part": 1},
+    "osaka": {"label": "阪大", "level": "OsakaHybrid", "genre": "listening_osaka", "seq": False, "default_part": 1},
+}
 
 
-def read_part() -> int:
+def part_file(uni: str) -> str:
+    return os.path.join(BASE_DIR, "data", f"{uni}_publish_part.txt")
+
+
+def thumb_base(uni: str) -> str:
+    return os.path.join(BASE_DIR, "assets", f"thumbnail_base_{uni}.png")
+
+
+def read_part(uni: str) -> int:
     try:
-        return int(open(PART_FILE, encoding="utf-8").read().strip())
+        return int(open(part_file(uni), encoding="utf-8").read().strip())
     except Exception:
-        return 4
+        return UNI_CONFIG[uni]["default_part"]
 
 
-def bump_part(n: int):
-    with open(PART_FILE, "w", encoding="utf-8") as f:
+def bump_part(uni: str, n: int):
+    with open(part_file(uni), "w", encoding="utf-8") as f:
         f.write(str(n + 1))
 
 
@@ -88,14 +101,15 @@ def _desc_path_for(video_path: str) -> str:
     return os.path.splitext(video_path)[0] + "_description.txt"
 
 
-def prepare(video_path: str, part: int):
+def prepare(video_path: str, part: int, uni: str):
     """Return (title, description, thumbnail_path) with the part number forced to N."""
+    cfg = UNI_CONFIG[uni]
     dp = _desc_path_for(video_path)
     if not os.path.exists(dp):
         raise FileNotFoundError(f"Description not found: {dp}")
     desc = open(dp, encoding="utf-8").read()
     desc = re.sub(r"第\d+回", f"第{part}回", desc, count=1)
-    title = desc.splitlines()[0].strip() if desc.strip() else f"【東大リスニング】第{part}回"
+    title = desc.splitlines()[0].strip() if desc.strip() else f"【{cfg['label']}リスニング】第{part}回"
     # YouTube title limit is 100 chars: drop the suffix, then word-trim the topic.
     if len(title) > 100:
         title = title.split(" | ")[0].strip()
@@ -114,26 +128,25 @@ def prepare(video_path: str, part: int):
         desc = desc[:keep].rstrip() + "\n\n…(全文は動画内をご覧ください)" + tail
         print(f"  - Description trimmed to {len(desc)} chars (YouTube 5000 limit)")
 
+    base = thumb_base(uni)
     thumb = None
-    if os.path.exists(THUMB_BASE):
+    if os.path.exists(base):
         try:
             import thumbnail_gen
-            thumb = thumbnail_gen.generate_exam_thumbnail(
-                part, THUMB_BASE,
-                os.path.join(BASE_DIR, "output", "exam", "todai", f"thumb_part{part}.png"),
-            )
+            out_thumb = os.path.join(BASE_DIR, "output", "exam", uni, f"thumb_part{part}.png")
+            thumb = thumbnail_gen.generate_exam_thumbnail(part, base, out_thumb)
             print(f"  - Thumbnail: {thumb}")
         except Exception as e:
             print(f"  ! Thumbnail failed (continuing without): {e}")
     else:
-        print(f"  ! Thumbnail base missing ({THUMB_BASE}); uploading without a custom thumbnail.")
+        print(f"  ! Thumbnail base missing ({base}); uploading without a custom thumbnail.")
     return title, desc, thumb
 
 
-def _playlist_id() -> str:
+def _playlist_id(genre: str) -> str:
     try:
         m = json.load(open(MASTER_FILE, encoding="utf-8"))
-        return m["genres"].get(GENRE, {}).get("playlist_id", "")
+        return m["genres"].get(genre, {}).get("playlist_id", "")
     except Exception:
         return ""
 
@@ -145,19 +158,31 @@ def main():
         i = args.index("--privacy")
         privacy = args[i + 1]
         del args[i:i + 2]
+    uni = "todai"
+    if "--university" in args:
+        i = args.index("--university")
+        uni = args[i + 1]
+        del args[i:i + 2]
+    if uni not in UNI_CONFIG:
+        print(f"! Unknown university: {uni}. Choose from {list(UNI_CONFIG)}")
+        sys.exit(1)
+    cfg = UNI_CONFIG[uni]
     generate = "--generate" in args
     video_path = next((a for a in args if not a.startswith("--")), None)
 
-    part = read_part()
+    part = read_part(uni)
 
     if generate or not video_path:
-        # day_number == part number -> each part uses a fresh 鉄壁 10-word block
-        # (Part5 -> 鉄壁 41-50, Part6 -> 51-60, ...). No repeats across parts.
-        print(f"=== Generating new Todai video (Part {part}, 鉄壁 block {part} = ID {(part-1)*10+1}-{(part-1)*10+10}) ===")
+        day = part if cfg["seq"] else 1
+        if cfg["seq"]:
+            block = f"鉄壁 ID {(part - 1) * 10 + 1}-{(part - 1) * 10 + 10}"
+        else:
+            block = "random hybrid vocab"
+        print(f"=== Generating {cfg['label']} video (Part {part}, {block}) ===")
         import main as pipeline
         r = pipeline.run_podcast_generation(
-            topic="", level="英単語帳鉄壁", day_number=part,
-            mode="university_listening", university="todai", generate_thumb=False,
+            topic="", level=cfg["level"], day_number=day,
+            mode="university_listening", university=uni, generate_thumb=False,
         )
         video_path = r[0] if isinstance(r, tuple) else r
 
@@ -165,16 +190,18 @@ def main():
         print(f"! Video not found: {video_path}")
         sys.exit(1)
 
-    print(f"=== Upload as Part {part} (privacy={privacy}) ===")
-    title, description, thumb = prepare(video_path, part)
+    print(f"=== Upload {cfg['label']} as Part {part} (privacy={privacy}) ===")
+    title, description, thumb = prepare(video_path, part, uni)
     print(f"  - Title: {title}")
+
+    tags = [f"{cfg['label']}リスニング", "大学受験", "英語リスニング", f"{cfg['label']}英語", "リスニング対策"]
 
     creds = get_credentials()
     yt = build("youtube", "v3", credentials=creds)
 
     body = {
         "snippet": {
-            "title": title, "description": description, "tags": DEFAULT_TAGS,
+            "title": title, "description": description, "tags": tags,
             "categoryId": "27", "defaultLanguage": "ja",
         },
         "status": {"privacyStatus": privacy, "selfDeclaredMadeForKids": False},
@@ -194,7 +221,7 @@ def main():
         except Exception as e:
             print(f"  ! Thumbnail set failed: {e}")
 
-    pid = _playlist_id()
+    pid = _playlist_id(cfg["genre"])
     if pid:
         try:
             yt.playlistItems().insert(part="snippet", body={"snippet": {
@@ -204,9 +231,11 @@ def main():
             print(f"  - Added to playlist {pid}")
         except Exception as e:
             print(f"  ! Playlist add failed: {e}")
+    else:
+        print(f"  - No playlist for genre '{cfg['genre']}' (skipped)")
 
-    bump_part(part)
-    print(f"=== Done. Next part = {part + 1} ===")
+    bump_part(uni, part)
+    print(f"=== Done. {cfg['label']} next part = {part + 1} ===")
 
 
 if __name__ == "__main__":
