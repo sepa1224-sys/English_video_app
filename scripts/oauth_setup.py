@@ -39,30 +39,13 @@ def get_credentials():
             creds.refresh(Request())
             print("[INFO] トークンを自動更新しました")
         else:
-            # コンソール（OOB）フローで認証URLを表示
-            flow = Flow.from_client_secrets_file(
-                SECRET_FILE,
-                scopes=SCOPES,
-                redirect_uri="urn:ietf:wg:oauth:2.0:oob"
-            )
-            auth_url, _ = flow.authorization_url(
-                access_type="offline",
-                include_granted_scopes="true",
-                prompt="consent"
-            )
-
-            print("\n" + "="*60)
-            print("【認証が必要です】")
-            print("以下のURLをブラウザで開いて認証してください:")
-            print()
-            print(auth_url)
-            print()
-            print("認証後に表示される「コード」を入力してください:")
-            print("="*60)
-            code = input("認証コード: ").strip()
-
-            flow.fetch_token(code=code)
-            creds = flow.credentials
+            # ブラウザで認証（ローカルサーバ方式）。
+            # OOB(urn:ietf:wg:oauth:2.0:oob) は Google が廃止したため、
+            # デスクトップ環境ではローカルサーバ方式を使う。
+            from google_auth_oauthlib.flow import InstalledAppFlow
+            flow = InstalledAppFlow.from_client_secrets_file(SECRET_FILE, scopes=SCOPES)
+            print("\nブラウザが開きます。気合イングリッシュのGoogleアカウントで認証してください...")
+            creds = flow.run_local_server(port=0, prompt="consent")
             print("[INFO] 新規認証が完了しました")
 
         # トークンを保存
