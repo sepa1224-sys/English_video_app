@@ -678,7 +678,17 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         Output just the topic title.
         """
         try:
-            topic = _call_llm(topic_prompt, json_mode=False).strip().strip('"')
+            raw_topic = _call_llm(topic_prompt, json_mode=False).strip()
+            # The model sometimes wraps the title in JSON despite the instruction;
+            # extract the actual title so it doesn't end up in the video title.
+            if raw_topic.startswith("{"):
+                try:
+                    raw_topic = json.loads(raw_topic).get("topic", raw_topic)
+                except Exception:
+                    m = re.search(r'"topic"\s*:\s*"([^"]+)"', raw_topic)
+                    if m:
+                        raw_topic = m.group(1)
+            topic = raw_topic.strip().strip('"').strip()
             print(f"  - Generated Specific Topic: {topic}")
         except Exception as e:
             print(f"  ! Error generating specific topic: {e}")
@@ -735,32 +745,37 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
            - They should carry significant weight in the sentence.
         
         4. **Length**:
-           - Approx 550-600 words. (Slightly shorter than Todai, but denser).
-           
-        5. **Questions**: 3 Questions.
-           - Q1: Specific Detail (What did the professor say about X?).
-           - Q2: Logical Inference (Why does the professor mention Y?).
-           - Q3: Main Idea/Theme.
+           - Write between 500 and 600 words — aim for ~550. Do NOT go below 500 and do NOT exceed 620 words.
+           - Note: Kyoto University's 2nd-stage English has NO official listening section; this is a
+             "Kyoto-level" abstract/philosophical lecture for listening PRACTICE, so prioritise depth
+             and abstraction over exam mimicry.
+
+        5. **Questions**: 5 Questions.
+           - Q1: Specific Detail. Q2: Specific Detail (different point). Q3: Logical Inference (Why X?).
+           - Q4: The lecturer's stance / implication. Q5: Main Idea / Theme.
+           - **Each question MUST have EXACTLY 5 choices, labelled "A) ", "B) ", "C) ", "D) ", "E) "**.
+           - Every question MUST be answerable solely from the lecture above.
            - **Rule**: The CORRECT ANSWER for at least 2 questions MUST paraphrase a Target Vocabulary word.
-           
+
         6. **Translation**: Provide a natural Japanese translation (Lecture style: "〜である", "〜であろう").
-        
+
         Output JSON:
         {{
             "topic": "{topic}",
             "dialog": [
                 {{"speaker": "Dr. Smith", "text": "...", "translation": "..."}},
-                {{"speaker": "Dr. Smith", "text": "...", "translation": "..."}} 
+                {{"speaker": "Dr. Smith", "text": "...", "translation": "..."}}
                 // Split long monologue into 3-4 chunks for better audio generation
             ],
             "questions": [
                 {{
                     "question": "Question text...",
-                    "choices": ["A) ...", "B) ...", "C) ...", "D) ..."],
+                    "choices": ["A) ...", "B) ...", "C) ...", "D) ...", "E) ..."],
                     "correct_answer": "A",
                     "explanation": "...",
                     "explanation_jp": "..."
                 }}
+                // Provide 5 questions total, each with 5 choices (A-E).
             ],
             "vocab_paraphrases": [
                 {{"word": "vital", "paraphrase": "crucial", "usage_in_question": "Q1"}}
@@ -797,15 +812,20 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
            - Use words in a practical context.
         
         4. **Length**:
-           - Approx 500 words. (Concise, well-structured).
-           
-        5. **Questions**: 3 Questions.
-           - Q1: Specific Fact/Data.
-           - Q2: Cause and Effect / Problem and Solution.
-           - Q3: Speaker's Opinion/Conclusion.
-           
+           - Write between 500 and 600 words — aim for ~550. Do NOT go below 500 and do NOT exceed 620 words.
+           - This matches the real Osaka University (外国語学部) listening passage: a ~500-700 word
+             academic MONOLOGUE, read twice. Keep it a single-speaker lecture/presentation.
+
+        5. **Questions**: 5 Questions (Osaka's real exam uses 5 written-response questions; here we
+           present them as multiple choice for a watchable video).
+           - Q1: Specific Fact/Data. Q2: Specific Fact/Data (different point).
+           - Q3: Cause and Effect / Problem and Solution. Q4: Inference / detail synthesis.
+           - Q5: Speaker's Opinion/Conclusion / Main idea.
+           - **Each question MUST have EXACTLY 5 choices, labelled "A) ", "B) ", "C) ", "D) ", "E) "**.
+           - Every question MUST be answerable solely from the monologue above.
+
         6. **Translation**: Provide a natural Japanese translation (Presentation style: "〜です", "〜ます").
-        
+
         Output JSON:
         {{
             "topic": "{topic}",
@@ -816,11 +836,12 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
             "questions": [
                 {{
                     "question": "Question text...",
-                    "choices": ["A) ...", "B) ...", "C) ...", "D) ..."],
+                    "choices": ["A) ...", "B) ...", "C) ...", "D) ...", "E) ..."],
                     "correct_answer": "A",
                     "explanation": "...",
                     "explanation_jp": "..."
                 }}
+                // Provide 5 questions total, each with 5 choices (A-E).
             ],
             "vocab_paraphrases": []
         }}

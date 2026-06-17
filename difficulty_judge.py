@@ -37,19 +37,31 @@ def _word_count(text: str) -> int:
     return len(re.findall(r"[A-Za-z']+", text))
 
 
-def _llm_rubric(passage: str, questions: list) -> dict:
+# Per-university benchmark used in the LLM rubric.
+UNI_BENCHMARK = {
+    "todai": ("University of Tokyo (UTokyo)",
+              "UTokyo level = academic 3-speaker discussion, dense, ~500-600 words"),
+    "kyoto": ("Kyoto University (KyotoU)",
+              "Kyoto has NO official listening exam, so judge as a Kyoto-level abstract/philosophical "
+              "academic LECTURE (monologue), dense and conceptually demanding, ~500-600 words"),
+    "osaka": ("Osaka University (OsakaU, Faculty of Foreign Studies)",
+              "Osaka level = academic MONOLOGUE read twice, ~500-700 words, practical/academic theme"),
+}
+
+
+def _llm_rubric(passage: str, questions: list, university: str = "todai") -> dict:
     if _call_llm is None:
         return {"error": "LLM unavailable"}
     qs_text = json.dumps(questions, ensure_ascii=False)
+    uni_name, uni_desc = UNI_BENCHMARK.get(university, UNI_BENCHMARK["todai"])
     sys_prompt = (
-        "You are an examiner for the University of Tokyo (UTokyo) English listening exam.\n"
-        "Evaluate the generated listening passage and its multiple-choice questions against "
-        "the REAL UTokyo 2nd-stage listening exam.\n\n"
+        f"You are an examiner for the {uni_name} English listening exam.\n"
+        f"Evaluate the generated listening passage and its multiple-choice questions against "
+        f"the {uni_name}-level standard.\n\n"
         f"PASSAGE:\n{passage}\n\n"
         f"QUESTIONS (JSON):\n{qs_text}\n\n"
-        "UTokyo level = academic, dense, ~500-600 words, 5 options per question, every question "
-        "uniquely answerable from the passage with plausible (not obviously wrong) distractors. "
-        "Rate strictly.\n\n"
+        f"{uni_desc}. 5 options per question, every question uniquely answerable from the passage "
+        "with plausible (not obviously wrong) distractors. Rate strictly.\n\n"
         "Output JSON ONLY (no markdown):\n"
         "{\n"
         '  "difficulty_score": <integer 1-10, 10 = exactly UTokyo difficulty>,\n'
@@ -102,7 +114,7 @@ def judge_exam_script(script_data: dict, university: str = "todai") -> dict:
         checks["word_count_ok"] and checks["num_questions_ok"] and checks["choices_ok"]
     )
 
-    llm = _llm_rubric(passage, questions)
+    llm = _llm_rubric(passage, questions, university)
     llm_ok = True
     score = llm.get("difficulty_score")
     if isinstance(score, (int, float)):
