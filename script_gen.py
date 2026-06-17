@@ -728,22 +728,31 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         Speaker:
         - Dr. Smith (Male, elderly, authoritative but engaging, "Grandfatherly Professor" tone).
         
+        **STYLE REFERENCE — match this exact register (excerpt from a real KyotoU 2024 passage):**
+        "Yet the modern concept of creativity does not perfectly trace back to any one of these older
+        words. Ingenuity is too utilitarian; it lacks the artsy vibe... Originality hits closer to the
+        mark, but it's somehow not as soulful — nobody ever says originality is the key to a fulfilling
+        life... The term may not be precise, but it is vague in precise and meaningful ways... The
+        slipperiness was a feature, not a bug."
+        Notice: it is a SUBTLE, IRONIC, INDIRECT intellectual essay built on fine conceptual
+        distinctions, parenthetical asides, em-dash interruptions, and self-aware remarks — NOT a tidy
+        lecture. Reproduce THIS tone.
+
         **CRITICAL INSTRUCTION: Style & Content**
-        1. **Abstract & Deep**:
-           - Focus on abstract concepts (Truth, Meaning, Time, Consciousness).
-           - The logic should be dense and require deep thinking to follow.
-           - Avoid superficial examples; use historical or philosophical analogies.
-        
-        2. **Lecture Structure**:
-           - Introduction: Raises a fundamental question or paradox.
-           - Body: Explores 2-3 perspectives or historical shifts in thought.
-           - Synthesis/Conclusion: Offers a profound insight or leaves the question open-ended.
-           - Use lecture markers: "Now, let us consider...", "This brings us to the crux of the matter...", "Conversely...".
-        
-        3. **Teppeki Vocabulary Usage**:
-           - Use the target vocabulary naturally within the academic discourse.
-           - They should carry significant weight in the sentence.
-        
+        1. **Essayistic & subtle (NOT a clear lecture)**:
+           - Write as a thoughtful, slightly ironic intellectual essay. Be indirect and qualified;
+             make the listener work to extract the meaning. Draw fine conceptual distinctions.
+           - Use parenthetical asides, em-dash interruptions, analogies, and self-aware remarks.
+           - AVOID tidy lecture markers ("Let me begin with a question", "This is the crux of the
+             matter", "Now, let us consider", "In conclusion"). Let ideas flow like an essay.
+        2. **Abstract & deep**:
+           - Focus on abstract concepts (meaning, language, value, time, the history of ideas).
+           - Difficulty must come from NUANCE and ABSTRACTION, not from rare jargon.
+           - Reference thinkers / historical shifts where it feels natural (e.g. Plato, Kant).
+        3. **Teppeki Vocabulary Usage (natural, NOT showcased)**:
+           - Weave the target words in so they do NOT stand out as "taught". Do NOT build sentences
+             around them or announce them; they should feel incidental, as in a real essay.
+
         4. **Length**:
            - Write between 500 and 600 words — aim for ~550. Do NOT go below 500 and do NOT exceed 620 words.
            - Note: Kyoto University's 2nd-stage English has NO official listening section; this is a
@@ -755,7 +764,8 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
            - Q4: The lecturer's stance / implication. Q5: Main Idea / Theme.
            - **Each question MUST have EXACTLY 5 choices, labelled "A) ", "B) ", "C) ", "D) ", "E) "**.
            - Every question MUST be answerable solely from the lecture above.
-           - **Rule**: The CORRECT ANSWER for at least 2 questions MUST paraphrase a Target Vocabulary word.
+           - Test comprehension of nuance and implication (not vocabulary recall). Distractors should
+             be plausible misreadings, not obviously wrong.
 
         6. **Translation**: Provide a natural Japanese translation (Lecture style: "〜である", "〜であろう").
 
