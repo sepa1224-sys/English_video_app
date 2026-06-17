@@ -51,9 +51,9 @@ MASTER_FILE = os.path.join(BASE_DIR, "data", "channel_analysis", "genre_master.j
 # Per-university settings. seq=True -> 鉄壁 advances by part number (day_number=part);
 # seq=False (Osaka hybrid) -> vocab is randomized each run (day_number ignored).
 UNI_CONFIG = {
-    "todai": {"label": "東大", "level": "英単語帳鉄壁", "genre": "listening_todai", "seq": True,  "default_part": 6},
-    "kyoto": {"label": "京大", "level": "英単語帳鉄壁", "genre": "listening_kyoto", "seq": True,  "default_part": 1},
-    "osaka": {"label": "阪大", "level": "OsakaHybrid", "genre": "listening_osaka", "seq": False, "default_part": 1},
+    "todai": {"label": "東大", "level": "英単語帳鉄壁", "genre": "listening_todai", "seq": True,  "default_part": 6, "thumb_pos": "bottom-left"},
+    "kyoto": {"label": "京大", "level": "英単語帳鉄壁", "genre": "listening_kyoto", "seq": True,  "default_part": 1, "thumb_pos": "top-right"},
+    "osaka": {"label": "阪大", "level": "OsakaHybrid", "genre": "listening_osaka", "seq": False, "default_part": 1, "thumb_pos": "top-right"},
 }
 
 
@@ -109,12 +109,8 @@ def prepare(video_path: str, part: int, uni: str):
         raise FileNotFoundError(f"Description not found: {dp}")
     desc = open(dp, encoding="utf-8").read()
     desc = re.sub(r"第\d+回", f"第{part}回", desc, count=1)
-    title = desc.splitlines()[0].strip() if desc.strip() else f"【{cfg['label']}リスニング】第{part}回"
-    # YouTube title limit is 100 chars: drop the suffix, then word-trim the topic.
-    if len(title) > 100:
-        title = title.split(" | ")[0].strip()
-        if len(title) > 100:
-            title = title[:97].rsplit(" ", 1)[0].rstrip() + "…"
+    # Short, clean YouTube title (the detailed topic stays inside the description).
+    title = f"【No.{part}】{cfg['label']}リスニング対策"
 
     # YouTube descriptions are capped at 5000 chars. Trim the (long) Script tail
     # but preserve the trailing hashtag line for discovery.
@@ -134,7 +130,8 @@ def prepare(video_path: str, part: int, uni: str):
         try:
             import thumbnail_gen
             out_thumb = os.path.join(BASE_DIR, "output", "exam", uni, f"thumb_part{part}.png")
-            thumb = thumbnail_gen.generate_exam_thumbnail(part, base, out_thumb)
+            thumb = thumbnail_gen.generate_exam_thumbnail(
+                part, base, out_thumb, position=cfg.get("thumb_pos", "bottom-left"))
             print(f"  - Thumbnail: {thumb}")
         except Exception as e:
             print(f"  ! Thumbnail failed (continuing without): {e}")

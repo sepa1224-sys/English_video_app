@@ -46,9 +46,11 @@ def _font(size: int):
 
 
 def generate_exam_thumbnail(part_number: int, base_image_path: str, output_path: str,
-                            label: str = "Part") -> str:
+                            label: str = "Part", position: str = "bottom-left") -> str:
     """
-    Draw "{label} {part_number}" (e.g. "Part 4") on the base image, bottom-left.
+    Draw "{label} {part_number}" (e.g. "Part 4") on the base image.
+    position: "bottom-left" | "top-right" | "top-left" | "bottom-right"
+    (use a corner that doesn't collide with the base's baked text).
     Returns output_path, or raises if the base image is missing.
     """
     if not base_image_path or not os.path.exists(base_image_path):
@@ -61,15 +63,28 @@ def generate_exam_thumbnail(part_number: int, base_image_path: str, output_path:
     font = _font(120)
     color = part_color(part_number)
 
-    # Bottom-left position with margin
-    x = 45
+    M = 45  # margin
     try:
         bbox = draw.textbbox((0, 0), text, font=font)
+        tw = bbox[2] - bbox[0]
         th = bbox[3] - bbox[1]
+        left_off = bbox[0]
         top_off = bbox[1]
     except Exception:
-        th, top_off = 120, 0
-    y = 720 - th - 60 - top_off
+        tw, th, left_off, top_off = 300, 120, 0, 0
+
+    if position == "top-right":
+        x = 1280 - tw - M - left_off
+        y = M - top_off
+    elif position == "top-left":
+        x = M - left_off
+        y = M - top_off
+    elif position == "bottom-right":
+        x = 1280 - tw - M - left_off
+        y = 720 - th - 60 - top_off
+    else:  # bottom-left (default)
+        x = M - left_off
+        y = 720 - th - 60 - top_off
 
     # Thick black outline then green fill
     try:
