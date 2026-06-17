@@ -632,14 +632,19 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         ref_text = ""
     # 1. Topic Refinement
     if university == "kyoto":
+        # Theme set grounded in verified analysis of KyotoU reading passages
+        # (modern non-fiction essays: science thought, philosophy of mind,
+        #  language, narrative, environment, digital society, cultural criticism).
         categories = [
-            "Philosophy of Language",
-            "Epistemology & Truth",
-            "Theoretical Physics & Cosmology",
-            "Cognitive Linguistics",
-            "History of Scientific Thought",
-            "Ethics of Technology",
-            "Cultural Anthropology"
+            "Philosophy of Mind & Consciousness",
+            "Philosophy of Language & Meaning",
+            "Science Thought & the History of Ideas",
+            "Cognitive Science & Human Behavior",
+            "Narrative, Storytelling & the Self",
+            "Environment, Climate & the Anthropocene",
+            "Digital Culture, Information & Knowledge",
+            "Cultural Criticism (creativity, choice, identity)",
+            "History of Knowledge, Religion & Civilization",
         ]
     elif university == "osaka":
         categories = [
@@ -752,6 +757,11 @@ def generate_exam_script(topic: str, vocab_list: list, university: str = "todai"
         3. **Teppeki Vocabulary Usage (natural, NOT showcased)**:
            - Weave the target words in so they do NOT stand out as "taught". Do NOT build sentences
              around them or announce them; they should feel incidental, as in a real essay.
+        4. **Sentence complexity (this is where KyotoU difficulty lives)**:
+           - Include several VERY long sentences (~40-60 words) with embedded insertions, appositives,
+             parentheticals, and the occasional inversion — the kind that are hard to parse on first pass.
+           - The hard part is mid-level vocabulary used in abstract, context-dependent ways (B2-C1),
+             NOT rare jargon. A dictionary gloss of a word should feel slightly wrong in context.
 
         4. **Length**:
            - Write between 500 and 600 words — aim for ~550. Do NOT go below 500 and do NOT exceed 620 words.
