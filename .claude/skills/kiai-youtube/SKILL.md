@@ -49,8 +49,22 @@ grep -E "Uploaded:|Title:|playlist|Done|! " logs/run_todai.log
 `Uploaded: https://youtu.be/...` と `Done. ... next part = N` が出ていれば成功。
 Part番号カウンタ（`data/<uni>_publish_part.txt`）は**成功時のみ+1**される。失敗時は番号据え置きなので、直しただけで同コマンド再実行すればよい。
 
-### 4. 報告
-アップしたURL・タイトル・Part番号・再生リスト追加可否をユーザーに簡潔に伝える。
+### 4. ダッシュボード更新（アップ成功後）
+状況監視ダッシュボード(kiai-dashboard, Vercel)へ最新状況を反映:
+```
+scripts\update_dashboard.bat
+```
+（中身: `py scripts/build_status.py --out ../kiai-dashboard/public/status.json` で status.json 再生成 → `npx vercel --prod --yes` で再デプロイ）
+daily タスク `run_daily_upload.bat` からは自動で呼ばれる。手動アップ時はここで実行。
+
+### 5. 報告
+アップしたURL・タイトル・Part番号・再生リスト追加可否・ダッシュボード更新可否を簡潔に伝える。
+
+## ダッシュボード(kiai-dashboard)
+- リポジトリ: `C:\Users\PC_User\kiai-dashboard`（Next.js / Vercel・チーム michaelts-projects）
+- データ源: ローカルが生成する `public/status.json`（YouTube実状況＋基本指標＋トークン残日数＋アラート）
+- 状況だけ素早く見たい時は `py scripts/build_status.py` で `data/status.json` を作り中身を確認してもよい（デプロイ不要）。
+- 分析の深掘り（視聴維持率/CTR）は YouTube Analytics API + 追加スコープ再認証が必要（未実装・将来）。
 
 ## 既知の失敗と対処（重要）
 今日まで自動アップが止まっていた原因は下記が**重なって**いた。preflightで切り分ける。
