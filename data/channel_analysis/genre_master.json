@@ -91,6 +91,15 @@
       "video_count": 1,
       "total_views": 670,
       "avg_views": 670
+    },
+    "listening_kyoto": {
+      "genre_id": "listening_kyoto",
+      "name": "京大リスニング対策 — 京大入試のリスニング対策動画",
+      "playlist_id": "PL0wZoBmJsWQbm0lMfhqqXLtWcsgrXhpjL",
+      "auto_tags": [],
+      "video_count": 0,
+      "total_views": 0,
+      "avg_views": 0
     }
   }
 }
