@@ -109,8 +109,8 @@ def prepare(video_path: str, part: int, uni: str):
         raise FileNotFoundError(f"Description not found: {dp}")
     desc = open(dp, encoding="utf-8").read()
     desc = re.sub(r"第\d+回", f"第{part}回", desc, count=1)
-    # Short, clean YouTube title (the detailed topic stays inside the description).
-    title = f"【No.{part}】{cfg['label']}リスニング対策"
+    # 統一フォーマット（煽りテンプレ: 実績No.1の勝ちパターン）。詳細トピックは説明欄に残す。
+    title = f"【{cfg['label']}リスニング対策】これ聞けないなら、{cfg['label']}受験はやめとけ。No.{part}"
 
     # YouTube descriptions are capped at 5000 chars. Trim the (long) Script tail
     # but preserve the trailing hashtag line for discovery.
