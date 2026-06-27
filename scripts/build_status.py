@@ -44,7 +44,8 @@ UNIS = {
     "kyoto": {"label": "京大", "kw": "京大", "genre": "listening_kyoto", "default_part": 1},
     "osaka": {"label": "阪大", "kw": "阪大", "genre": "listening_osaka", "default_part": 1},
 }
-TOKEN_TTL_DAYS = 7  # GCP同意画面が「テスト」状態のリフレッシュトークン失効ルール
+OAUTH_PRODUCTION = True  # GCP同意画面を「本番」公開済み(2026-06-27) → リフレッシュトークンは失効しない
+TOKEN_TTL_DAYS = 7       # 「テスト」状態だった頃の失効ルール(参考)。OAUTH_PRODUCTION=Falseの時のみ有効
 
 
 def creds_from_token():
@@ -141,15 +142,16 @@ def main():
         else:
             alerts.append({"level": "error", "msg": f"YouTube取得エラー: {msg[:120]}"})
 
-    # --- トークン残日数 ---
+    # --- トークン残日数（本番公開後は失効しないので警告不要） ---
     token_age_days = token_left = None
     if os.path.exists(TOKEN):
         mtime = datetime.datetime.fromtimestamp(os.path.getmtime(TOKEN), JST)
         token_age_days = round((now - mtime).total_seconds() / 86400, 1)
-        token_left = round(TOKEN_TTL_DAYS - token_age_days, 1)
-        if token_left is not None and token_left <= 2:
-            alerts.append({"level": "warn",
-                           "msg": f"YouTubeトークンが残り約{token_left}日で失効します。本番公開で恒久化を推奨。"})
+        if not OAUTH_PRODUCTION:
+            token_left = round(TOKEN_TTL_DAYS - token_age_days, 1)
+            if token_left <= 2:
+                alerts.append({"level": "warn",
+                               "msg": f"YouTubeトークンが残り約{token_left}日で失効します。本番公開で恒久化を推奨。"})
 
     # --- Anthropic クレジット ---
     anthropic_ok = None
@@ -217,6 +219,7 @@ def main():
             "token_age_days": token_age_days,
             "token_left_days": token_left,
             "token_ttl_days": TOKEN_TTL_DAYS,
+            "oauth_production": OAUTH_PRODUCTION,
         },
         "universities": unis_out,
         "evaluation": evaluation,
