@@ -1595,9 +1595,13 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         if intro_clip:
             final_clips_list.append(intro_clip)
 
+        # YouTube向け短縮(2026-06-27): Part3「Review」=本文の2周目を省略し「本文1回読み」に。
+        # 伸びている動画(東大Part1-3)が6分台=本文1回のため。スクリプト全文は概要欄にあり冗長。
+        INCLUDE_REVIEW = False
         final_clips_list.append(part1_video)     # Listening
         final_clips_list.append(part2_video)     # Questions (attempt)
-        final_clips_list.append(part3_video)     # Review (full script)
+        if INCLUDE_REVIEW:
+            final_clips_list.append(part3_video) # Review (full script)
         final_clips_list.append(part4_video)     # Answers & Explanations
 
         log_debug(f"DEBUG: final_clips_list length: {len(final_clips_list)}")
@@ -1625,8 +1629,9 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         timestamps_log.append({"type": "Questions (1st)", "start": current_time})
         current_time += part2_video.duration
 
-        timestamps_log.append({"type": "Review (Full Script)", "start": current_time})
-        current_time += part3_video.duration
+        if INCLUDE_REVIEW:
+            timestamps_log.append({"type": "Review (Full Script)", "start": current_time})
+            current_time += part3_video.duration
 
         timestamps_log.append({"type": "Answers & Explanations", "start": current_time})
         current_time += part4_video.duration
