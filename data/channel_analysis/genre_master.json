@@ -100,6 +100,15 @@
       "video_count": 0,
       "total_views": 0,
       "avg_views": 0
+    },
+    "listening_osaka": {
+      "genre_id": "listening_osaka",
+      "name": "阪大リスニング対策 — 阪大入試のリスニング対策動画",
+      "playlist_id": "PLPMv2FJYCc5k",
+      "auto_tags": [],
+      "video_count": 0,
+      "total_views": 0,
+      "avg_views": 0
     }
   }
 }
