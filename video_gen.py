@@ -1241,6 +1241,11 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
 
         part1_video = concatenate_videoclips(part1_clips)
         
+        # 6分台化(2026-06-28): 設問・解説は読み上げず画面表示のみにして大幅短縮。
+        # 視聴維持率データ上、短い動画ほど維持率が2〜3倍高い。Trueに戻せば従来の読み上げ。
+        SPOKEN_QUESTIONS = False
+        SPOKEN_EXPLANATIONS = False
+
         log_debug("    > Building Part 2: Questions...")
         part2_clips = []
         
@@ -1280,57 +1285,58 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
         part2_clips.append(trans_clip)
 
         for i, q in enumerate(questions):
-            q_audio = None
-            q_audio_path = q.get("audio_path")
-            
-            if not (q_audio_path and os.path.exists(q_audio_path)):
-                if generate_section_audio:
-                    log_debug(f"      (Generating Question {i+1} Audio...)")
-                    q_audio_path = f"temp/q_{i+1}_{int(time.time())}.mp3"
-                    # Phase 5: announce "Question N" before reading, slightly slower pace.
-                    generate_section_audio(f"Question {i+1}. {q['question']}", q_audio_path, speed=0.92)
-            
-            if q_audio_path and os.path.exists(q_audio_path):
-                q_main_audio = AudioFileClip(q_audio_path)
-                resources_to_close.append(q_main_audio)
-                
-                audio_elements = [(q_main_audio, 0)]
-                
-                # 英語→選択肢の順に、音声を「順次」再生させるためのオフセット
-                current_time_q = q_main_audio.duration + 0.2
-                
-                choices_text = q.get("choices", [])
-                if not choices_text:
-                    choices_text = q.get("options", [])
-                
-                existing_paths = q.get("choices_audio_paths", [])
-                
-                for j, choice_text in enumerate(choices_text):
-                    c_path = None
-                    
-                    if j < len(existing_paths) and existing_paths[j] and os.path.exists(existing_paths[j]):
-                        c_path = existing_paths[j]
-                    
-                    if not c_path:
-                        c_path = f"temp/q_{i+1}_c_{j+1}_{int(time.time())}.mp3"
-                        if generate_section_audio:
-                            generate_section_audio(choice_text, c_path, speed=0.92)
-                    
-                    if c_path and os.path.exists(c_path):
-                        try:
-                            c_clip = AudioFileClip(c_path)
-                            resources_to_close.append(c_clip)
-                            audio_elements.append((c_clip, current_time_q))
-                            current_time_q += c_clip.duration + 0.2
-                        except Exception as e:
-                            log_debug(f"      ! Error loading choice audio {c_path}: {e}")
-                
-                final_q_audio = CompositeAudioClip([clip.with_start(t) for clip, t in audio_elements])
-                q_dur = current_time_q + 3.0 
-                
+            choices_text = q.get("choices", []) or q.get("options", [])
+
+            if SPOKEN_QUESTIONS:
+                q_audio_path = q.get("audio_path")
+                if not (q_audio_path and os.path.exists(q_audio_path)):
+                    if generate_section_audio:
+                        log_debug(f"      (Generating Question {i+1} Audio...)")
+                        q_audio_path = f"temp/q_{i+1}_{int(time.time())}.mp3"
+                        # Phase 5: announce "Question N" before reading, slightly slower pace.
+                        generate_section_audio(f"Question {i+1}. {q['question']}", q_audio_path, speed=0.92)
+
+                if q_audio_path and os.path.exists(q_audio_path):
+                    q_main_audio = AudioFileClip(q_audio_path)
+                    resources_to_close.append(q_main_audio)
+
+                    audio_elements = [(q_main_audio, 0)]
+
+                    # 英語→選択肢の順に、音声を「順次」再生させるためのオフセット
+                    current_time_q = q_main_audio.duration + 0.2
+
+                    existing_paths = q.get("choices_audio_paths", [])
+
+                    for j, choice_text in enumerate(choices_text):
+                        c_path = None
+
+                        if j < len(existing_paths) and existing_paths[j] and os.path.exists(existing_paths[j]):
+                            c_path = existing_paths[j]
+
+                        if not c_path:
+                            c_path = f"temp/q_{i+1}_c_{j+1}_{int(time.time())}.mp3"
+                            if generate_section_audio:
+                                generate_section_audio(choice_text, c_path, speed=0.92)
+
+                        if c_path and os.path.exists(c_path):
+                            try:
+                                c_clip = AudioFileClip(c_path)
+                                resources_to_close.append(c_clip)
+                                audio_elements.append((c_clip, current_time_q))
+                                current_time_q += c_clip.duration + 0.2
+                            except Exception as e:
+                                log_debug(f"      ! Error loading choice audio {c_path}: {e}")
+
+                    final_q_audio = CompositeAudioClip([clip.with_start(t) for clip, t in audio_elements])
+                    q_dur = current_time_q + 3.0
+                else:
+                    final_q_audio = None
+                    q_dur = 10.0
             else:
+                # 無音・画面表示のみ。読む時間を文字量から確保（6〜14秒）。
                 final_q_audio = None
-                q_dur = 10.0
+                chars = len(q.get("question", "")) + sum(len(str(c)) for c in choices_text)
+                q_dur = max(6.0, min(14.0, chars / 16))
 
             def draw_question(draw, img):
                 q_text = f"Q{i+1}: {q['question']}"
@@ -1560,15 +1566,19 @@ def generate_exam_video(audio_segments: list, questions: list, bg_image_path: st
             exp_en = q.get("explanation") or ""
 
             ans_audio = None
-            ans_path = f"temp/ans_{i+1}_{int(time.time())}.mp3"
-            if generate_section_audio:
+            if SPOKEN_EXPLANATIONS and generate_section_audio:
                 # Final explanation is spoken in Japanese (ja-JP voice).
+                ans_path = f"temp/ans_{i+1}_{int(time.time())}.mp3"
                 spoken = f"第{i+1}問。正解は {correct} です。{exp_jp}"
                 generate_section_audio(spoken, ans_path, speed=0.95, voice="ja-JP-NanamiNeural")
-            if os.path.exists(ans_path):
-                ans_audio = AudioFileClip(ans_path)
-                resources_to_close.append(ans_audio)
-            ans_dur = (ans_audio.duration + 2.0) if ans_audio else 8.0
+                if os.path.exists(ans_path):
+                    ans_audio = AudioFileClip(ans_path)
+                    resources_to_close.append(ans_audio)
+            if ans_audio:
+                ans_dur = ans_audio.duration + 2.0
+            else:
+                # 無音・画面表示のみ。解説を読む時間を文字量から確保（6〜14秒）。
+                ans_dur = max(6.0, min(14.0, len(str(exp_jp)) / 14))
 
             def draw_answer(draw, img, idx=i, correct=correct, correct_text=correct_text, exp_jp=exp_jp):
                 try:
