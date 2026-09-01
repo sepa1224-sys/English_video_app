@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 import anthropic
 
 # --- 定数 ---
-PODCAST_SCRIPT_MODEL = os.getenv("PODCAST_SCRIPT_MODEL", "claude-sonnet-4-6")
-ALLOWED_MODELS = {"claude-sonnet-4-6", "claude-opus-4-7", "claude-haiku-4-5-20251001"}
+PODCAST_SCRIPT_MODEL = os.getenv("PODCAST_SCRIPT_MODEL", "claude-opus-5")
+ALLOWED_MODELS = {"claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5-20251001"}
 OUTPUT_BASE_DIR = Path("output") / "podcast"
 MAX_RETRIES = 3
 RETRY_BACKOFF = [2, 5, 10]
@@ -67,6 +67,75 @@ JSON_SCHEMA = """{
     "narration_ja": "(string) エンディングナレーション"
   }
 }"""
+
+# --- 構造化出力ツール定義 ---
+# 生JSONを文字列で受け取るとエスケープ崩れでパースに失敗するため、
+# tool use（構造化出力）でスキーマ検証済みの dict を直接受け取る。
+_PHRASE_ITEM_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "id": {"type": "integer", "description": "1からの連番"},
+        "phrase_en": {"type": "string", "description": "英語フレーズ"},
+        "meaning_ja": {"type": "string", "description": "日本語訳（自然な意訳、原則1文）"},
+        "explanation_ja": {"type": "string", "description": "使用場面の解説（1〜2文）"},
+        "example_en": {"type": "string", "description": "例文（15語以内）"},
+        "difficulty": {
+            "type": "string",
+            "enum": ["beginner", "intermediate", "advanced"],
+        },
+        "category": {"type": "string", "description": "テーマ内カテゴリ"},
+        "is_review": {"type": "boolean", "description": "復習パートに含めるか"},
+    },
+    "required": [
+        "id", "phrase_en", "meaning_ja", "explanation_ja",
+        "example_en", "difficulty", "category", "is_review",
+    ],
+}
+
+SCRIPT_TOOL = {
+    "name": "submit_podcast_script",
+    "description": "生成した聞き流し英語学習ポッドキャストの台本を提出する。",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "meta": {
+                "type": "object",
+                "properties": {
+                    "title_candidates": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "タイトル候補を厳密に3つ",
+                    },
+                },
+                "required": ["title_candidates"],
+            },
+            "opening": {
+                "type": "object",
+                "properties": {"narration_ja": {"type": "string"}},
+                "required": ["narration_ja"],
+            },
+            "phrases": {"type": "array", "items": _PHRASE_ITEM_SCHEMA},
+            "ending": {
+                "type": "object",
+                "properties": {"narration_ja": {"type": "string"}},
+                "required": ["narration_ja"],
+            },
+        },
+        "required": ["meta", "opening", "phrases", "ending"],
+    },
+}
+
+
+def _extract_tool_input(response, tool_name: str) -> dict | None:
+    """レスポンスから tool_use ブロックの input を取り出す。
+
+    thinking ブロックが先頭に来ることがあるため content[0] を仮定しない。
+    """
+    for block in response.content:
+        if getattr(block, "type", None) == "tool_use" and block.name == tool_name:
+            return block.input
+    return None
+
 
 # --- System Prompt ---
 SYSTEM_PROMPT_TEMPLATE = """あなたは英語学習ポッドキャストの台本ライターです。
@@ -125,9 +194,8 @@ meta.title_candidates に3つのタイトル候補を生成する。各タイト
 厳密に以下のスキーマに従うこと。フィールドの追加・省略・名称変更は禁止。
 {json_schema}
 
-## JSON出力上の注意
-- JSON文字列値の中にダブルクォート（"）を含める場合は、必ずバックスラッシュでエスケープすること（例: \\"Dear Mr. Smith\\"）
-- 日本語の鉤括弧「」を使うことで、ダブルクォートの使用を避けることを推奨する
+## 表記上の注意
+- 日本語の解説文中で英語表現を引用するときは、鉤括弧「」で囲む
 
 ## 禁止事項
 - 架空の英語表現や造語を含めないこと
@@ -286,10 +354,14 @@ def _to_theme_slug(theme: str) -> str:
     for ja, en in slug_map.items():
         if ja in theme:
             return en
-    # マッチしない場合は英数字のみ残す
-    slug = re.sub(r"[^a-zA-Z0-9]", "_", theme)
-    slug = re.sub(r"_+", "_", slug).strip("_").lower()
-    return slug or "podcast"
+    # マッチしない場合: 日本語を残したまま記号だけを潰す
+    # （英数字のみに絞ると「空港と機内で使う英語6選」→「6」のように
+    #   意味のないファイル名になってしまうため）
+    slug = re.sub(r"[^\w]+", "_", theme, flags=re.UNICODE).strip("_")
+    slug = re.sub(r"_+", "_", slug)
+    if not slug or slug.isdigit():
+        return "podcast"
+    return slug[:40]
 
 
 def _script_to_markdown(data: dict) -> str:
@@ -381,7 +453,7 @@ def generate_podcast_script(
             "参考: .env.example"
         )
 
-    model = os.getenv("PODCAST_SCRIPT_MODEL", "claude-sonnet-4-6")
+    model = os.getenv("PODCAST_SCRIPT_MODEL", "claude-opus-5")
     model = _validate_model(model)
 
     # --- 難易度配分 ---
@@ -419,17 +491,21 @@ def generate_podcast_script(
     # --- API 呼び出し（リトライ付き） ---
     client = anthropic.Anthropic(api_key=api_key)
 
-    raw_content = None
+    parsed_data = None
     for attempt in range(MAX_RETRIES):
         try:
             print(f"🎙 台本生成中... (attempt {attempt + 1}/{MAX_RETRIES}, model: {model})")
             response = client.messages.create(
                 model=model,
-                max_tokens=8192,
+                max_tokens=16384,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
+                tools=[SCRIPT_TOOL],
+                tool_choice={"type": "tool", "name": SCRIPT_TOOL["name"]},
             )
-            raw_content = response.content[0].text
+            parsed_data = _extract_tool_input(response, SCRIPT_TOOL["name"])
+            if parsed_data is None:
+                raise ValueError("tool_use ブロックが返りませんでした")
             break
         except anthropic.RateLimitError:
             if attempt < MAX_RETRIES - 1:
@@ -451,37 +527,13 @@ def generate_podcast_script(
                 print(f"❌ API エラーが解消されません: {e}")
                 return None
 
-    if raw_content is None:
+    if parsed_data is None:
         print("❌ API レスポンスを取得できませんでした。")
         return None
 
-    # --- JSON パース ---
-    # コードブロック記法が含まれている場合は除去
-    cleaned = raw_content.strip()
-    if cleaned.startswith("```"):
-        cleaned = re.sub(r"^```(?:json)?\s*\n?", "", cleaned)
-        cleaned = re.sub(r"\n?```\s*$", "", cleaned)
-
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     theme_slug = _to_theme_slug(theme)
-
-    try:
-        data = json.loads(cleaned)
-    except json.JSONDecodeError:
-        # 修復を試みる: JSON文字列値内の未エスケープのダブルクォートを修正
-        repaired = _repair_json_quotes(cleaned)
-        try:
-            data = json.loads(repaired)
-            print("⚠ JSON内の未エスケープ文字を自動修復しました。")
-        except json.JSONDecodeError as e:
-            print(f"❌ JSON パースエラー: {e}")
-            print(f"- 生のレスポンス冒頭500文字: {repr(raw_content[:500])}")
-            # デバッグ用に生レスポンスを保存
-            OUTPUT_BASE_DIR.mkdir(parents=True, exist_ok=True)
-            error_path = OUTPUT_BASE_DIR / f"{theme_slug}_raw_error_{timestamp}.txt"
-            error_path.write_text(raw_content, encoding="utf-8")
-            print(f"- 生レスポンスを保存: {error_path}")
-            return None
+    data = parsed_data
 
     # --- meta フィールドの補完（AIが埋めない可能性があるフィールド） ---
     if "meta" not in data:

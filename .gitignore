@@ -37,3 +37,10 @@ debug_audio_output/
 # OAuth認証情報（セキュリティのためGitHub管理外）
 config/token.json
 config/client_secret.json
+
+# 退避ファイル（APIキーを含むため絶対にコミットしない）
+.env.bak*
+*.bak
+
+# 生成した音源
+assets/*.m4a
