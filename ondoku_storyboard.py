@@ -23,7 +23,19 @@ OUTPUT_DIR = Path("output") / "ondoku"
 
 # 全カットで共通の絵柄。--style で切り替える。
 # 絵コンテのpromptは「何が描かれているか」だけを持ち、画風はここで後付けする。
+from ondoku_profiles import PROFILES, DEFAULT_PROFILE, paths
+
 STYLES = {
+    # 銅版画・木版画（ポッドキャスト用。古書の挿絵の質感）
+    # z_image はプロンプトが約800字を超えると失敗するため簡潔に保つこと
+    "engraving": (
+        "antique copperplate engraving illustration, dense fine hatching and "
+        "cross-hatching, crisp black ink linework on warm aged paper, "
+        "no color or only a single muted sepia tone, high contrast between "
+        "deep blacks and bare paper, old encyclopedia plate feel, "
+        "visible plate texture and slight print imperfections, "
+        "no text, no letters, no words, no watermark, horizontal composition"
+    ),
     # 手描き・水彩（絵本寄り）
     "handdrawn": (
         "hand-drawn illustration, visible pencil and ink linework, "
@@ -42,6 +54,25 @@ STYLES = {
         "faceted crystalline rocks, simple leaf silhouettes, cute minimal "
         "creatures with dot eyes, smooth gradients, no texture, maximum color "
         "contrast, no text, horizontal composition"
+    ),
+    # 水彩エディトリアル（TED-Ed風・明るく彩度高め）
+    "watercolor": (
+        "editorial watercolor illustration, loose confident brush strokes with "
+        "visible pigment pooling and soft bleeding edges, clean simple shapes "
+        "over the wash, bright saturated but natural palette, warm ochre, deep "
+        "teal, soft coral, generous white paper showing through, subtle cold "
+        "press paper texture, light ink accents, airy and uncluttered, "
+        "explanatory science illustration feel, no text, no letters, "
+        "no watermark, horizontal composition"
+    ),
+    # 実写ドキュメンタリー（ディスカバリーチャンネル風）
+    "documentary": (
+        "photorealistic wildlife documentary still frame, shot on a long "
+        "telephoto lens, shallow depth of field with soft bokeh, natural golden "
+        "hour light, crisp feather and texture detail, subtle atmospheric haze, "
+        "cinematic color grading, filmic contrast, BBC Planet Earth aesthetic, "
+        "no illustration, no cartoon, no text, no watermark, horizontal "
+        "composition"
     ),
 }
 DEFAULT_STYLE = "flat"
@@ -125,6 +156,37 @@ STORYBOARD_TOOL = {
     },
 }
 
+# 長い教材は1回の応答に収まらず文IDを見失うため、2段階に分ける。
+SENTENCE_TOOL = {
+    "name": "submit_sentences",
+    "description": "本文を文に分割し、日本語訳を付ける。",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "sentences": STORYBOARD_TOOL["input_schema"]["properties"]["sentences"],
+        },
+        "required": ["sentences"],
+    },
+}
+
+SCENE_TOOL = {
+    "name": "submit_scenes",
+    "description": "分割済みの文にシーンを割り当てる。",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            k: STORYBOARD_TOOL["input_schema"]["properties"][k]
+            for k in STORYBOARD_TOOL["input_schema"]["properties"]
+            if k != "sentences"
+        },
+        "required": [k for k in STORYBOARD_TOOL["input_schema"]["required"]
+                     if k != "sentences"],
+    },
+}
+
+TWO_PASS_THRESHOLD = 40   # この文数を超えたら2段階にする
+
+
 SYSTEM_PROMPT = """あなたは英語学習動画の演出家です。
 日本人学習者向けの教養系リーディング教材から、YouTube動画の絵コンテを作ってください。
 
@@ -187,19 +249,46 @@ def build_storyboard(material_id: str, style: str = DEFAULT_STYLE) -> dict | Non
     model = _validate_model(os.getenv("PODCAST_SCRIPT_MODEL", "claude-opus-5"))
     client = anthropic.Anthropic(api_key=api_key)
 
-    print(f"🎬 絵コンテ生成中... (model: {model})")
-    response = client.messages.create(
-        model=model,
-        max_tokens=16384,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_prompt}],
-        tools=[STORYBOARD_TOOL],
-        tool_choice={"type": "tool", "name": STORYBOARD_TOOL["name"]},
-    )
-    data = _extract_tool_input(response, STORYBOARD_TOOL["name"])
-    if data is None:
-        print("❌ tool_use ブロックが返りませんでした。")
-        return None
+    def _call(tools, name, msgs):
+        r = client.messages.create(
+            model=model, max_tokens=16384, system=SYSTEM_PROMPT,
+            messages=msgs, tools=tools,
+            tool_choice={"type": "tool", "name": name},
+        )
+        return _extract_tool_input(r, name)
+
+    n_sent = sum(t.count(".") + t.count("!") + t.count("?") for t in paras)
+    if n_sent <= TWO_PASS_THRESHOLD:
+        print(f"🎬 絵コンテ生成中... (model: {model})")
+        data = _call([STORYBOARD_TOOL], STORYBOARD_TOOL["name"],
+                     [{"role": "user", "content": user_prompt}])
+        if data is None:
+            print("❌ tool_use ブロックが返りませんでした。")
+            return None
+    else:
+        # 長文は 文分割 → シーン設計 の2段階。1回の出力量を半分に抑える。
+        print(f"🎬 絵コンテ生成中... 長文のため2段階 (model: {model}, 約{n_sent}文)")
+        print("  [1/2] 文の分割と翻訳")
+        first = _call([SENTENCE_TOOL], SENTENCE_TOOL["name"],
+                      [{"role": "user", "content": user_prompt}])
+        if first is None:
+            print("❌ 文分割が返りませんでした。")
+            return None
+        sents = first["sentences"]
+        print(f"       {len(sents)}文")
+
+        listing = "\n".join(f'{x["id"]}: {x["en"]}' for x in sents)
+        print("  [2/2] シーンの設計")
+        second = _call(
+            [SCENE_TOOL], SCENE_TOOL["name"],
+            [{"role": "user", "content":
+              f"{user_prompt}\n\n## 分割済みの文（この id をそのまま使うこと）\n"
+              f"{listing}\n\n上の全 {len(sents)} 文を、"
+              f"id 1〜{len(sents)} のどれも漏らさず重複させずにシーンへ割り当てること。"}])
+        if second is None:
+            print("❌ シーン設計が返りませんでした。")
+            return None
+        data = {"sentences": sents, **second}
 
     # --- 検証: en が本文と一致するか（ハルシネーション防止） ---
     full = " ".join(paras)
@@ -257,6 +346,15 @@ if __name__ == "__main__":
     ap.add_argument("--id", required=True, help="教材ID（例: 056）")
     ap.add_argument("--style", default=DEFAULT_STYLE, choices=sorted(STYLES),
                     help="絵柄")
+    ap.add_argument("--profile", default=DEFAULT_PROFILE, choices=sorted(PROFILES),
+                    help="この系統の絵コンテとして保存する")
     args = ap.parse_args()
     if build_storyboard(args.id, args.style) is None:
         raise SystemExit(1)
+    # 以降の画像・動画は系統ごとのファイル名を見るため、そこへ複製しておく。
+    # これが無いと手作業のコピーが要り、忘れると古い絵コンテのまま進んでしまう。
+    src = OUTPUT_DIR / f"{args.id}_storyboard.json"
+    dst = paths(args.id, args.profile)["storyboard"]
+    if src.exists() and src != dst:
+        dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+        print(f"✅ {args.profile} 用に保存: {dst}")

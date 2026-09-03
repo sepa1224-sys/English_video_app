@@ -44,3 +44,12 @@ config/client_secret.json
 
 # 生成した音源
 assets/*.m4a
+
+# 認証情報はフォルダごと除外する。
+# 以前は config/token.json と個別指定していたが、実際の鍵は
+# config/youtube_token.json という別名で、公開リポジトリに漏れる状態だった。
+config/
+*token*.json
+credentials.json
+.DS_Store
+assets/bgm/_raw/

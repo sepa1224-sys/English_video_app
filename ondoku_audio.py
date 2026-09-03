@@ -91,7 +91,8 @@ def _chunk_times(sentence_text: str, chunks: list[dict], alignment: dict) -> lis
     return out
 
 
-def build_audio(material_id: str, voice: str = "george", speed: float = 0.92) -> dict:
+def build_audio(material_id: str, voice: str = "george", speed: float = 0.92,
+                profile: str | None = None) -> dict:
     load_dotenv(override=True)
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not api_key:
@@ -100,9 +101,12 @@ def build_audio(material_id: str, voice: str = "george", speed: float = 0.92) ->
         raise ValueError(f"voice は次から選んでください: {', '.join(VOICES)}")
     vid, vname = VOICES[voice]
 
-    sb = json.loads(
-        (OUTPUT_DIR / f"{material_id}_storyboard.json").read_text(encoding="utf-8")
-    )
+    if profile:
+        from ondoku_profiles import paths
+        sb_path = paths(material_id, profile)["storyboard"]
+    else:
+        sb_path = OUTPUT_DIR / f"{material_id}_storyboard.json"
+    sb = json.loads(sb_path.read_text(encoding="utf-8"))
     rows = align(material_id, sb["sentences"])
 
     audio_dir = OUTPUT_DIR / material_id / "audio"
@@ -165,5 +169,6 @@ if __name__ == "__main__":
     ap.add_argument("--id", required=True, help="教材ID（例: 056）")
     ap.add_argument("--voice", default="george", choices=sorted(VOICES))
     ap.add_argument("--speed", type=float, default=0.92)
+    ap.add_argument("--profile", default=None, help="制作系統")
     a = ap.parse_args()
-    build_audio(a.id, a.voice, a.speed)
+    build_audio(a.id, a.voice, a.speed, a.profile)

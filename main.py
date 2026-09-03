@@ -148,6 +148,12 @@ def run_word_audio_generation(
         print(f"  ! {error_msg}")
         raise RuntimeError(error_msg) from e
 
+# 入試変更で作らなくなった大学。値は停止の理由。
+RETIRED_UNIVERSITIES = {
+    "kyoto": "京大は英語の聞き取りテストを廃止（二次試験にリスニングなし）",
+}
+
+
 def run_podcast_generation(
     topic: str,
     level: str = "TOEIC600",
@@ -161,6 +167,13 @@ def run_podcast_generation(
     Generate a complete podcast video.
     Returns (video_path, description_path) or raises Exception.
     """
+    # 京大は英語の聞き取りテストを廃止したため、対策動画を作る意味がなくなった。
+    # UIを消すだけでは他の経路から作れてしまうので、入口で止める。
+    # 再開する場合はこのブロックを外す。
+    if university in RETIRED_UNIVERSITIES:
+        raise ValueError(
+            f"{university} は生成を停止しています: {RETIRED_UNIVERSITIES[university]}"
+        )
     try:
         # .envファイルから環境変数を読み込む
         load_dotenv()

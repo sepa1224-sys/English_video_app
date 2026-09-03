@@ -450,8 +450,14 @@ elif mode == "University Entrance Exam Listening":
 
     # --- KYOTO TAB ---
     with tab_kyoto:
+        # 京大は英語の聞き取りテストを廃止したため、生成を止めている。
+        # 再開する場合はこの警告と disabled=True、main.RETIRED_UNIVERSITIES を外す。
+        st.warning(
+            "京都大学は英語の聞き取りテストを廃止したため、リスニング対策動画の生成を停止しています。"
+            "（共通テストのリスニングは別枠です）"
+        )
         next_no_kyoto = history_manager.get_next_episode_number("kyoto")
-        st.subheader(f"京都大学 (KyotoU) Mode - Next Episode: #{next_no_kyoto}")
+        st.subheader(f"京都大学 (KyotoU) Mode - 停止中 - Next Episode: #{next_no_kyoto}")
         
         # Kyoto Settings
         st.info("Vocabulary Source: 英単語帳鉄壁")
@@ -469,7 +475,8 @@ elif mode == "University Entrance Exam Listening":
         - **Structure**: Listening (No Sub) -> Questions -> Review (Red Sub) -> Questions
         """)
         
-        if st.button("Generate KyotoU Video", type="primary", key="btn_kyoto"):
+        if st.button("Generate KyotoU Video", type="primary", key="btn_kyoto",
+                     disabled=True, help="京大はリスニング廃止のため停止中"):
             st.session_state.exam_university = "kyoto"
             with st.spinner("Generating KyotoU Listening Video..."):
                 try:

@@ -44,6 +44,31 @@ F_BLACK = os.path.join(_FD, "NotoSansCJKjp-Black.otf")
 SZ_WORD, SZ_LABEL, SZ_JA = 42, 19, 30
 GAP_X, GAP_Y = 24, 12
 
+# --- カメラワーク ---
+# 各シーンに1つ割り当てる。progress(0→1)に対して
+# (zoom, ox, oy) を返す。ox/oy は -1〜1 で、切り出し余白の中での位置。
+CAMERA_MOVES = {
+    "push_in":    lambda t: (1.00 + 0.14 * t,  0.0, 0.0),
+    "pull_out":   lambda t: (1.14 - 0.14 * t,  0.0, 0.0),
+    "pan_right":  lambda t: (1.12, -1.0 + 2.0 * t, 0.0),
+    "pan_left":   lambda t: (1.12,  1.0 - 2.0 * t, 0.0),
+    "tilt_up":    lambda t: (1.12, 0.0,  1.0 - 2.0 * t),
+    "tilt_down":  lambda t: (1.12, 0.0, -1.0 + 2.0 * t),
+    "zoom_pan":   lambda t: (1.02 + 0.12 * t, -0.6 + 1.2 * t, 0.0),
+    "rise":       lambda t: (1.14 - 0.10 * t, 0.0, 0.8 - 1.6 * t),
+    "static":     lambda t: (1.0, 0.0, 0.0),
+}
+DEFAULT_MOVE = "push_in"
+
+
+def camera_at(move: str, progress: float):
+    """カメラワーク名と進捗から (zoom, ox, oy) を返す"""
+    f = CAMERA_MOVES.get(move, CAMERA_MOVES[DEFAULT_MOVE])
+    t = max(0.0, min(1.0, progress))
+    # 端を緩めて、動きの出入りを滑らかにする（ease-in-out）
+    e = t * t * (3 - 2 * t)
+    return f(e)
+
 _IMG_CACHE: dict[str, Image.Image] = {}
 
 
@@ -87,7 +112,7 @@ def layout_chunks(draw, chunks, f_word, f_label, max_w):
 
 
 def render_frame(illust, chunks, highlight_idx, ja_text, out_path=None,
-                 progress=None, zoom=1.0):
+                 progress=None, zoom=1.0, ox=0.0, oy=0.0, show_ja=True):
     """1フレームを描いて PIL Image を返す。
 
     illust: 画像パス、または既に画面比に整えた PIL.Image（動画クリップのフレーム）
@@ -106,7 +131,11 @@ def render_frame(illust, chunks, highlight_idx, ja_text, out_path=None,
     else:
         if zoom > 1.0:
             cw, ch = int(src.width / zoom), int(src.height / zoom)
-            x0, y0 = (src.width - cw) // 2, (src.height - ch) // 2
+            mx, my = src.width - cw, src.height - ch      # 動かせる余白
+            x0 = int(mx / 2 + ox * mx / 2)
+            y0 = int(my / 2 + oy * my / 2)
+            x0 = max(0, min(x0, mx))
+            y0 = max(0, min(y0, my))
             src = src.crop((x0, y0, x0 + cw, y0 + ch))
         img = src.resize((W, H), Image.LANCZOS) if src.size != (W, H) else src.copy()
 
@@ -156,8 +185,11 @@ def render_frame(illust, chunks, highlight_idx, ja_text, out_path=None,
         y += row_h + GAP_Y
 
     # --- 日本語訳 ---
-    jw = _text_w(d, ja_text, f_ja)
-    d.text(((W - jw) // 2, JA_TOP), ja_text, font=f_ja, fill=JA_COLOR)
+    # 訳が見えていると英語を読まずに済むため、既定では出さない。
+    # 視聴者は YouTube の字幕から必要なときだけ参照する。
+    if show_ja and ja_text:
+        jw = _text_w(d, ja_text, f_ja)
+        d.text(((W - jw) // 2, JA_TOP), ja_text, font=f_ja, fill=JA_COLOR)
 
     # --- 進捗バー ---
     if progress is not None:
