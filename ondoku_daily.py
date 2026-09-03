@@ -8,8 +8,10 @@ import argparse, json, os, shutil, subprocess, sys, time
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from ondoku_profiles import materials_dir
+
 APP = Path(__file__).resolve().parent
-MATERIALS = Path.home() / "kiai-coaching-app" / "materials"
+MATERIALS = materials_dir()
 LOG_DIR = APP / "output" / "daily_logs"
 MIN_FREE_MB = 2500          # これを下回ると書き出しが落ちるので先に止める
 

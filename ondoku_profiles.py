@@ -138,3 +138,24 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+def materials_dir() -> Path:
+    """音読教材の置き場所を返す。
+
+    機械によって置き場所が違う（開発機では ~/kiai-coaching-app/materials、
+    生成機では英語アプリ配下）。環境変数 KIAI_MATERIALS_DIR があればそれを使い、
+    無ければ順に探して、見つからなければアプリ直下の materials/ を作る。
+    """
+    import os
+    env = os.getenv("KIAI_MATERIALS_DIR")
+    if env:
+        return Path(env)
+    here = Path(__file__).resolve().parent
+    for cand in (Path.home() / "kiai-coaching-app" / "materials",
+                 here / "materials"):
+        if cand.is_dir():
+            return cand
+    d = here / "materials"
+    d.mkdir(parents=True, exist_ok=True)
+    return d

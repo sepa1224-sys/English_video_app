@@ -14,9 +14,23 @@ FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 
 def download(url: str, dest: Path) -> bool:
     """urllib は macOS の証明書設定で失敗するため curl を使う。"""
-    r = subprocess.run(["curl", "-sSL", "--fail", "-o", str(dest), url],
-                       capture_output=True, text=True)
-    return r.returncode == 0 and dest.exists() and dest.stat().st_size > 0
+    import shutil
+    if shutil.which("curl"):
+        r = subprocess.run(["curl", "-sSL", "--fail", "-o", str(dest), url],
+                           capture_output=True, text=True)
+        if r.returncode == 0 and dest.exists() and dest.stat().st_size > 0:
+            return True
+    # curl が無い環境（古いWindowsなど）向けの代替
+    try:
+        import requests
+        with requests.get(url, stream=True, timeout=180) as resp:
+            resp.raise_for_status()
+            with open(dest, "wb") as fp:
+                for chunk in resp.iter_content(1 << 16):
+                    fp.write(chunk)
+    except Exception:
+        return False
+    return dest.exists() and dest.stat().st_size > 0
 OUT_DIR = Path("assets/bgm")
 COMMON = ("Purely instrumental, no vocals, no voice, no lyrics. "
           "Steady and even throughout with no sudden swells or stops, "

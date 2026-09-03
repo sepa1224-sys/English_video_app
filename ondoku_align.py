@@ -8,7 +8,9 @@ ondoku_align.py — 教材のSVOチャンクと絵コンテの文を対応づけ
 import json
 from pathlib import Path
 
-MATERIALS_DIR = Path.home() / "kiai-coaching-app" / "materials"
+from ondoku_profiles import materials_dir
+
+MATERIALS_DIR = materials_dir()
 
 
 def _norm(s: str) -> str:

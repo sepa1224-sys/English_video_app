@@ -8,11 +8,13 @@ import argparse, json, os, sys
 from datetime import date
 from pathlib import Path
 
+from ondoku_profiles import materials_dir
+
 import anthropic
 from dotenv import load_dotenv
 
 TOPICS = Path("topics_kyoyo.json")
-MATERIALS = Path.home() / "kiai-coaching-app" / "materials"
+MATERIALS = materials_dir()
 
 SYSTEM = """あなたは英語学習教材の書き手です。日本の学習者（CEFR A2-B1）に向けて、
 教養テーマを「やさしい英語」で読ませる本文を書きます。

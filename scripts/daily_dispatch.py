@@ -2,13 +2,15 @@
 """
 daily_dispatch.py
 今日(JST)アップすべき大学を1語で出力する。毎日アップ・曜日ローテ:
-  月/木 = todai, 火/金/日 = kyoto, 水/土 = osaka
-（伸びている京大を週3に。日曜の追加枠は京大へ。休みなし）
+  月/水/金/日 = todai, 火/木/土 = osaka
+京大は英語の聞き取りテストが廃止され、対策動画を作る意味がなくなったため
+ローテーションから外した（旧: 火/金/日 = kyoto）。空いた枠は東大・阪大へ。
 run_daily_upload.bat から呼ばれ、結果を auto_upload.py の --university に渡す。
 """
 import datetime
 
 JST = datetime.timezone(datetime.timedelta(hours=9))
 wd = datetime.datetime.now(JST).weekday()  # Mon=0 ... Sun=6
-ROTATION = {0: "todai", 3: "todai", 1: "kyoto", 4: "kyoto", 6: "kyoto", 2: "osaka", 5: "osaka"}
+ROTATION = {0: "todai", 2: "todai", 4: "todai", 6: "todai",
+            1: "osaka", 3: "osaka", 5: "osaka"}
 print(ROTATION.get(wd, "skip"))

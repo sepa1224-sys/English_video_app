@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse, json, sys
 from pathlib import Path
 
+from ondoku_profiles import materials_dir
+
 SERIES = "1日5分 英語で聞く教養"
 
 # CEFR表記 → 難易度。上から順に見て最初に当たったものを使う。
@@ -54,8 +56,8 @@ def playlists_for(meta: dict) -> list[str]:
 def load_meta(material_id: str) -> dict:
     """音読教材のJSONと絵コンテの両方からメタを拾う。"""
     meta = {}
-    for p in (Path.home() / "kiai-coaching-app" / "materials" / f"{material_id}.json",
-              Path.home() / "kiai-coaching-app" / "materials" / f"{material_id.rstrip('L')}.json"):
+    for p in (materials_dir() / f"{material_id}.json",
+              materials_dir() / f"{material_id.rstrip('L')}.json"):
         if p.exists():
             m = json.loads(p.read_text(encoding="utf-8"))
             meta = {**m, **(m.get("meta") or {}), **meta}

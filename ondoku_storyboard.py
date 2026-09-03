@@ -18,12 +18,12 @@ import anthropic
 
 from podcast_script_gen import _extract_tool_input, _validate_model
 
-MATERIALS_DIR = Path.home() / "kiai-coaching-app" / "materials"
+MATERIALS_DIR = materials_dir()
 OUTPUT_DIR = Path("output") / "ondoku"
 
 # 全カットで共通の絵柄。--style で切り替える。
 # 絵コンテのpromptは「何が描かれているか」だけを持ち、画風はここで後付けする。
-from ondoku_profiles import PROFILES, DEFAULT_PROFILE, paths
+from ondoku_profiles import PROFILES, DEFAULT_PROFILE, paths, materials_dir
 
 STYLES = {
     # 銅版画・木版画（ポッドキャスト用。古書の挿絵の質感）
