@@ -1,4 +1,5 @@
 import os
+import time
 import re
 import io
 import sys
@@ -105,6 +106,36 @@ def generate_audio_segment_elevenlabs(text: str, voice_id: str, api_key: str) ->
         print(f"      ! ElevenLabs Exception: {e}")
         return None
 
+
+def trim_silence(path: str, thresh_db: str = "-45dB", keep: float = 0.06) -> bool:
+    """音声の前後の無音を削る。
+
+    Edge-TTS は語の前後に余韻を付けるため、設定した間(0.7秒)にそれが上乗せされ、
+    単語の間が実測1.7秒になっていた。「日本語を読み終えてから次の英単語までが
+    長い」という指摘への対応。削りすぎると語頭が欠けるので keep 秒は残す。
+    """
+    import shutil
+    import imageio_ffmpeg
+    ff = imageio_ffmpeg.get_ffmpeg_exe()
+    tmp = path + ".trim.mp3"
+    af = (f"silenceremove=start_periods=1:start_silence={keep}:"
+          f"start_threshold={thresh_db}:detection=peak,areverse,"
+          f"silenceremove=start_periods=1:start_silence={keep}:"
+          f"start_threshold={thresh_db}:detection=peak,areverse")
+    # 再エンコードで音質が落ちないよう、元と同じ形式で余裕を持った音質にする。
+    # 既定のままだと 48kb/s の素材が 32kb/s に落ちて、音がこもって聞こえた。
+    r = subprocess.run([ff, "-y", "-loglevel", "error", "-i", path,
+                        "-af", af, "-c:a", "libmp3lame", "-b:a", "128k",
+                        "-ar", "24000", "-ac", "1", tmp],
+                       capture_output=True, text=True)
+    if r.returncode == 0 and os.path.exists(tmp) and os.path.getsize(tmp) > 500:
+        shutil.move(tmp, path)
+        return True
+    if os.path.exists(tmp):
+        os.remove(tmp)
+    return False
+
+
 def generate_audio_segment_edge(text: str, voice: str, output_path: str, speed: float = 1.0) -> bool:
     """
     Edge-TTSを使用して音声ファイルを生成する。
@@ -133,6 +164,7 @@ def generate_audio_segment_edge(text: str, voice: str, output_path: str, speed: 
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             
         subprocess.run(cmd, check=True, startupinfo=startupinfo, capture_output=True)
+        trim_silence(output_path)
         return True
     except subprocess.CalledProcessError as e:
         print(f"      ! Edge-TTS Error: {e}")
@@ -612,6 +644,28 @@ def generate_audio_sections(script_data: dict, output_dir: str = None) -> List[D
         
     return results
 
+
+_JP_READINGS = None
+
+
+def jp_reading(text: str) -> str:
+    """日本語音声用に読みを補正する。表示は元のままで、読み上げだけ差し替える。
+
+    漢字1文字の訳は音読みされやすい（「的」が「てき」になる等の指摘があった）。
+    data/jp_readings.json に載っている語と完全に一致するときだけ、かなに置き換える。
+    部分一致で置換すると別の語まで壊すため、必ず完全一致に限る。
+    """
+    global _JP_READINGS
+    if _JP_READINGS is None:
+        import json
+        try:
+            with open("data/jp_readings.json", encoding="utf-8") as fp:
+                _JP_READINGS = json.load(fp).get("readings", {})
+        except Exception:
+            _JP_READINGS = {}
+    return _JP_READINGS.get(text.strip(), text)
+
+
 def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "output_audio_word", 
                         gap_eng_to_jap: float = GAP_ENG_TO_JAP, 
                         gap_between_jap: float = GAP_BETWEEN_JAP, 
@@ -668,7 +722,9 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
                 # Actually str.split("、") returns [text] if "、" not found.
                 parts = meaning_text.split("、")
                 
-            clean_parts = [p.strip() for p in parts if p.strip()]
+            # 訳は最大4つまで。5つ以上は長くなりすぎるため切る。
+            # 画面表示（video_gen）も同じ4つに揃えているので、読み上げと表示がずれない。
+            clean_parts = [p.strip() for p in parts if p.strip()][:4]
             if not clean_parts:
                 clean_parts = [meaning_text]
             
@@ -677,18 +733,34 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
             
             # Helper to generate clip
             def get_clip(text, voice, label):
-                fname = f"w{i}_{label}_{random.randint(0,9999)}.mp3"
-                fpath = os.path.join(temp_dir, fname)
-                if generate_audio_segment_edge(text, voice, fpath):
+                """音声を作る。失敗したら例外で止める。
+
+                以前はここで None を返し、呼び出し側が `if c:` で黙って飛ばして
+                いた。すると英語だけが欠け、そこから先の英語と日本語の対応が
+                ひとつずつずれ続ける。視聴者から「途中からずれてます」
+                「dreamの意味が間違いになってる」と指摘された原因がこれ。
+                ずれた動画を作るくらいなら、その場で止めて作り直す。
+                """
+                last = None
+                for attempt in range(3):
+                    fname = f"w{i}_{label}_{random.randint(0,9999)}.mp3"
+                    fpath = os.path.join(temp_dir, fname)
                     try:
-                        c = AudioFileClip(fpath)
-                        # Apply slight boost
-                        if hasattr(c, "volumex"): c = c.volumex(1.1)
-                        elif hasattr(c, "with_volume_scaled"): c = c.with_volume_scaled(1.1)
-                        return c
-                    except:
-                        return None
-                return None
+                        if generate_audio_segment_edge(text, voice, fpath):
+                            c = AudioFileClip(fpath)
+                            if hasattr(c, "volumex"):
+                                c = c.volumex(1.1)
+                            elif hasattr(c, "with_volume_scaled"):
+                                c = c.with_volume_scaled(1.1)
+                            return c
+                        last = "generate_audio_segment_edge が False"
+                    except Exception as e:
+                        last = repr(e)
+                    if attempt < 2:
+                        time.sleep([1, 3][attempt])
+                raise RuntimeError(
+                    f"音声を作れませんでした（{label}）: {text!r} / 3回試行 / {last}\n"
+                    f"このまま続けると英語と日本語の対応がずれるため中止します。")
 
             # --- Sequence Logic ---
             
@@ -717,7 +789,7 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
                         text_to_speak = re.sub(r'[①-⑳]', '', part_text)
                         # Note: video_gen.py handles adding numbers to the display based on part_index.
 
-                        c = get_clip(text_to_speak, VOICE_JP, "jp")
+                        c = get_clip(jp_reading(text_to_speak), VOICE_JP, "jp")
                         if c:
                             clips_to_concat.append(c)
                             current_seq_metadata.append({"label": "jp", "part_index": idx, "duration": c.duration, "type": "content", "text": part_text})
@@ -726,7 +798,7 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
                 # JP -> EN (Simple implementation)
                 for idx, part_text in enumerate(clean_parts):
                     text_to_speak = re.sub(r'[①-⑳]', '', part_text)
-                    c = get_clip(text_to_speak, VOICE_JP, "jp")
+                    c = get_clip(jp_reading(text_to_speak), VOICE_JP, "jp")
                     if c:
                         clips_to_concat.append(c)
                         current_seq_metadata.append({"label": "jp", "part_index": idx, "duration": c.duration, "type": "content", "text": part_text})

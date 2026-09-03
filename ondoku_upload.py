@@ -114,6 +114,9 @@ def main() -> int:
     ap.add_argument("--playlist-privacy", default="unlisted",
                     choices=["private", "unlisted", "public"],
                     help="新規作成する再生リストの公開範囲")
+    ap.add_argument("--publish-at",
+                    help="予約公開の時刻。'2026-09-04 07:00' か ISO8601。"
+                         "指定すると非公開でアップし、その時刻に自動公開される")
     ap.add_argument("--privacy", default="unlisted",
                     choices=["private", "unlisted", "public"])
     ap.add_argument("--tags", default="英語,英語学習,教養,リスニング,多読")

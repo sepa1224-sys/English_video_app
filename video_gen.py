@@ -512,14 +512,49 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                 print(f"    ! Error mixing audio for word {i+1} ({word_text}): {e}")
                 mixed_audio = audio_clip
 
-            total_duration = total_audio_dur + 0.5
+            # 音声の後ろに0.5秒の余白を足していたため、設定した間(0.7秒)に
+            # 加えて毎回0.5秒伸びていた。実測で単語間が1.7秒になっていたので詰める。
+            total_duration = total_audio_dur + 0.05
 
             # --- Layout (English word raised; meanings lowered for clear spacing) ---
-            WORD_CENTER_Y = 190
+            # 英単語は毎回まったく同じ位置に出す。
+            # 日本語を隠して英単語だけ見る使い方をするため、語によって上下すると使えない。
+            # 文字の形（下に伸びる字があるか）で高さが変わらないよう、
+            # フォントの基準線で位置を決める。
+            WORD_TOP_Y = 120          # 英単語の描画開始位置（固定）
             MEANING_START_Y = 370
             MEANING_LINE_STEP = 115
+            # 訳は最大4つ。5つ以上は長くなりすぎるので切る。
+            MAX_MEANINGS = 4
+            reveal_lines = reveal_lines[:MAX_MEANINGS]
+            _n_lines = len(reveal_lines)
+            # 4つのときは縦一列だと画面からはみ出すので、2列×2段に並べる。
+            TWO_COLUMN = _n_lines >= 4
+            if TWO_COLUMN:
+                MEANING_START_Y = 380
+                MEANING_LINE_STEP = 130
+            elif _n_lines == 3:
+                # 3行だと下端まで20pxしか残らないので少し上げて詰める
+                MEANING_START_Y = 352
+                MEANING_LINE_STEP = 106
             
-            def make_frame(t, id_text=id_text, w_text=word_text, reveal_lines=reveal_lines):
+            # 1コマずつ描き直すと、縁取り文字だけで1文字49回の描画になり、
+            # 500語の動画に4時間かかっていた。絵が変わるのは訳が現れる瞬間だけ
+            # なので、「今いくつ訳が出ているか」で作った絵を使い回す。
+            # _cache は def のたびに新しく作られるので、語ごとに別の入れ物になる。
+            # レイアウトは語ごとに変わる。make_frame は書き出し時に呼ばれるため、
+            # 変数のまま参照すると「最後の語の設定」が全語に適用されてしまう。
+            # 既定引数で語ごとの値を焼き付ける。
+            def make_frame(t, id_text=id_text, w_text=word_text,
+                           reveal_lines=reveal_lines, _cache={},
+                           TWO_COLUMN=TWO_COLUMN,
+                           MEANING_START_Y=MEANING_START_Y,
+                           MEANING_LINE_STEP=MEANING_LINE_STEP,
+                           WORD_TOP_Y=WORD_TOP_Y):
+                _shown = sum(1 for _rt, _ in reveal_lines if t >= _rt)
+                _hit = _cache.get(_shown)
+                if _hit is not None:
+                    return _hit
                 # Use the same textured background as the countdown / end screen
                 if bg_img is not None:
                     img = bg_img.copy()
@@ -568,7 +603,8 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                     except Exception:
                         tw, th = (0, 0)
 
-                    ty = WORD_CENTER_Y - th // 2
+                    # 高さは使わない。基準線から決めるので語が変わっても動かない
+                    ty = WORD_TOP_Y
                     tx = (1280 - tw) // 2
                     try:
                         stroke_w = 3
@@ -587,25 +623,98 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                     jp_font = ImageFont.truetype(regular_path, 80)
                 except Exception:
                     jp_font = font_mean
-                y = MEANING_START_Y
-                for reveal_t, line in reveal_lines:
-                    if t >= reveal_t:
-                        try:
-                            if hasattr(draw, "textbbox"):
-                                x1, y1, x2, y2 = draw.textbbox((0, 0), line, font=jp_font)
-                                lw_line = x2 - x1
-                            else:
-                                lw_line, _ = jp_font.getsize(line)
-                        except Exception:
-                            lw_line = 0
-                        x = (1280 - lw_line) // 2
-                        try:
-                            draw.text((x, y), line, font=jp_font, fill="#FFFFFF")
-                        except Exception:
-                            draw.text((x, y), line, fill="#FFFFFF")
-                    y += MEANING_LINE_STEP
+                # 訳が長い語（例: assume「を当然のことと思う」）は横幅が画面を超える。
+                # 収まるまで字を小さくする。切れて読めなくなるより良い。
+                def _fit_font(lines_txt, two_col):
+                    size = 80
+                    while size > 44:
+                        f = ImageFont.truetype(regular_path, size)
+                        dd = ImageDraw.Draw(img)
+                        nw = max((dd.textbbox((0,0), chr(0x2460+i), font=f)[2] for i in range(4)),
+                                 default=0)
+                        def bw(txt):
+                            return dd.textbbox((0, 0), txt, font=f)[2]
+                        if two_col and len(lines_txt) >= 4:
+                            left = nw + 16 + max(bw(lines_txt[0]), bw(lines_txt[2]))
+                            right = nw + 16 + max(bw(lines_txt[1]), bw(lines_txt[3]))
+                            total = left + 70 + right
+                        else:
+                            total = nw + 16 + max((bw(x) for x in lines_txt), default=0)
+                        if total <= 1200:
+                            return f
+                        size -= 4
+                    return ImageFont.truetype(regular_path, 44)
+                try:
+                    _bodies = [ln.partition(" ")[2].strip() for _, ln in reveal_lines]
+                    jp_font = _fit_font(_bodies, TWO_COLUMN)
+                except Exception:
+                    pass
+                # 番号と訳文を分けて扱う。
+                #  - 番号は縦にきれいに揃える（行ごとに中央寄せすると番号がずれる）
+                #  - 訳が2つ以上あるときは番号を最初から出す。
+                #    いくつ訳があるかが先に分かる方が、視聴者は身構えられる。
+                def _w(txt):
+                    try:
+                        if hasattr(draw, "textbbox"):
+                            a, b, c, d = draw.textbbox((0, 0), txt, font=jp_font)
+                            return c - a
+                    except Exception:
+                        pass
+                    try:
+                        return jp_font.getsize(txt)[0]
+                    except Exception:
+                        return 0
 
-                return np.array(img)
+                NUM_GAP = 16
+                parts_split = []
+                for reveal_t, line in reveal_lines:
+                    num, _, body = line.partition(" ")
+                    parts_split.append((reveal_t, num, body.strip()))
+                num_w = max((_w(n) for _, n, _ in parts_split), default=0)
+
+                # 段の塊ごとに幅を求めて、塊の中央を揃える
+                if TWO_COLUMN:
+                    groups = {0: [0, 2], 1: [1, 3]}     # 左列, 右列
+                else:
+                    groups = {0: list(range(len(parts_split)))}
+                # 列ごとの幅を出し、画面に収まるように置き直す。
+                # 単純に列の中央へ寄せると、「一緒にいること」のような長い訳で
+                # 左列が画面外へはみ出し、番号が切れていた。
+                MARGIN, COL_GAP = 40, 70
+                widths = {}
+                for gi, idxs in groups.items():
+                    idxs = [i for i in idxs if i < len(parts_split)]
+                    if not idxs:
+                        continue
+                    widths[gi] = num_w + NUM_GAP + max(_w(parts_split[i][2]) for i in idxs)
+                origin = {}
+                if TWO_COLUMN and len(widths) == 2:
+                    total = widths[0] + COL_GAP + widths[1]
+                    start = max(MARGIN, (1280 - total) // 2)
+                    origin[0] = start
+                    origin[1] = start + widths[0] + COL_GAP
+                else:
+                    for gi, w in widths.items():
+                        origin[gi] = max(MARGIN, (1280 - w) // 2)
+
+                show_numbers = len(parts_split) >= 2
+                for slot, (reveal_t, num, body) in enumerate(parts_split):
+                    if TWO_COLUMN:
+                        gi, row = slot % 2, slot // 2
+                    else:
+                        gi, row = 0, slot
+                    x0 = origin.get(gi, 0)
+                    y = MEANING_START_Y + row * MEANING_LINE_STEP
+                    revealed = t >= reveal_t
+                    if show_numbers or revealed:
+                        draw.text((x0, y), num, font=jp_font, fill="#FFFFFF")
+                    if revealed:
+                        draw.text((x0 + num_w + NUM_GAP, y), body,
+                                  font=jp_font, fill="#FFFFFF")
+
+                _out = np.array(img)
+                _cache[_shown] = _out
+                return _out
             
             dynamic_clip = VideoClip(make_frame).with_duration(total_duration)
             dynamic_clip = with_audio_compat(dynamic_clip, mixed_audio)
@@ -686,6 +795,7 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
         fps=24,
         codec="libx264",
         audio_codec="aac",
+        audio_bitrate="192k",     # 既定の80kb/sだと音がこもる
         threads=4,
         logger=None
     )
