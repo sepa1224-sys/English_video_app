@@ -711,11 +711,13 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
             word_text = word_item["word"]
             meaning_text = word_item["meaning"]
             
-            # 訳の区切り文字は単語帳によって違う。
-            # ターゲット系は全角読点「、」だが、鉄壁は半角カンマ「,」を使っている。
+            # 訳の区切り文字は単語帳によってバラバラなので、全部受け付ける。
+            #   ターゲット1900/1400/LEAP/システム/準1級 … 全角読点「、」
+            #   鉄壁 … 半角カンマ「,」（1306件）
+            #   ターゲット1200 … 全角カンマ「，」（505件）とスラッシュ（10件）
             # 「、」だけで分割していたため、鉄壁は訳全体が1つの塊として扱われ、
             # 番号(①②)も付かず、長い一文として読み上げられていた。
-            parts = re.split(r"[、,]", meaning_text)
+            parts = re.split(r"[、,，／/]", meaning_text)
                 
             # 訳は最大4つまで。5つ以上は長くなりすぎるため切る。
             # 画面表示（video_gen）も同じ4つに揃えているので、読み上げと表示がずれない。
