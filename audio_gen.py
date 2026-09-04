@@ -711,16 +711,11 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
             word_text = word_item["word"]
             meaning_text = word_item["meaning"]
             
-            # Split meanings for precise timing
-            # User requested split by "、"
-            if "、" in meaning_text:
-                parts = meaning_text.split("、")
-            else:
-                # Fallback to existing logic or treat as single
-                # But user said "Example: meaning_list = original_text.split('、')"
-                # If no comma, it becomes a list of 1 element automatically by split?
-                # Actually str.split("、") returns [text] if "、" not found.
-                parts = meaning_text.split("、")
+            # 訳の区切り文字は単語帳によって違う。
+            # ターゲット系は全角読点「、」だが、鉄壁は半角カンマ「,」を使っている。
+            # 「、」だけで分割していたため、鉄壁は訳全体が1つの塊として扱われ、
+            # 番号(①②)も付かず、長い一文として読み上げられていた。
+            parts = re.split(r"[、,]", meaning_text)
                 
             # 訳は最大4つまで。5つ以上は長くなりすぎるため切る。
             # 画面表示（video_gen）も同じ4つに揃えているので、読み上げと表示がずれない。
