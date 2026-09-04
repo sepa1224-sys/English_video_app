@@ -107,6 +107,22 @@ def generate_audio_segment_elevenlabs(text: str, voice_id: str, api_key: str) ->
         return None
 
 
+
+def _is_valid_audio(path: str) -> bool:
+    """音声として読めるか確かめる。
+
+    ファイルサイズだけ見ていたため、73KBあるのに中身が壊れたmp3を
+    「正常」と判定して通してしまい、動画の書き出し中に落ちた
+    （ffmpegがvvc動画と誤認する状態になっていた）。
+    """
+    import imageio_ffmpeg
+    ff = imageio_ffmpeg.get_ffmpeg_exe()
+    r = subprocess.run([ff, "-v", "error", "-i", path, "-f", "null", "-"],
+                       capture_output=True, text=True)
+    return r.returncode == 0 and "Audio:" in subprocess.run(
+        [ff, "-i", path], capture_output=True, text=True).stderr
+
+
 def trim_silence(path: str, thresh_db: str = "-45dB", keep: float = 0.06) -> bool:
     """音声の前後の無音を削る。
 
@@ -128,7 +144,8 @@ def trim_silence(path: str, thresh_db: str = "-45dB", keep: float = 0.06) -> boo
                         "-af", af, "-c:a", "libmp3lame", "-b:a", "128k",
                         "-ar", "24000", "-ac", "1", tmp],
                        capture_output=True, text=True)
-    if r.returncode == 0 and os.path.exists(tmp) and os.path.getsize(tmp) > 500:
+    if (r.returncode == 0 and os.path.exists(tmp)
+            and os.path.getsize(tmp) > 500 and _is_valid_audio(tmp)):
         shutil.move(tmp, path)
         return True
     if os.path.exists(tmp):
