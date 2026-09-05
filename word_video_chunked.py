@@ -25,8 +25,14 @@ def make_chunk(book: str, rng: str, submode: str, dest: Path,
     script = script_gen.generate_word_audio_script(book, rng, use_shuffle=False)
     if not script:
         raise RuntimeError(f"{rng} の単語を取れませんでした")
+    # 音声のファイル名は塊内の連番（word_31_...）なので、塊が変わると
+    # 別の単語が同じ名前になる。同じフォルダを使い回すと衝突して
+    # 書き出し中のファイルが壊れることがあった（word_31_supply.mp3）。
+    # 塊ごとにフォルダを分ける。
+    chunk_dir = os.path.join(audio_dir, rng.replace("-", "_"))
+    os.makedirs(chunk_dir, exist_ok=True)
     audio = audio_gen.generate_word_audio(
-        script, submode, output_dir=audio_dir,
+        script, submode, output_dir=chunk_dir,
         gap_eng_to_jap=extras["gap_eng_to_jap"],
         gap_between_jap=extras["gap_between_jap"],
         gap_next_word=extras["gap_next_word"])

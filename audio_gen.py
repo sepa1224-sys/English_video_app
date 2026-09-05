@@ -877,8 +877,22 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
                     out_filename = f"word_{i}_{safe_word}.mp3"
                     out_path = os.path.join(output_dir, out_filename)
                     
-                    final_clip.write_audiofile(out_path, fps=44100, logger=None)
-                    
+                    # 書き出した音声が壊れることがある（実際に word_31_supply.mp3 が
+                    # 73KBあるのに中身が壊れ、動画の書き出しが停止した）。
+                    # 読めるファイルになるまで書き直す。3回だめなら止める。
+                    for _try in range(3):
+                        final_clip.write_audiofile(out_path, fps=44100, logger=None)
+                        if _is_valid_audio(out_path):
+                            break
+                        print(f"    ! 音声が壊れていたので書き直します: {out_filename}"
+                              f" ({_try + 1}回目)")
+                        if os.path.exists(out_path):
+                            os.remove(out_path)
+                    else:
+                        raise RuntimeError(
+                            f"音声を正しく書き出せませんでした: {out_filename}\n"
+                            f"このまま進めると動画の書き出しで落ちるため中止します。")
+
                     results.append({
                         "word_item": word_item,
                         "path": os.path.abspath(out_path),
