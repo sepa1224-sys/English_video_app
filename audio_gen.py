@@ -686,7 +686,8 @@ def jp_reading(text: str) -> str:
 def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "output_audio_word", 
                         gap_eng_to_jap: float = GAP_ENG_TO_JAP, 
                         gap_between_jap: float = GAP_BETWEEN_JAP, 
-                        gap_next_word: float = GAP_NEXT_WORD) -> List[Dict]:
+                        gap_next_word: float = GAP_NEXT_WORD,
+                        gap_example: float = 0.6) -> List[Dict]:
     """
     Generate audio for Word Audio Mode with precise timing.
     Timing:
@@ -738,7 +739,8 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
                 
             # 訳は最大4つまで。5つ以上は長くなりすぎるため切る。
             # 画面表示（video_gen）も同じ4つに揃えているので、読み上げと表示がずれない。
-            clean_parts = [p.strip() for p in parts if p.strip()][:4]
+            # 例文つきは1語が長くなるので、訳は3つまでにする（表示も同じ3つ）。
+            clean_parts = [p.strip() for p in parts if p.strip()][:3 if submode == "en_jp_ex" else 4]
             if not clean_parts:
                 clean_parts = [meaning_text]
             
@@ -778,7 +780,7 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
 
             # --- Sequence Logic ---
             
-            if submode == "en_jp":
+            if submode in ("en_jp", "en_jp_ex"):
                 # 1. EN
                 c = get_clip(word_text, VOICE_EN, "en")
                 if c:
@@ -807,6 +809,22 @@ def generate_word_audio(script_data: Dict, submode: str, output_dir: str = "outp
                         if c:
                             clips_to_concat.append(c)
                             current_seq_metadata.append({"label": "jp", "part_index": idx, "duration": c.duration, "type": "content", "text": part_text})
+
+                # 3. 例文（英→和）。example は word_examples.attach_examples が付ける
+                ex = word_item.get("example") if submode == "en_jp_ex" else None
+                if submode == "en_jp_ex" and not ex:
+                    raise RuntimeError(f"例文がありません: {word_text}")
+                if ex:
+                    clips_to_concat.append(make_silence(gap_example))
+                    current_seq_metadata.append({"label": "gap", "duration": gap_example, "type": "pause"})
+                    c = get_clip(ex["en"], VOICE_EN, "exen")
+                    clips_to_concat.append(c)
+                    current_seq_metadata.append({"label": "ex_en", "duration": c.duration, "type": "content", "text": ex["en"]})
+                    clips_to_concat.append(make_silence(gap_between_jap))
+                    current_seq_metadata.append({"label": "gap", "duration": gap_between_jap, "type": "pause"})
+                    c = get_clip(ex["ja"], VOICE_JP, "exja")
+                    clips_to_concat.append(c)
+                    current_seq_metadata.append({"label": "ex_jp", "duration": c.duration, "type": "content", "text": ex["ja"]})
 
             elif submode == "jp_en":
                 # JP -> EN (Simple implementation)

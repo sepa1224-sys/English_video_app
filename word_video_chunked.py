@@ -14,6 +14,7 @@ import imageio_ffmpeg
 import audio_gen
 import script_gen
 import video_gen
+import word_examples
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 OUT_DIR = Path("output/word_audio")
@@ -25,6 +26,9 @@ def make_chunk(book: str, rng: str, submode: str, dest: Path,
     script = script_gen.generate_word_audio_script(book, rng, use_shuffle=False)
     if not script:
         raise RuntimeError(f"{rng} の単語を取れませんでした")
+    if submode == "en_jp_ex":
+        # 例文は data/examples/<book>.json に作り置き。無い語だけここで生成する
+        word_examples.attach_examples(book, script["words"])
     # 音声のファイル名は塊内の連番（word_31_...）なので、塊が変わると
     # 別の単語が同じ名前になる。同じフォルダを使い回すと衝突して
     # 書き出し中のファイルが壊れることがあった（word_31_supply.mp3）。
@@ -35,7 +39,8 @@ def make_chunk(book: str, rng: str, submode: str, dest: Path,
         script, submode, output_dir=chunk_dir,
         gap_eng_to_jap=extras["gap_eng_to_jap"],
         gap_between_jap=extras["gap_between_jap"],
-        gap_next_word=extras["gap_next_word"])
+        gap_next_word=extras["gap_next_word"],
+        gap_example=extras.get("gap_example", 0.6))
     if not audio:
         raise RuntimeError(f"{rng} の音声を作れませんでした")
     video_gen.generate_word_audio_video(audio, str(dest), extras=extras)
@@ -74,11 +79,14 @@ def main() -> int:
                     help="t1200 / t1400 / t1900 / teppeki / systan / derujun / leap")
     ap.add_argument("--start", type=int, required=True)
     ap.add_argument("--end", type=int, required=True)
-    ap.add_argument("--submode", default="en_jp", choices=["en_jp", "jp_en", "en_only"])
+    ap.add_argument("--submode", default="en_jp", choices=["en_jp", "jp_en", "en_only", "en_jp_ex"],
+                    help="en_jp_ex は 英単語→訳→例文→例文の訳（例文つき聞き流し）")
     ap.add_argument("--chunk", type=int, default=50, help="1つの塊に入れる語数")
     ap.add_argument("--gap-eng-jap", type=float, default=0.4)
     ap.add_argument("--gap-between-jap", type=float, default=0.4)
     ap.add_argument("--gap-next-word", type=float, default=0.7)
+    ap.add_argument("--gap-example", type=float, default=0.6,
+                    help="訳を読み終えてから例文までの間（en_jp_ex のみ）")
     ap.add_argument("--end-duration", type=int, default=10)
     ap.add_argument("--countdown", action="store_true",
                     help="冒頭に5秒のカウントダウンを入れる")
@@ -88,9 +96,12 @@ def main() -> int:
     a = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    work = OUT_DIR / f"_parts_{a.book}_{a.start}-{a.end}"
+    # 塊は作成済みならスキップされるので、形式ごとにフォルダを分ける。
+    # 分けないと例文つきの生成で、通常版の塊がそのまま使われてしまう。
+    suffix = "_ex" if a.submode == "en_jp_ex" else ""
+    work = OUT_DIR / f"_parts_{a.book}_{a.start}-{a.end}{suffix}"
     work.mkdir(exist_ok=True)
-    out = Path(a.out) if a.out else OUT_DIR / f"word_audio_{a.book}_{a.start}-{a.end}.mp4"
+    out = Path(a.out) if a.out else OUT_DIR / f"word_audio_{a.book}_{a.start}-{a.end}{suffix}.mp4"
 
     bounds = list(range(a.start, a.end + 1, a.chunk))
     print(f"{a.book} {a.start}-{a.end} を {len(bounds)}個の塊に分けて作ります"
@@ -109,6 +120,7 @@ def main() -> int:
             "gap_eng_to_jap": a.gap_eng_jap,
             "gap_between_jap": a.gap_between_jap,
             "gap_next_word": a.gap_next_word,
+            "gap_example": a.gap_example,
             # カウントダウンは先頭の塊だけ、終了画面は最後の塊だけに付ける
             "use_countdown": a.countdown and first,
             "end_duration": a.end_duration if last else 0,

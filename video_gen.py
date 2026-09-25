@@ -206,6 +206,82 @@ def draw_centered_text(draw, text, font, img_w=1280, img_h=720, max_width_ratio=
     
     return current_y
 
+EX_HIGHLIGHT = "#FFD24A"
+
+
+def _wrap_words(draw, words, font, max_w):
+    """英文を語単位で折り返す。行ごとに語のリストを返す。"""
+    lines, cur = [], []
+    for w in words:
+        trial = " ".join(cur + [w])
+        if cur and draw.textlength(trial, font=font) > max_w:
+            lines.append(cur)
+            cur = [w]
+        else:
+            cur.append(w)
+    if cur:
+        lines.append(cur)
+    return lines
+
+
+def _wrap_chars(draw, text, font, max_w):
+    """和文を文字単位で折り返す。句読点が行頭に来ないようにする。"""
+    lines, cur = [], ""
+    for ch in text:
+        if cur and draw.textlength(cur + ch, font=font) > max_w and ch not in "、。」）":
+            lines.append(cur)
+            cur = ch
+        else:
+            cur += ch
+    if cur:
+        lines.append(cur)
+    return lines
+
+
+def _draw_example(draw, example, show_ja, top=455, max_w=1160, width=1280):
+    """画面下半分に例文を描く。見出し語は黄色で目立たせる。"""
+    en, target = example["en"], example.get("target", "")
+    # 見出し語が例文のどこにあるか（大文字小文字は無視）
+    lo = en.lower().find(target.lower()) if target else -1
+    span = (lo, lo + len(target)) if lo >= 0 else (-1, -1)
+
+    draw.line([(160, top - 22), (width - 160, top - 22)], fill="#555555", width=2)
+
+    size = 48
+    while True:
+        f_en = ImageFont.truetype(FONT_PATH_BOLD, size)
+        words = en.split(" ")
+        lines = _wrap_words(draw, words, f_en, max_w)
+        if len(lines) <= 2 or size <= 36:
+            break
+        size -= 4
+    # 各語の文字位置を覚えておき、見出し語の範囲に重なる語を色付けする
+    pos, offsets = 0, []
+    for w in words:
+        offsets.append((pos, pos + len(w)))
+        pos += len(w) + 1
+    y, k = top, 0
+    space = draw.textlength(" ", font=f_en)
+    for line in lines:
+        lw = draw.textlength(" ".join(line), font=f_en)
+        x = (width - lw) / 2
+        for w in line:
+            a, b = offsets[k]
+            hit = span[0] >= 0 and a < span[1] and b > span[0]
+            draw.text((x, y), w, font=f_en, fill=EX_HIGHLIGHT if hit else "#FFFFFF")
+            x += draw.textlength(w, font=f_en) + space
+            k += 1
+        y += size + 16
+
+    if show_ja:
+        f_ja = ImageFont.truetype(FONT_PATH_BOLD, 38)
+        y += 10
+        for line in _wrap_chars(draw, example["ja"], f_ja, max_w)[:2]:
+            lw = draw.textlength(line, font=f_ja)
+            draw.text(((width - lw) / 2, y), line, font=f_ja, fill="#BBBBBB")
+            y += 38 + 14
+
+
 def generate_word_audio_video(audio_results: list, output_file: str, bg_style: str = "black", extras: dict = None):
     print(f"--- generate_word_audio_video (Count: {len(audio_results)}) ---")
     log_debug(f"--- generate_word_audio_video (Count: {len(audio_results)}) ---")
@@ -413,7 +489,10 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
         font_word = ImageFont.truetype(black_path, 140)
         font_mean = ImageFont.truetype(regular_path, 80)
         font_id = ImageFont.truetype(regular_path, 30)
+        # 例文つき：下に例文を置くので、英単語を小さくして上へ詰める
+        font_word_ex = ImageFont.truetype(black_path, 110)
     except:
+        font_word_ex = ImageFont.load_default()
         font_word = ImageFont.load_default()
         font_mean = ImageFont.load_default()
         font_id = ImageFont.load_default()
@@ -472,6 +551,16 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                             pidx = len(jp_reveals)
                         jp_reveals.append((seg_start, pidx, str(s.get("text", ""))))
 
+            # 例文つき（en_jp_ex）：例文の英語・和訳が読まれ始める時刻
+            example = word_item.get("example") or None
+            ex_en_t = ex_jp_t = None
+            for s in (meta_segments if isinstance(meta_segments, list) else []):
+                if s.get("label") == "ex_en":
+                    ex_en_t = float(s.get("start", 0.0))
+                elif s.get("label") == "ex_jp":
+                    ex_jp_t = float(s.get("start", 0.0))
+            EX_MODE = bool(example) and ex_en_t is not None
+
             # Sort by spoken order, attach circled numbers (①②③...)
             jp_reveals.sort(key=lambda x: (x[1], x[0]))
             reveal_lines = []  # (reveal_time, display_text)
@@ -529,8 +618,13 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
             reveal_lines = reveal_lines[:MAX_MEANINGS]
             _n_lines = len(reveal_lines)
             # 4つのときは縦一列だと画面からはみ出すので、2列×2段に並べる。
-            TWO_COLUMN = _n_lines >= 4
-            if TWO_COLUMN:
+            TWO_COLUMN = _n_lines >= 4 and not EX_MODE
+            if EX_MODE:
+                # 訳は最大3行。下半分（y=450〜）を例文に空ける
+                WORD_TOP_Y = 30
+                MEANING_START_Y = 200
+                MEANING_LINE_STEP = 76
+            elif TWO_COLUMN:
                 MEANING_START_Y = 380
                 MEANING_LINE_STEP = 130
             elif _n_lines == 3:
@@ -550,8 +644,14 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                            TWO_COLUMN=TWO_COLUMN,
                            MEANING_START_Y=MEANING_START_Y,
                            MEANING_LINE_STEP=MEANING_LINE_STEP,
-                           WORD_TOP_Y=WORD_TOP_Y):
+                           WORD_TOP_Y=WORD_TOP_Y,
+                           EX_MODE=EX_MODE, example=example,
+                           ex_en_t=ex_en_t, ex_jp_t=ex_jp_t):
                 _shown = sum(1 for _rt, _ in reveal_lines if t >= _rt)
+                _ex = 0
+                if EX_MODE:
+                    _ex = (1 if t >= ex_en_t else 0) + (1 if ex_jp_t is not None and t >= ex_jp_t else 0)
+                _shown = (_shown, _ex)
                 _hit = _cache.get(_shown)
                 if _hit is not None:
                     return _hit
@@ -592,14 +692,15 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
 
                 # English word: always visible at a fixed (raised) position
                 text = w_text or ""
+                fw = font_word_ex if EX_MODE else font_word
                 if text:
                     try:
                         if hasattr(draw, "textbbox"):
-                            x1, y1, x2, y2 = draw.textbbox((0, 0), text, font=font_word)
+                            x1, y1, x2, y2 = draw.textbbox((0, 0), text, font=fw)
                             tw = x2 - x1
                             th = y2 - y1
                         else:
-                            tw, th = font_word.getsize(text)
+                            tw, th = fw.getsize(text)
                     except Exception:
                         tw, th = (0, 0)
 
@@ -612,8 +713,8 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                             for oy in range(-stroke_w, stroke_w + 1):
                                 if ox == 0 and oy == 0:
                                     continue
-                                draw.text((tx + ox, ty + oy), text, font=font_word, fill="white")
-                        draw.text((tx, ty), text, font=font_word, fill="#2060C0")
+                                draw.text((tx + ox, ty + oy), text, font=fw, fill="white")
+                        draw.text((tx, ty), text, font=fw, fill="#2060C0")
                     except Exception:
                         draw.text((tx, ty), text, fill="#2060C0")
 
@@ -626,7 +727,7 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                 # 訳が長い語（例: assume「を当然のことと思う」）は横幅が画面を超える。
                 # 収まるまで字を小さくする。切れて読めなくなるより良い。
                 def _fit_font(lines_txt, two_col):
-                    size = 80
+                    size = 60 if EX_MODE else 80
                     while size > 44:
                         f = ImageFont.truetype(regular_path, size)
                         dd = ImageDraw.Draw(img)
@@ -711,6 +812,9 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
                     if revealed:
                         draw.text((x0 + num_w + NUM_GAP, y), body,
                                   font=jp_font, fill="#FFFFFF")
+
+                if EX_MODE and _ex >= 1:
+                    _draw_example(draw, example, show_ja=_ex >= 2)
 
                 _out = np.array(img)
                 _cache[_shown] = _out

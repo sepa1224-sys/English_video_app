@@ -1,0 +1,62 @@
+{
+ "1": {
+  "word": "create",
+  "en": "The artist created a beautiful painting for the museum.",
+  "target": "created",
+  "ja": "その芸術家は美術館のために美しい絵を創り出した。"
+ },
+ "2": {
+  "word": "increase",
+  "en": "The number of visitors increased last summer.",
+  "target": "increased",
+  "ja": "昨年の夏、訪問者の数が増加した。"
+ },
+ "3": {
+  "word": "improve",
+  "en": "She studied hard to improve her English.",
+  "target": "improve",
+  "ja": "彼女は英語を向上させるために熱心に勉強した。"
+ },
+ "4": {
+  "word": "mean",
+  "en": "This word means something different in French.",
+  "target": "means",
+  "ja": "この単語はフランス語では違う意味を持つ。"
+ },
+ "5": {
+  "word": "own",
+  "en": "My uncle owns a small farm near the river.",
+  "target": "owns",
+  "ja": "私のおじは川の近くに小さな農場を所有している。"
+ },
+ "6": {
+  "word": "include",
+  "en": "The price includes breakfast at the hotel.",
+  "target": "includes",
+  "ja": "その値段はホテルの朝食を含んでいる。"
+ },
+ "7": {
+  "word": "consider",
+  "en": "Many people consider him a great leader.",
+  "target": "consider",
+  "ja": "多くの人々は彼を偉大な指導者だと見なしている。"
+ },
+ "8": {
+  "word": "allow",
+  "en": "Her parents allowed her to travel alone.",
+  "target": "allowed",
+  "ja": "彼女の両親は彼女が一人で旅行することを許した。"
+ },
+ "9": {
+  "word": "suggest",
+  "en": "The doctor suggested a shorter walking route.",
+  "target": "suggested",
+  "ja": "医者はもっと短い散歩の道を提案した。"
+ },
+ "10": {
+  "word": "produce",
+  "en": "This factory produces cars for many countries.",
+  "target": "produces",
+  "ja": "この工場は多くの国のために車を生産している。"
+ }
+}
