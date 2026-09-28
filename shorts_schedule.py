@@ -22,7 +22,8 @@ LEDGER = Path("data/shorts_ledger.json")
 LINKS = Path("data/shorts_links.json")
 # videos.insert は1本1,600ユニット、1日の上限は10,000。他の投稿の分も残す
 MAX_UPLOADS = 5
-NAME_RE = re.compile(r"short_(?P<book>[a-z0-9]+)_(?P<s>\d{4})-(?P<e>\d{4})\.mp4$")
+# 番号順: short_t1900_0001-0005.mp4 ／ ランダム: short_t1900_r0001.mp4
+NAME_RE = re.compile(r"short_(?P<book>[a-z0-9]+?)_(?:(?P<s>\d{4})-(?P<e>\d{4})|r(?P<r>\d{4}))\.mp4$")
 
 
 def load_json(p: Path, default):
@@ -42,7 +43,8 @@ def stock(ledger: dict) -> list[dict]:
         if not m or mp4.name in ledger or not mp4.with_suffix(".json").exists():
             continue
         by_book.setdefault(m["book"], []).append(
-            {"file": mp4, "book": m["book"], "start": int(m["s"]), "end": int(m["e"])})
+            {"file": mp4, "book": m["book"], "start": int(m["s"] or m["r"]),
+             "end": int(m["e"] or m["r"])})
     # 同じ単語帳が何日も続くと飽きられるので、単語帳を1本ずつ交互に出す
     queues = [sorted(v, key=lambda x: x["start"]) for _, v in sorted(by_book.items())]
     out = []
@@ -100,17 +102,24 @@ def playlist_id(yt, name: str, cache: dict) -> str:
     return cache[name]
 
 
-def auto_generate(ledger: dict, need: int, books: list[str], count: int) -> None:
+def auto_generate(ledger: dict, need: int, books: list[str], count: int,
+                  sequential: bool = False) -> None:
     """在庫が need 本に満たなければ、単語帳ごとに続きの範囲を作る。"""
     have = len(stock(ledger))
     if have >= need:
         return
     for book in books:
-        ends = [int(m["e"]) for p in SHORTS_DIR.glob(f"short_{book}_*.mp4")
-                if (m := NAME_RE.search(p.name))]
-        ends += [v["end"] for v in ledger.values() if v["book"] == book]
-        start = max(ends, default=0) + 1
         n = -(-(need - have) // len(books))   # 切り上げ
+        if not sequential:
+            print(f"🎬 {book}: ランダム出題を{n}本作ります")
+            subprocess.run([sys.executable, "shorts_quiz.py", "--book", book, "--random",
+                            "--count", str(count), "--shorts", str(n)], check=True)
+            continue
+        ends = [int(m["e"]) for p in SHORTS_DIR.glob(f"short_{book}_*.mp4")
+                if (m := NAME_RE.search(p.name)) and m["e"]]
+        ends += [v["end"] for k, v in ledger.items()
+                 if v["book"] == book and "_r" not in k]
+        start = max(ends, default=0) + 1
         print(f"🎬 {book}: No.{start}〜 を{n}本作ります")
         subprocess.run([sys.executable, "shorts_quiz.py", "--book", book,
                         "--start", str(start), "--count", str(count),
@@ -128,6 +137,8 @@ def main() -> int:
     ap.add_argument("--books", default="t1900,teppeki",
                     help="--auto-generate で作る単語帳（交互に作る）")
     ap.add_argument("--count", type=int, default=5, help="1本あたりの語数")
+    ap.add_argument("--sequential", action="store_true",
+                    help="--auto-generate で番号順に作る（既定はランダム出題）")
     ap.add_argument("--dry-run", action="store_true", help="予定だけ表示して上げない")
     a = ap.parse_args()
 
@@ -141,7 +152,8 @@ def main() -> int:
         return 0
 
     if a.auto_generate:
-        auto_generate(ledger, len(slots), [b.strip() for b in a.books.split(",")], a.count)
+        auto_generate(ledger, len(slots), [b.strip() for b in a.books.split(",")], a.count,
+                      a.sequential)
     plan = list(zip(stock(ledger), slots))
     if not plan:
         print("⚠ 上げられるショートがありません。shorts_quiz.py で作るか --auto-generate を付けてください。")

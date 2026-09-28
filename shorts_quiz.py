@@ -8,7 +8,7 @@
       → No.1-5, 6-10, 11-15, 16-20 の4本
 """
 from __future__ import annotations
-import argparse, json, os, re, sys, tempfile
+import argparse, json, os, random, re, sys, tempfile
 from pathlib import Path
 
 import numpy as np
@@ -25,6 +25,8 @@ W, H = 1080, 1920
 # 大事な文字は横 120〜960・縦 1500 より上に収める。
 SAFE_W = 820
 OUT_DIR = Path("output/shorts")
+# ランダム出題で出した語。単語帳を一周するまで同じ語を出さない
+USED = Path("data/shorts_used.json")
 VOICE_EN = "en-US-ChristopherNeural"
 VOICE_JP = "ja-JP-KeitaNeural"
 TICK_SE = "assets/Accent08-1.mp3"
@@ -34,6 +36,8 @@ BOOK_LABEL = {
     "t1200": "ターゲット1200", "t1400": "ターゲット1400", "t1900": "ターゲット1900",
     "teppeki": "鉄壁", "systan": "システム英単語", "derujun": "でる順準1級", "leap": "LEAP",
 }
+# 範囲の上限。t1900 は 1900 を超える範囲を渡すとエラーになる
+BOOK_MAX = {"t1900": 1900}
 
 
 def font(path: str, size: int) -> ImageFont.FreeTypeFont:
@@ -105,11 +109,11 @@ class Frames:
         centered(d, 1400, f"No.{item['id']:04d}", font(FONT_PATH_BOLD, 40), GRAY)
         return np.array(img)
 
-    def end(self, first: int, last: int) -> np.ndarray:
+    def end(self) -> np.ndarray:
         img, d = self.base(None)
         centered(d, 820, "何問言えた？", font(FONT_PATH_BLACK, 120), "white")
         centered(d, 1000, "コメントで教えて！", font(FONT_PATH_BOLD, 70), YELLOW)
-        centered(d, 1200, f"No.{first}〜{last} の聞き流しは", font(FONT_PATH_BOLD, 48), GRAY)
+        centered(d, 1200, f"{self.label}の聞き流しは", font(FONT_PATH_BOLD, 48), GRAY)
         centered(d, 1270, "チャンネルの動画で", font(FONT_PATH_BOLD, 48), GRAY)
         return np.array(img)
 
@@ -149,7 +153,7 @@ def build_short(book: str, words: list[dict], out: Path) -> dict:
             clips.append(ImageClip(fr.word(i, w, meanings=ms)).with_duration(ans))
             t += ans
 
-        clips.append(ImageClip(fr.end(words[0]["id"], words[-1]["id"])).with_duration(2.5))
+        clips.append(ImageClip(fr.end()).with_duration(2.5))
         t += 2.5
 
         video = concatenate_videoclips(clips).with_audio(
@@ -161,17 +165,22 @@ def build_short(book: str, words: list[dict], out: Path) -> dict:
     return {"duration": round(t, 1)}
 
 
-def metadata(book: str, words: list[dict], long_url: str | None) -> dict:
+def metadata(book: str, words: list[dict], long_url: str | None,
+             serial: int | None = None) -> dict:
     label = BOOK_LABEL.get(book, book)
     s, e = words[0]["id"], words[-1]["id"]
-    answers = "\n".join(f"{w['word']} … {'、'.join(meanings_of(w))}" for w in words)
-    desc = [f"{label} No.{s}〜{e} を3秒でチェック。何問言えたかコメントで教えてください。", "",
+    answers = "\n".join(f"No.{w['id']} {w['word']} … {'、'.join(meanings_of(w))}" for w in words)
+    what = f"ランダム{len(words)}問" if serial else f"No.{s}〜{e}"
+    desc = [f"{label}から{what}を3秒でチェック。何問言えたかコメントで教えてください。", "",
             "【答え】", answers, ""]
     if long_url:
         desc += [f"▶ {label} の聞き流しはこちら", long_url, ""]
     desc += [f"#{label.replace(' ', '')} #英単語 #大学受験 #shorts"]
+    title = (f"【{label}】3秒で意味言える？ ランダム{len(words)}問 Part.{serial} #shorts"
+             if serial else f"【{label}】3秒で意味言える？ No.{s}〜{e} #shorts")
     return {
-        "title": f"【{label}】3秒で意味言える？ No.{s}〜{e} #shorts",
+        "title": title,
+        "ids": [w["id"] for w in words],
         "description": "\n".join(desc),
         "tags": [label, "英単語", "大学受験", "英単語クイズ", "shorts"],
     }
@@ -180,11 +189,17 @@ def metadata(book: str, words: list[dict], long_url: str | None) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser(description="単語帳の3秒クイズ・ショートを作る")
     ap.add_argument("--book", required=True, help=" / ".join(BOOK_LABEL))
-    ap.add_argument("--start", type=int, required=True, help="最初の単語番号")
+    ap.add_argument("--start", type=int, help="最初の単語番号（番号順に出すとき）")
+    ap.add_argument("--random", action="store_true",
+                    help="単語帳全体から、まだ出していない語をランダムに出す")
     ap.add_argument("--count", type=int, default=5, help="1本に入れる語数")
     ap.add_argument("--shorts", type=int, default=1, help="続けて何本作るか")
     ap.add_argument("--long-url", help="概要欄に載せる聞き流し動画のURL")
     a = ap.parse_args()
+    if a.random:
+        return main_random(a)
+    if a.start is None:
+        ap.error("--start か --random を指定してください")
 
     end = a.start + a.count * a.shorts - 1
     script = script_gen.generate_word_audio_script(a.book, f"{a.start}-{end}")
@@ -205,6 +220,36 @@ def main() -> int:
         meta = metadata(a.book, words, a.long_url) | info
         out.with_suffix(".json").write_text(json.dumps(meta, ensure_ascii=False, indent=2),
                                             encoding="utf-8")
+        print(f"   ✅ {out}（{info['duration']}秒）")
+    return 0
+
+
+def main_random(a) -> int:
+    script = script_gen.generate_word_audio_script(a.book, f"1-{BOOK_MAX.get(a.book, 9999)}")
+    if not script:
+        return 1
+    pool = script["words"]
+    used = json.loads(USED.read_text(encoding="utf-8")) if USED.exists() else {}
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    serial = len(list(OUT_DIR.glob(f"short_{a.book}_r*.mp4")))
+    for k in range(a.shorts):
+        seen = set(used.get(a.book, []))
+        left = [w for w in pool if w["id"] not in seen]
+        if len(left) < a.count:
+            print(f"   {a.book} を一周したので、最初から出し直します")
+            used[a.book], left = [], pool
+        words = sorted(random.sample(left, a.count), key=lambda w: w["id"])
+        random.shuffle(words)
+        serial += 1
+        out = OUT_DIR / f"short_{a.book}_r{serial:04d}.mp4"
+        print(f"[{k + 1}/{a.shorts}] Part.{serial}: " + ", ".join(w["word"] for w in words))
+        info = build_short(a.book, words, out)
+        meta = metadata(a.book, words, a.long_url, serial) | info
+        out.with_suffix(".json").write_text(json.dumps(meta, ensure_ascii=False, indent=2),
+                                            encoding="utf-8")
+        # 動画ができてから記録する。途中で落ちた語は次回また候補に戻る
+        used.setdefault(a.book, []).extend(w["id"] for w in words)
+        USED.write_text(json.dumps(used, ensure_ascii=False), encoding="utf-8")
         print(f"   ✅ {out}（{info['duration']}秒）")
     return 0
 
