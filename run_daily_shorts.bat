@@ -1,5 +1,5 @@
 @echo off
-REM Shorts: keep 7 days of scheduled 3-second-quiz Shorts (19:00 JST).
+REM Shorts: keep 7 days of scheduled 3-second-quiz Shorts (07:00 and 19:00 JST).
 REM Generates more Shorts when stock runs low, then uploads with publishAt.
 REM Register in Windows Task Scheduler (e.g. EnglishVideoApp_DailyShorts, 05:00).
 REM Run on ONE machine only: data\shorts_ledger.json prevents double uploads per machine.

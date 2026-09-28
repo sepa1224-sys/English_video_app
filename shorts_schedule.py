@@ -2,7 +2,7 @@
 
 何度実行しても同じ動画を二重に上げない。上げた記録は data/shorts_ledger.json。
 実行するたびに「今から --days 日先まで」の空き枠を埋める。毎日1回走らせれば、
-常に1週間ぶんの予約が並んだ状態が保たれる。
+常に1週間ぶんの予約（朝7:00・夜19:00）が並んだ状態が保たれる。
 
   python3 shorts_schedule.py --dry-run          # 何をいつ上げるかだけ表示
   python3 shorts_schedule.py                    # 予約投稿する
@@ -56,18 +56,19 @@ def stock(ledger: dict) -> list[dict]:
 
 
 def next_slots(ledger: dict, slots: list[str], days: int, now: datetime) -> list[datetime]:
-    """予約済みの最後より後ろで、今から days 日先までの空き枠。"""
+    """今から days 日先までの、まだ予約の入っていない枠。
+    予約済みの枠の間に空きがあれば、そこも埋める（1日1本→2本に増やしたとき、
+    予約済みの日の朝の枠が空いたままにならないように）。"""
     taken = {datetime.fromisoformat(v["publish_at"]) for v in ledger.values()}
     # 直前すぎる枠は処理が間に合わないことがあるので、1時間後からにする
     earliest = now + timedelta(hours=1)
-    last = max([t for t in taken if t > now], default=earliest)
     out = []
     for d in range(days + 1):
         day = (now + timedelta(days=d)).date()
         for hm in slots:
             h, m = map(int, hm.split(":"))
             t = datetime(day.year, day.month, day.day, h, m, tzinfo=JST)
-            if t >= earliest and t >= last and t not in taken:
+            if t >= earliest and t not in taken:
                 out.append(t)
     return sorted(out)
 
@@ -128,7 +129,7 @@ def auto_generate(ledger: dict, need: int, books: list[str], count: int,
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="ショートを日本時間の枠に予約投稿する")
-    ap.add_argument("--slots", default="19:00",
+    ap.add_argument("--slots", default="07:00,19:00",
                     help="毎日の公開時刻（日本時間）。カンマ区切りで複数可 例: 07:00,19:00")
     ap.add_argument("--days", type=int, default=7, help="何日先まで予約で埋めるか")
     ap.add_argument("--max-uploads", type=int, default=MAX_UPLOADS)
