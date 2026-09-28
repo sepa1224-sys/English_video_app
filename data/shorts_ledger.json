@@ -5,7 +5,8 @@
     "start": 1,
     "end": 5,
     "publish_at": "2026-09-28T19:00:00+09:00",
-    "uploaded_at": "2026-09-28T14:51:32+09:00"
+    "uploaded_at": "2026-09-28T14:51:32+09:00",
+    "published_now": true
   },
   "short_teppeki_0001-0005.mp4": {
     "video_id": "pY4W4jpBvFU",
