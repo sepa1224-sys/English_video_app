@@ -1,0 +1,42 @@
+{
+  "short_t1900_0001-0005.mp4": {
+    "video_id": "3qRVo4u6z8Y",
+    "book": "t1900",
+    "start": 1,
+    "end": 5,
+    "publish_at": "2026-09-28T19:00:00+09:00",
+    "uploaded_at": "2026-09-28T14:51:32+09:00"
+  },
+  "short_teppeki_0001-0005.mp4": {
+    "video_id": "pY4W4jpBvFU",
+    "book": "teppeki",
+    "start": 1,
+    "end": 5,
+    "publish_at": "2026-09-29T19:00:00+09:00",
+    "uploaded_at": "2026-09-28T14:51:43+09:00"
+  },
+  "short_t1900_0006-0010.mp4": {
+    "video_id": "zGIhP0AUWXY",
+    "book": "t1900",
+    "start": 6,
+    "end": 10,
+    "publish_at": "2026-09-30T19:00:00+09:00",
+    "uploaded_at": "2026-09-28T14:51:53+09:00"
+  },
+  "short_teppeki_0006-0010.mp4": {
+    "video_id": "XTvj7h_kuF4",
+    "book": "teppeki",
+    "start": 6,
+    "end": 10,
+    "publish_at": "2026-10-01T19:00:00+09:00",
+    "uploaded_at": "2026-09-28T14:51:57+09:00"
+  },
+  "short_t1900_0011-0015.mp4": {
+    "video_id": "PrkVTk5v1as",
+    "book": "t1900",
+    "start": 11,
+    "end": 15,
+    "publish_at": "2026-10-02T19:00:00+09:00",
+    "uploaded_at": "2026-09-28T14:52:01+09:00"
+  }
+}
