@@ -622,8 +622,9 @@ def generate_word_audio_video(audio_results: list, output_file: str, bg_style: s
             if EX_MODE:
                 # 訳は最大3行。下半分（y=450〜）を例文に空ける
                 WORD_TOP_Y = 30
-                MEANING_START_Y = 200
-                MEANING_LINE_STEP = 76
+                # 訳が3行でも区切り線（y=433）に触れないよう、行間を詰める
+                MEANING_START_Y = 195
+                MEANING_LINE_STEP = 68
             elif TWO_COLUMN:
                 MEANING_START_Y = 380
                 MEANING_LINE_STEP = 130
