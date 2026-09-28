@@ -1,0 +1,608 @@
+{
+ "set": "p001",
+ "theme": "仕事の雑談で言えそうで言えない表現",
+ "title_ja": "仕事の雑談で言えそうで言えない英語100フレーズ聞き流し",
+ "hook": "それ英語で言える？",
+ "items": [
+  {
+   "ja": "最近仕事が立て込んでてバタバタしてるんだ。",
+   "en": "I've been swamped with work lately.",
+   "point": "現在完了進行形",
+   "situation": "同僚に、最近仕事が立て込んでてバタバタしてると伝える"
+  },
+  {
+   "ja": "その件は一旦保留にしよう。",
+   "en": "Let's put that on hold for now.",
+   "point": "put on hold",
+   "situation": "同僚に、その件は一旦保留にしようと提案する"
+  },
+  {
+   "ja": "話が脱線したから元に戻そう。",
+   "en": "We're getting off track, let's get back to it.",
+   "point": "off track表現",
+   "situation": "同僚に、話が脱線したので元に戻そうと言う"
+  },
+  {
+   "ja": "今抱えてる案件がなかなか進まなくて。",
+   "en": "This project just isn't moving forward.",
+   "point": "進行否定の強調",
+   "situation": "同僚に、今抱えている案件がなかなか進まないとぼやく"
+  },
+  {
+   "ja": "急な予定変更に対応してくださってありがとうございます。",
+   "en": "Thanks for accommodating the last-minute change.",
+   "point": "accommodateの使い方",
+   "situation": "上司に、急な予定変更に対応してもらったお礼を言う"
+  },
+  {
+   "ja": "その資料まだ途中だけど、共有していい？",
+   "en": "It's still a work in progress, but can I share it?",
+   "point": "work in progress",
+   "situation": "同僚に、その資料はまだ途中だけど共有していいか聞く"
+  },
+  {
+   "ja": "今日なんかテンション上がらないんだよね。",
+   "en": "I'm just not feeling it today.",
+   "point": "not feeling it",
+   "situation": "同僚に、今日はテンション上がらないと軽く愚痴る"
+  },
+  {
+   "ja": "取引先の担当者の名前ド忘れしちゃって、なんだっけ？",
+   "en": "I totally blanked on the client's name, what was it again?",
+   "point": "blank on〜",
+   "situation": "取引先の担当者の名前をド忘れしたので同僚にこっそり聞く"
+  },
+  {
+   "ja": "会議長引きそうだから先に行ってて。",
+   "en": "This meeting might run long, go ahead without me.",
+   "point": "run long",
+   "situation": "同僚に、会議が長引きそうだから先に行っててと伝える"
+  },
+  {
+   "ja": "分からないことがあったら遠慮なく聞いてね。",
+   "en": "Feel free to ask if anything's unclear.",
+   "point": "Feel free to〜",
+   "situation": "後輩に、分からないことがあれば遠慮なく聞いてと伝える"
+  },
+  {
+   "ja": "あの件どうなった？",
+   "en": "How's that thing coming along?",
+   "point": "come along進捗確認",
+   "situation": "同僚に、あの件どうなったか進捗を軽く聞く"
+  },
+  {
+   "ja": "体調があまり良くないので早退してもいいですか。",
+   "en": "I'm not feeling well, can I head out early?",
+   "point": "head out early",
+   "situation": "上司に、体調がすぐれないので早退したいと申し出る"
+  },
+  {
+   "ja": "それは自分の専門外なんだよね。",
+   "en": "That's outside my area of expertise.",
+   "point": "outside my expertise",
+   "situation": "同僚に、その仕事は自分の専門外だと伝える"
+  },
+  {
+   "ja": "話がまとまらないから後で整理して送るね。",
+   "en": "Let me sort my thoughts and send them later.",
+   "point": "sort my thoughts",
+   "situation": "同僚に、話がまとまらないので後で整理して送ると伝える"
+  },
+  {
+   "ja": "締め切りに間に合いそうにないんだけど、どうしよう。",
+   "en": "I don't think I'll make the deadline, what should I do?",
+   "point": "make the deadline",
+   "situation": "同僚に、締め切りに間に合いそうにないと相談する"
+  },
+  {
+   "ja": "指示された内容があいまいなので確認したいのですが。",
+   "en": "Could you clarify what you meant by that?",
+   "point": "clarifyの依頼",
+   "situation": "上司に、指示された内容があいまいで確認したいと伝える"
+  },
+  {
+   "ja": "その提案はちょっと現実的じゃないかも。",
+   "en": "That proposal might not be very realistic.",
+   "point": "控えめな意見表現",
+   "situation": "同僚に、その提案はちょっと現実的じゃないかもと意見する"
+  },
+  {
+   "ja": "忙しいところ悪いけど、ちょっと手伝ってくれる？",
+   "en": "Sorry to bother you, but can you give me a hand?",
+   "point": "give me a hand",
+   "situation": "同僚に、忙しいところ悪いけどちょっと手伝ってと頼む"
+  },
+  {
+   "ja": "なるほど、そういうことか。",
+   "en": "Ah, I see what you mean now.",
+   "point": "納得の相づち",
+   "situation": "同僚の話に、なるほどそういうことかと納得する相づちを打つ"
+  },
+  {
+   "ja": "それ、自分も同感だよ。",
+   "en": "I feel the same way about that.",
+   "point": "同意の表現",
+   "situation": "同僚に、それは自分も同感だと伝える"
+  },
+  {
+   "ja": "今の説明だとちょっとピンとこないんだけど。",
+   "en": "I'm not quite following that explanation.",
+   "point": "follow理解する",
+   "situation": "同僚に、今の説明だとちょっとピンとこないと伝える"
+  },
+  {
+   "ja": "さっきの会議の内容ざっくり共有するね。",
+   "en": "Let me give you a quick rundown of the meeting.",
+   "point": "quick rundown",
+   "situation": "同僚に、さっきの会議の内容を簡単に共有する"
+  },
+  {
+   "ja": "その件はまだ社内で調整中だよ。",
+   "en": "We're still ironing things out internally.",
+   "point": "iron out調整する",
+   "situation": "同僚に、その件はまだ社内で調整中だと伝える"
+  },
+  {
+   "ja": "ここ、誤字があるみたいだよ。",
+   "en": "I think there's a typo right here.",
+   "point": "控えめな指摘",
+   "situation": "同僚に、資料の誤字を指摘する"
+  },
+  {
+   "ja": "ごめん、間違って違うファイル送っちゃった。",
+   "en": "Sorry, I sent you the wrong file by mistake.",
+   "point": "うっかりミスの謝罪",
+   "situation": "同僚に、間違えて違うファイルを送ってしまったことを謝る"
+  },
+  {
+   "ja": "その案、もう少し詰める必要があるね。",
+   "en": "We need to work out the details a bit more.",
+   "point": "詰める必要ありの表現",
+   "situation": "同僚に、その案はもう少し詰める必要があると伝える"
+  },
+  {
+   "ja": "これ、いい感じに仕上がってるね。",
+   "en": "This is turning out really well.",
+   "point": "仕上がりを褒める",
+   "situation": "後輩の作業に対して、いい感じに仕上がってると褒める"
+  },
+  {
+   "ja": "そのアイデア、面白いね。",
+   "en": "That's a really interesting idea.",
+   "point": "感想を伝える",
+   "situation": "同僚に、そのアイデア面白いねと感想を伝える"
+  },
+  {
+   "ja": "今の仕事量だと正直手一杯です。",
+   "en": "I'm honestly maxed out with my current workload.",
+   "point": "手一杯を伝える",
+   "situation": "上司に、今の仕事量だと手一杯だと伝える"
+  },
+  {
+   "ja": "他の部署との調整が難航してます。",
+   "en": "We're having trouble coordinating with the other department.",
+   "point": "難航を報告",
+   "situation": "同僚に、他の部署との調整が難航してると報告する"
+  },
+  {
+   "ja": "今度飲みにでも行こうよ。",
+   "en": "Let's grab a drink sometime soon.",
+   "point": "カジュアルな誘い",
+   "situation": "同僚に、今度飲みにでも行こうと誘う"
+  },
+  {
+   "ja": "今日は早めに切り上げようか。",
+   "en": "Let's wrap up early today.",
+   "point": "切り上げの提案",
+   "situation": "同僚に、今日は早めに切り上げようと提案する"
+  },
+  {
+   "ja": "あのプロジェクト、ひとまず落ち着いたよ。",
+   "en": "Things have calmed down with that project.",
+   "point": "一段落の報告",
+   "situation": "同僚に、あのプロジェクトはひとまず落ち着いたと報告する"
+  },
+  {
+   "ja": "報告が遅くなってすみません。",
+   "en": "Sorry for the late update on this.",
+   "point": "報告遅れの謝罪",
+   "situation": "上司に、報告が遅くなったことを謝る"
+  },
+  {
+   "ja": "来週改めてご連絡します。",
+   "en": "I'll reach out again sometime next week.",
+   "point": "後日連絡の予告",
+   "situation": "取引先に、来週改めて連絡すると伝える"
+  },
+  {
+   "ja": "そのやり方だと二度手間になるよ。",
+   "en": "That way will just create extra work.",
+   "point": "二度手間の指摘",
+   "situation": "同僚に、そのやり方だと二度手間になると指摘する"
+  },
+  {
+   "ja": "疲れた顔してるけど大丈夫?",
+   "en": "You look tired, are you doing okay?",
+   "point": "体調を気遣う",
+   "situation": "同僚に、疲れた顔してるけど大丈夫かと気遣う"
+  },
+  {
+   "ja": "あまり無理しないでね。",
+   "en": "Don't push yourself too hard, okay?",
+   "point": "労いの声かけ",
+   "situation": "同僚に、無理しないでねと声をかける"
+  },
+  {
+   "ja": "休みをいただき、ありがとうございました。",
+   "en": "Thanks for letting me take the day off.",
+   "point": "休暇への感謝",
+   "situation": "上司に、休みをもらったことへのお礼を言う"
+  },
+  {
+   "ja": "その件は私に任せてもらえますか。",
+   "en": "Can you leave that one to me?",
+   "point": "任せてほしいと申し出",
+   "situation": "同僚に、その件は自分に任せてほしいと申し出る"
+  },
+  {
+   "ja": "その仕事、引き継いでもらえないかな。",
+   "en": "Could you take over that task for me?",
+   "point": "引き継ぎの依頼",
+   "situation": "同僚に、その仕事引き継いでもらえないか頼む"
+  },
+  {
+   "ja": "急なお願いで申し訳ないんだけど。",
+   "en": "Sorry for the short notice, but could I ask you something?",
+   "point": "依頼前の前置き",
+   "situation": "同僚に、急な依頼で申し訳ないと前置きして頼み事をする"
+  },
+  {
+   "ja": "あの取引先、ちょっと癖があるよね。",
+   "en": "That client is a bit particular, isn't it?",
+   "point": "軽い人物評",
+   "situation": "同僚に、あの取引先ちょっと癖があるよねと軽く話す"
+  },
+  {
+   "ja": "今の職場の雰囲気、働きやすいよね。",
+   "en": "This workplace has a really comfortable vibe.",
+   "point": "職場の感想",
+   "situation": "同僚に、今の職場の雰囲気が働きやすいと感想を言う"
+  },
+  {
+   "ja": "実は転職を考えてるんだけど、内緒にしてね。",
+   "en": "I'm actually thinking about changing jobs, keep it between us.",
+   "point": "内緒の相談",
+   "situation": "同僚に、転職を考えていることをこっそり相談する"
+  },
+  {
+   "ja": "あの人の言ってることは正論だけど、なかなか厳しいよね",
+   "en": "He's right, but he's pretty harsh about it.",
+   "point": "逆接のbut",
+   "situation": "同僚に、あの人の言ってることは正論だけど厳しいと感想を言う"
+  },
+  {
+   "ja": "明日は在宅にしようか迷ってるんだよね",
+   "en": "I'm thinking about working from home tomorrow.",
+   "point": "迷いの表現",
+   "situation": "同僚に、明日は在宅にしようか迷ってると話す"
+  },
+  {
+   "ja": "出張の日程、確認してもいいですか",
+   "en": "Could I confirm the dates for the business trip?",
+   "point": "丁寧な確認依頼",
+   "situation": "上司に、出張の日程を確認する"
+  },
+  {
+   "ja": "あのメール、ちょっと言い方きつくなかった？",
+   "en": "Wasn't that email a bit harsh?",
+   "point": "否定疑問の感想",
+   "situation": "同僚に、あのメール、ちょっと言い方きつくなかったと感想を言う"
+  },
+  {
+   "ja": "それはさすがにやりすぎじゃない？",
+   "en": "Isn't that a bit too much?",
+   "point": "否定疑問で意見",
+   "situation": "同僚に、それはさすがにやりすぎじゃないかと意見する"
+  },
+  {
+   "ja": "その件は一度持ち帰らせてもらっていい？",
+   "en": "Can I take this back and think it over?",
+   "point": "持ち帰る表現",
+   "situation": "同僚に、その件は一度持ち帰らせてほしいと伝える"
+  },
+  {
+   "ja": "それはちょっと違う気がするな",
+   "en": "I feel like that's not quite right.",
+   "point": "軽い反論表現",
+   "situation": "同僚に、それはちょっと違う気がすると軽く反論する"
+  },
+  {
+   "ja": "今度こそ本気でダイエットするよ",
+   "en": "This time I'm really going to lose weight.",
+   "point": "決意のthis time",
+   "situation": "同僚に、今度こそ本気でダイエットすると宣言する"
+  },
+  {
+   "ja": "あの案件はもうあきらめたほうがいいかもね",
+   "en": "We might just have to give up on that project.",
+   "point": "諦めの提案",
+   "situation": "同僚に、あの案件はもうあきらめたほうがいいかもと意見する"
+  },
+  {
+   "ja": "正直、そのやり方には賛成しかねるな",
+   "en": "Honestly, I can't really agree with that approach.",
+   "point": "婉曲的な反対",
+   "situation": "同僚に、正直そのやり方には賛成しかねると伝える"
+  },
+  {
+   "ja": "今の状況を踏まえると、リスクが高いよね",
+   "en": "Given the situation, that seems pretty risky.",
+   "point": "given the~の使い方",
+   "situation": "同僚に、今の状況を踏まえるとリスクが高いと指摘する"
+  },
+  {
+   "ja": "え、その話は聞いてないよ",
+   "en": "Wait, I never heard about that.",
+   "point": "驚きのneverの強調",
+   "situation": "同僚に、その話は聞いてないと驚きを伝える"
+  },
+  {
+   "ja": "今更だけど、確認しておきたいことがあって",
+   "en": "I know it's a bit late, but I want to confirm something.",
+   "point": "今更の切り出し方",
+   "situation": "同僚に、今更だけど確認しておきたいことがあると切り出す"
+  },
+  {
+   "ja": "ちょっと愚痴を聞いてもらっていい？",
+   "en": "Can I vent to you for a second?",
+   "point": "愚痴を言う表現",
+   "situation": "同僚に、ちょっと愚痴を聞いてもらっていいか頼む"
+  },
+  {
+   "ja": "資料作成を手伝ってくれてありがとう",
+   "en": "Thanks for helping me with the materials.",
+   "point": "お礼のThanks for",
+   "situation": "同僚に、資料作成を手伝ってくれたことへのお礼を言う"
+  },
+  {
+   "ja": "その提案、一理あるね",
+   "en": "That proposal does make sense.",
+   "point": "一理あるの表現",
+   "situation": "同僚に、その提案には一理あると認める"
+  },
+  {
+   "ja": "その件、もう少し様子見ようよ",
+   "en": "Let's wait and see a bit longer.",
+   "point": "様子を見る表現",
+   "situation": "同僚に、その件はもう少し様子を見ようと提案する"
+  },
+  {
+   "ja": "実はあの人が言ってたこと、よく分からなかった",
+   "en": "Honestly, I didn't quite get what he meant.",
+   "point": "理解できなかった告白",
+   "situation": "同僚に、あの人が言ってたこと、実はよく分からなかったと打ち明ける"
+  },
+  {
+   "ja": "最近どう？調子は？",
+   "en": "How have you been lately?",
+   "point": "近況を尋ねる現在完了",
+   "situation": "同僚に、最近調子どうかと近況を聞く"
+  },
+  {
+   "ja": "その資料、後で見返しておくね",
+   "en": "I'll take another look at that later.",
+   "point": "後で確認する意思",
+   "situation": "同僚に、その資料、後で見返しておくと伝える"
+  },
+  {
+   "ja": "あの件はもう時間の無駄だからやめよう",
+   "en": "Let's drop it, it's just a waste of time.",
+   "point": "時間の無駄でやめる",
+   "situation": "同僚に、あの件はもう時間の無駄だからやめようと提案する"
+  },
+  {
+   "ja": "その資料、抜けがあるから確認してほしい",
+   "en": "Can you check this? Something seems missing.",
+   "point": "抜けを指摘する依頼",
+   "situation": "同僚に、その資料、抜けがあるから確認してほしいと頼む"
+  },
+  {
+   "ja": "その意見、ちょっと極端じゃない？",
+   "en": "Isn't that opinion a bit extreme?",
+   "point": "極端さを指摘する",
+   "situation": "同僚に、その意見はちょっと極端じゃないかと指摘する"
+  },
+  {
+   "ja": "今日の会議、思ったより早く終わったね",
+   "en": "That meeting ended sooner than I expected.",
+   "point": "予想より早いの表現",
+   "situation": "同僚に、今日の会議、思ったより早く終わったねと感想を言う"
+  },
+  {
+   "ja": "今週末は久しぶりにゆっくりしたいな",
+   "en": "I just want to relax this weekend for once.",
+   "point": "久しぶりの願望表現",
+   "situation": "同僚に、今週末は久しぶりにゆっくりしたいと話す"
+  },
+  {
+   "ja": "あの人はいつも要点をつかむのがうまいよね",
+   "en": "He's always good at getting to the point.",
+   "point": "要点をつかむ表現",
+   "situation": "同僚に、あの人はいつも要点をつかむのがうまいと褒める"
+  },
+  {
+   "ja": "新しいシステムにまだ慣れてなくて、ちょっと手間取ってるんだ。",
+   "en": "I'm still getting used to the new system.",
+   "point": "getting used toの用法",
+   "situation": "同僚に、新しいシステムにまだ慣れてなくて手間取ってると話す"
+  },
+  {
+   "ja": "他部署から異動してきた人のために歓迎会を企画したいんですが。",
+   "en": "I'd like to plan a welcome party for the new transfer.",
+   "point": "提案のI'd like to",
+   "situation": "上司に、他部署から異動してきた人の歓迎会を企画したいと提案する"
+  },
+  {
+   "ja": "その件、メールより電話で話した方が早いと思う。",
+   "en": "It'd be faster to just call about that.",
+   "point": "提案のit'd be faster to",
+   "situation": "同僚に、その件はメールより電話で話した方が早いと提案する"
+  },
+  {
+   "ja": "あの会議室、予約しといてくれてありがとう。",
+   "en": "Thanks for booking that meeting room for us.",
+   "point": "感謝のThanks for -ing",
+   "situation": "同僚に、あの会議室予約しといてくれたことへのお礼を言う"
+  },
+  {
+   "ja": "それ、自分のミスだったんだ",
+   "en": "That was my mistake.",
+   "point": "素直に認める表現",
+   "situation": "同僚に、その件は自分のミスだったと素直に認める"
+  },
+  {
+   "ja": "新しいツールの使い方、よく分からないから教えてくれる？",
+   "en": "Can you show me how this new tool works?",
+   "point": "依頼のCan you",
+   "situation": "同僚に、新しいツールの使い方がよく分からないので教えてほしいと頼む"
+  },
+  {
+   "ja": "他部署からクレームが来てまして",
+   "en": "We got a complaint from another department.",
+   "point": "報告のgot",
+   "situation": "上司に、他部署からのクレームについて報告する"
+  },
+  {
+   "ja": "その件は私から説明しておくよ",
+   "en": "I'll explain that part myself.",
+   "point": "申し出のI'll",
+   "situation": "同僚に、その件については自分から説明しておくと申し出る"
+  },
+  {
+   "ja": "会議室の予約、重複してない？",
+   "en": "Didn't we double-book the meeting room?",
+   "point": "確認の否定疑問",
+   "situation": "同僚に、会議室の予約が重複していたことに気づいて確認する"
+  },
+  {
+   "ja": "急な依頼、対応できそう？",
+   "en": "Can we handle this last-minute request?",
+   "point": "相談のCan we",
+   "situation": "取引先からの急な依頼に対応できるか同僚に相談する"
+  },
+  {
+   "ja": "うちのミスで、納期がずれそうなんだ",
+   "en": "Our mistake might push back the deadline.",
+   "point": "未来の推量might",
+   "situation": "同僚に、こちらのミスで納期がずれ込みそうだと伝える"
+  },
+  {
+   "ja": "そのやり方、前に試して失敗したことあるんだ",
+   "en": "We tried that before, and it didn't work.",
+   "point": "経験の共有",
+   "situation": "同僚に、そのやり方は前にも試して失敗したと共有する"
+  },
+  {
+   "ja": "今日、部長機嫌よさそうだね",
+   "en": "The boss seems in a good mood today.",
+   "point": "様子のseem",
+   "situation": "同僚に、上司の機嫌が今日はよさそうだと軽く話す"
+  },
+  {
+   "ja": "他のメンバーにも声かけておいてくれる？",
+   "en": "Can you let the others know too?",
+   "point": "依頼のlet know",
+   "situation": "同僚に、他のメンバーにも声をかけておいてほしいと頼む"
+  },
+  {
+   "ja": "それ、自分だけじゃ決められないな",
+   "en": "I can't decide that on my own.",
+   "point": "制約のcan't",
+   "situation": "同僚に、その件は自分の判断だけでは決められないと伝える"
+  },
+  {
+   "ja": "そのプロジェクトから外れることになったんだ",
+   "en": "I'm off that project now.",
+   "point": "状態変化のbe off",
+   "situation": "同僚に、そのプロジェクトから外れることになったと報告する"
+  },
+  {
+   "ja": "久しぶりに会った取引先の人、全然変わってなかったよ",
+   "en": "That client hasn't changed at all.",
+   "point": "現在完了の継続",
+   "situation": "同僚に、久しぶりに会った取引先の人が変わってなかったと感想を言う"
+  },
+  {
+   "ja": "電話の内容聞き取りにくかったから、後でメールしてくれる？",
+   "en": "Can you email me the details later?",
+   "point": "依頼のCan you",
+   "situation": "同僚に、電話の内容が聞き取りにくかったので後でメールしてほしいと頼む"
+  },
+  {
+   "ja": "今日のランチ何にしようか迷ってるんだよね。",
+   "en": "I can't decide what to have for lunch today.",
+   "point": "can't decide 迷う",
+   "situation": "同僚に、今日のランチ何にするか迷ってると相談する"
+  },
+  {
+   "ja": "パソコンの動きが重くて全然作業が進まないよ。",
+   "en": "My computer is so slow, I can't get anything done.",
+   "point": "so形容詞で結果を表す",
+   "situation": "同僚に、パソコンの動きが重くて作業が進まないとこぼす"
+  },
+  {
+   "ja": "この前教えてもらったやり方、すごく役に立ったよ。",
+   "en": "That trick you showed me really helped a lot.",
+   "point": "help+a lotで感謝",
+   "situation": "同僚に、この前教えてもらったやり方が役に立ったとお礼を言う"
+  },
+  {
+   "ja": "会議の議事録、私がまとめておくよ。",
+   "en": "I'll put together the meeting notes.",
+   "point": "put togetherでまとめる",
+   "situation": "同僚に、会議の議事録は自分がまとめておくと申し出る"
+  },
+  {
+   "ja": "来月、有給を取りたいんですが。",
+   "en": "I'd like to take some time off next month.",
+   "point": "take time offで休暇",
+   "situation": "上司に、来月の有給申請をしたいと伝える"
+  },
+  {
+   "ja": "コーヒー買ってくるけど、何かいる？",
+   "en": "I'm getting coffee, do you want anything?",
+   "point": "進行形で予定を伝える",
+   "situation": "同僚に、コーヒーでも買ってくるけど何か欲しいか聞く"
+  },
+  {
+   "ja": "あの案件、クライアントの反応がすごく良かったよ。",
+   "en": "The client responded really well to that project.",
+   "point": "respond wellで好反応",
+   "situation": "同僚に、あの案件はクライアントの反応が良かったと報告する"
+  },
+  {
+   "ja": "急用ができたから、続きはあとで聞かせて。",
+   "en": "Something came up, can you fill me in later?",
+   "point": "fill in で詳細を伝える",
+   "situation": "同僚に、話の途中で急用ができたので後で続きを聞かせてと伝える"
+  },
+  {
+   "ja": "資料の順番を変えた方が分かりやすいと思う。",
+   "en": "I think it'd be clearer if we reordered the slides.",
+   "point": "仮定法でやわらかい提案",
+   "situation": "同僚に、資料の並び順を変えた方が分かりやすいと提案する"
+  },
+  {
+   "ja": "電車が遅れてて、少し遅刻しそう。",
+   "en": "My train's delayed, so I'll be a bit late.",
+   "point": "現在形で予定的未来",
+   "situation": "同僚に、電車が遅延して少し遅れると連絡する"
+  },
+  {
+   "ja": "久しぶりに残業したから今日はちょっと疲れたよ。",
+   "en": "I worked late for the first time in a while, so I'm beat.",
+   "point": "for the first time in a while",
+   "situation": "同僚に、久しぶりに残業したから今日は疲れたと話す"
+  }
+ ]
+}
