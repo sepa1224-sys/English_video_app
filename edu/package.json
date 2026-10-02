@@ -1,0 +1,20 @@
+{
+  "name": "kiai-edu-videos",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "sync-cast": "node scripts/sync-cast.mjs",
+    "voice": "node scripts/voice.mjs",
+    "render": "node scripts/render.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.532",
+    "@remotion/fonts": "^4.0.532",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.532",
+    "@types/react": "^19.3.0",
+    "typescript": "^5.6.0"
+  }
+}

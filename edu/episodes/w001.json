@@ -1,0 +1,188 @@
+{
+ "id": "w001",
+ "format": "short",
+ "kind": "word",
+ "title": "afford＝余裕がある",
+ "youtube_title": "「I don't afford」は間違い！afford の正しい使い方【can't afford to】",
+ "topic": "afford（can't afford の形で使う／お金だけでなく時間や余裕にも）",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "金がないときは、こう言うんだッ！",
+   "en": "I don't afford it!",
+   "visual": {
+    "kind": "word",
+    "en": "afford",
+    "ja": "〜する余裕がある",
+    "pos": "動詞",
+    "note": "can't afford の形でよく使う"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "megane",
+   "line": "残念ですね。アフォードは、ほぼキャンとセットで使います",
+   "caption": "残念。afford は can とセットです",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I don't afford it.",
+    "right": "I can't afford it.",
+    "why": "afford は can / could と一緒に使うのが基本"
+   }
+  },
+  {
+   "id": "b03",
+   "who": "master",
+   "pose": "point",
+   "line": "核はひとつ。〜する余裕がある、じゃ",
+   "visual": {
+    "kind": "rule",
+    "title": "afford の核",
+    "lines": [
+     "afford ＝ 〜する余裕がある",
+     "can't afford ＋ 名詞",
+     "can't afford to ＋ 動詞の原形",
+     "お金だけでなく時間やリスクにも"
+    ]
+   }
+  },
+  {
+   "id": "b04",
+   "who": "nekketsu",
+   "line": "余裕だと？金の話じゃないのかッ！"
+  },
+  {
+   "id": "b05",
+   "who": "master",
+   "pose": "talk",
+   "line": "まずは金じゃ",
+   "en": "I can't afford a new car.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "can't afford",
+      "l": "V"
+     },
+     {
+      "w": "a new car.",
+      "l": "O"
+     }
+    ],
+    "ja": "新車を買う余裕がない",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b06",
+   "who": "master",
+   "pose": "fist",
+   "line": "負けられぬときも、こう言う",
+   "en": "We can't afford to lose this game.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "We",
+      "l": "S"
+     },
+     {
+      "w": "can't afford",
+      "l": "V"
+     },
+     {
+      "w": "to lose this game.",
+      "l": "O"
+     }
+    ],
+    "ja": "この試合は負けるわけにいかない",
+    "mark": [
+     2
+    ]
+   }
+  },
+  {
+   "id": "b07",
+   "who": "megane",
+   "line": "負ける余裕がない、つまり絶対に負けられない、ですね"
+  },
+  {
+   "id": "b08",
+   "who": "nekketsu",
+   "line": "負けてる余裕はないッ！燃えてきたッ！"
+  },
+  {
+   "id": "b09",
+   "who": "master",
+   "pose": "point",
+   "line": "では問題じゃ。どっちが正しい？",
+   "think": 3,
+   "visual": {
+    "kind": "quiz",
+    "q": "I can't afford ___ a mistake.",
+    "choices": [
+     "making",
+     "to make"
+    ],
+    "answer": 1,
+    "reveal": false
+   }
+  },
+  {
+   "id": "b10",
+   "who": "nekketsu",
+   "line": "左だッ！勢いがあるッ！"
+  },
+  {
+   "id": "b11",
+   "who": "master",
+   "pose": "arms",
+   "line": "答えは右。アフォードの後ろは、トゥ＋動詞の原形じゃ",
+   "caption": "答えは to make。afford の後は to ＋ 動詞の原形",
+   "visual": {
+    "kind": "quiz",
+    "q": "I can't afford ___ a mistake.",
+    "choices": [
+     "making",
+     "to make"
+    ],
+    "answer": 1,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b12",
+   "who": "megane",
+   "line": "熱血さん、ミスする余裕はないはずでしたが？"
+  },
+  {
+   "id": "b13",
+   "who": "nekketsu",
+   "line": "メガネには、絶対に負けられないッ！",
+   "en": "I can't afford to lose to you!"
+  },
+  {
+   "id": "b14",
+   "who": "master",
+   "pose": "talk",
+   "line": "うむ。使い方は合っておる"
+  },
+  {
+   "id": "b15",
+   "who": "nekketsu",
+   "line": "よっしゃ！財布の余裕は、まだないけどなッ！",
+   "visual": {
+    "kind": "image",
+    "emoji": "👛",
+    "label": "余裕なし"
+   }
+  }
+ ]
+}

@@ -1,0 +1,10 @@
+{
+  "_note": "キャラごとの声。provider は edge（無料・仮）か eleven（ElevenLabs）。eleven にするときは voice に ElevenLabs の voice_id を入れる。en は英文を読む声（edge）。rate/pitch は edge のみ有効",
+  "master":      { "provider": "edge", "voice": "ja-JP-KeitaNeural",  "rate": "-12%", "pitch": "-14Hz", "en": "en-US-GuyNeural" },
+  "spartan":     { "provider": "edge", "voice": "ja-JP-NanamiNeural", "rate": "+4%",  "pitch": "-8Hz",  "en": "en-US-AriaNeural" },
+  "ikemen":      { "provider": "edge", "voice": "ja-JP-KeitaNeural",  "rate": "+6%",  "pitch": "+4Hz",  "en": "en-US-ChristopherNeural" },
+  "tsundere":    { "provider": "edge", "voice": "ja-JP-NanamiNeural", "rate": "+10%", "pitch": "+18Hz", "en": "en-US-AnaNeural" },
+  "osananajimi": { "provider": "edge", "voice": "ja-JP-NanamiNeural", "rate": "-4%",  "pitch": "+6Hz",  "en": "en-US-JennyNeural" },
+  "megane":      { "provider": "edge", "voice": "ja-JP-KeitaNeural",  "rate": "+8%",  "pitch": "+22Hz", "en": "en-US-EricNeural" },
+  "nekketsu":    { "provider": "edge", "voice": "ja-JP-KeitaNeural",  "rate": "+14%", "pitch": "+8Hz",  "en": "en-US-RogerNeural" }
+}

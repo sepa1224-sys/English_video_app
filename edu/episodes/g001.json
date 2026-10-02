@@ -1,0 +1,206 @@
+{
+ "id": "g001",
+ "format": "short",
+ "kind": "grammar",
+ "title": "for と since の使い分け",
+ "youtube_title": "【9割が間違える】for と since の違い、一瞬で分かる！現在完了の「ずっと」",
+ "topic": "現在完了の継続（for と since の使い分け）",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "俺の英語歴を英語で言うぞッ！",
+   "en": "I have studied English since three years!",
+   "visual": {
+    "kind": "title",
+    "text": "for と since",
+    "sub": "あなたは言い分けられる？"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "megane",
+   "line": "残念、その since は間違いですね。定番のミスです。"
+  },
+  {
+   "id": "b03",
+   "who": "nekketsu",
+   "line": "えッ！どっちも「ずっと」じゃないのかッ！"
+  },
+  {
+   "id": "b04",
+   "who": "master",
+   "line": "後ろに来るものが違うのじゃ",
+   "pose": "talk",
+   "visual": {
+    "kind": "compare",
+    "a": {
+     "label": "for",
+     "en": "for three years",
+     "ja": "期間の長さ"
+    },
+    "b": {
+     "label": "since",
+     "en": "since 2020",
+     "ja": "始まった時点"
+    }
+   }
+  },
+  {
+   "id": "b05",
+   "who": "master",
+   "line": "フォーは長さ、シンスはスタート地点じゃ",
+   "pose": "point"
+  },
+  {
+   "id": "b06",
+   "who": "megane",
+   "line": "三年間なら for。三年前から、なら since ですね。",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I have studied English since three years.",
+    "right": "I have studied English for three years.",
+    "why": "three years は長さ → for"
+   }
+  },
+  {
+   "id": "b07",
+   "who": "master",
+   "line": "例文じゃ。ここに十年ずっと住んでおる",
+   "pose": "talk",
+   "en": "I have lived here for ten years.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "have lived",
+      "l": "V"
+     },
+     {
+      "w": "here",
+      "l": "M"
+     },
+     {
+      "w": "for ten years.",
+      "l": "M"
+     }
+    ],
+    "ja": "ここに10年住んでいる",
+    "mark": [
+     3
+    ]
+   }
+  },
+  {
+   "id": "b08",
+   "who": "nekketsu",
+   "line": "始まりの年なら since だなッ！",
+   "en": "I have known him since 2019.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "have known",
+      "l": "V"
+     },
+     {
+      "w": "him",
+      "l": "O"
+     },
+     {
+      "w": "since 2019.",
+      "l": "M"
+     }
+    ],
+    "ja": "2019年から彼を知っている",
+    "mark": [
+     3
+    ]
+   }
+  },
+  {
+   "id": "b09",
+   "who": "master",
+   "line": "どちらも、have と組んで「今までずっと」を表すのじゃ",
+   "caption": "どちらも have＋過去分詞と組んで「今までずっと」",
+   "pose": "arms",
+   "visual": {
+    "kind": "rule",
+    "title": "ルール",
+    "lines": [
+     "for ＋ 長さ（ten years / two weeks）",
+     "since ＋ 始まり（2019 / last Monday）",
+     "have ＋ 過去分詞 と組んで「今までずっと」"
+    ]
+   }
+  },
+  {
+   "id": "b10",
+   "who": "master",
+   "line": "では問題じゃ。どっちが入る？",
+   "pose": "point",
+   "think": 3,
+   "visual": {
+    "kind": "quiz",
+    "q": "I have been busy ___ last Monday.",
+    "choices": [
+     "for",
+     "since"
+    ],
+    "answer": 1,
+    "reveal": false
+   }
+  },
+  {
+   "id": "b11",
+   "who": "nekketsu",
+   "line": "一週間は長いから for だッ！"
+  },
+  {
+   "id": "b12",
+   "who": "master",
+   "line": "先週の月曜は始まりの日。ゆえに since じゃ",
+   "pose": "fist",
+   "visual": {
+    "kind": "quiz",
+    "q": "I have been busy ___ last Monday.",
+    "choices": [
+     "for",
+     "since"
+    ],
+    "answer": 1,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b13",
+   "who": "megane",
+   "line": "ちなみに熱血さんの間違い癖は、生まれた時からですね",
+   "en": "since he was born",
+   "visual": {
+    "kind": "image",
+    "emoji": "👶",
+    "label": "生まれた時から"
+   }
+  },
+  {
+   "id": "b14",
+   "who": "nekketsu",
+   "line": "せめて for 十五年と言ってくれッ！"
+  },
+  {
+   "id": "b15",
+   "who": "master",
+   "line": "どちらにせよ、ずっとじゃな",
+   "pose": "idle"
+  }
+ ]
+}
