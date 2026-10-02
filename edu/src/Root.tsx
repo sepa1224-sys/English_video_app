@@ -17,6 +17,6 @@ export const Root = () => (
       width={1080} height={1920} fps={FPS} durationInFrames={90} calculateMetadata={meta} />
     <Composition id="EduLong" component={Episode} defaultProps={{ episode: { ...SAMPLE, format: 'long' as const } }}
       width={1920} height={1080} fps={FPS} durationInFrames={90} calculateMetadata={meta} />
-    <Composition id="CharaSheet" component={Sheet} width={2200} height={680} fps={FPS} durationInFrames={60} />
+    <Composition id="CharaSheet" component={Sheet} width={1620} height={2020} fps={FPS} durationInFrames={60} />
   </>
 );

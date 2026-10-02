@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { PixelSprite } from './PixelSprite';
 
 // マスター（ドット絵版）。16ビット機の格闘ゲーム風、約3頭身。
-// 黒に近い紺の道着＋ピンクの鉢巻、つんつんの黒髪。白い道着・赤い鉢巻・グローブは使わない（既存のゲームキャラと重ならないように）。
+// 見た目（道着の色・髪型・鉢巻・ひげ・目）は LOOKS で切り替える。
+// 特定のゲームキャラと重なる組み合わせ（白い道着＋赤い鉢巻＋破れた袖＋グローブ）は使わない。
 // ベクターで描いて PixelSprite でドット化する。光は左上から。
 
 export type Pose = 'idle' | 'talk' | 'point' | 'surprised' | 'fist' | 'arms';
 export type Face = 'calm' | 'stern' | 'surprised' | 'shout' | 'smile';
 
-export const C = {
+const BASE = {
   ol: '#140c0a',
   skin: '#f2b98f', skinS: '#c98559', skinH: '#ffdcbc',
   hair: '#2a1c17', hairH: '#5a3d31',
@@ -21,7 +22,24 @@ export const C = {
   wrap: '#efe9dc', wrapS: '#b9ae9c',
   sweat: '#7fd0ff', spark: '#ffcf3a',
 };
-export const PALETTE = Object.values(C);
+export type Look = typeof BASE & { hairStyle: 'spiky' | 'short' | 'messy'; headband: boolean; beard: boolean };
+
+// 見た目の候補。どれにするかは坂本さんが選ぶ
+export const LOOKS: Record<string, Look> = {
+  // A 道場の師範：白い道着、鉢巻なし、短い黒髪にあごひげ、黒い瞳
+  sensei: { ...BASE, gi: '#f1ede4', giS: '#bdb5a6', giH: '#ffffff', lapel: '#f8f6f1', lapelS: '#a59c8c',
+    hair: '#1e1a1a', hairH: '#555050', iris: '#3a2418', irisD: '#1c100a', hairStyle: 'short', headband: false, beard: true },
+  // B 若き武道家：白い道着に紺の鉢巻、ぼさぼさの茶髪
+  young: { ...BASE, gi: '#f1ede4', giS: '#bdb5a6', giH: '#ffffff', lapel: '#f8f6f1', lapelS: '#a59c8c',
+    hair: '#5a3620', hairH: '#8a5a36', band: '#2f4fa8', bandS: '#1c2f6b', iris: '#3a2418', irisD: '#1c100a',
+    hairStyle: 'messy', headband: true, beard: false },
+  // C 藍の拳士：藍染めの道着にオレンジの鉢巻、短い黒髪
+  indigo: { ...BASE, gi: '#2f4478', giS: '#1d2b52', giH: '#4c64a6', band: '#ff8a1f', bandS: '#b85a0c',
+    hairStyle: 'short', headband: true, beard: false },
+};
+const LookCtx = createContext<Look>(LOOKS.sensei);
+const C = BASE; // 縁取りなど、見た目で変わらない色
+const paletteOf = (l: Look) => Object.values(l).filter((v): v is string => typeof v === 'string' && v.startsWith('#'));
 
 const ln = { stroke: C.ol, strokeWidth: 6, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
 
@@ -30,6 +48,7 @@ const faceFor = (pose: Pose): Face =>
 
 /* ───── 頭 ───── */
 const Head: React.FC<{ face: Face; amp: number; blink: boolean; t: number }> = ({ face, amp, blink, t }) => {
+  const C = useContext(LookCtx);
   const flap = Math.round(Math.sin(t * 6) * 2) * 5; // 鉢巻の端（1ドット単位で揺らす）
   const open = face === 'shout' ? Math.max(0.7, amp) : amp;
   const browUp = face === 'surprised' ? -10 : 0;
@@ -37,11 +56,23 @@ const Head: React.FC<{ face: Face; amp: number; blink: boolean; t: number }> = (
   return (
     <g>
       {/* 鉢巻の端 */}
-      <path d={`M262 112 L318 ${96 + flap} L326 ${112 + flap} L268 126 Z`} fill={C.band} />
-      <path d={`M264 124 L312 ${142 - flap} L304 ${154 - flap} L262 134 Z`} fill={C.bandS} />
-      {/* 後ろ髪のつんつん（輪郭の外へ突き出す） */}
-      <path d="M128 134 L104 104 L130 100 L114 58 L152 76 L158 30 L190 64 L206 18 L224 62 L254 28 L258 76 L292 58 L276 100 L300 106 L272 134 Z" fill={C.hair} />
-      <path d="M158 30 L170 62 M206 18 L210 56 M254 28 L244 64" stroke={C.hairH} strokeWidth={8} />
+      {C.headband && <>
+        <path d={`M262 112 L318 ${96 + flap} L326 ${112 + flap} L268 126 Z`} fill={C.band} />
+        <path d={`M264 124 L312 ${142 - flap} L304 ${154 - flap} L262 134 Z`} fill={C.bandS} />
+      </>}
+      {/* 後ろ髪 */}
+      {C.hairStyle === 'spiky' && <>
+        <path d="M128 134 L104 104 L130 100 L114 58 L152 76 L158 30 L190 64 L206 18 L224 62 L254 28 L258 76 L292 58 L276 100 L300 106 L272 134 Z" fill={C.hair} />
+        <path d="M158 30 L170 62 M206 18 L210 56 M254 28 L244 64" stroke={C.hairH} strokeWidth={8} />
+      </>}
+      {C.hairStyle === 'short' && <>
+        <path d="M126 140 C118 70 154 40 200 40 C246 40 282 70 274 140 Z" fill={C.hair} />
+        <path d="M160 56 C176 46 196 44 214 48" stroke={C.hairH} strokeWidth={8} fill="none" />
+      </>}
+      {C.hairStyle === 'messy' && <>
+        <path d="M124 150 L100 126 L122 116 L104 80 L140 84 L138 44 L176 62 L196 26 L222 58 L252 34 L262 70 L298 64 L284 102 L308 118 L280 132 L276 150 Z" fill={C.hair} />
+        <path d="M138 44 L156 74 M196 26 L204 60 M252 34 L242 66 M298 64 L270 88" stroke={C.hairH} strokeWidth={8} />
+      </>}
       {/* 耳 */}
       <ellipse cx={134} cy={164} rx={13} ry={19} fill={C.skin} />
       <ellipse cx={266} cy={164} rx={13} ry={19} fill={C.skinS} />
@@ -55,9 +86,13 @@ const Head: React.FC<{ face: Face; amp: number; blink: boolean; t: number }> = (
       {/* もみあげ（耳の前まで髪を下ろす。無いと坊主頭に見える） */}
       <path d="M132 126 L132 170 L146 178 L150 128 Z" fill={C.hair} />
       <path d="M268 126 L268 170 L254 178 L250 128 Z" fill={C.hair} />
-      {/* 鉢巻 */}
-      <path d="M130 112 C170 100 230 100 270 112 L270 132 C230 120 170 120 130 132 Z" fill={C.band} />
-      <path d="M130 126 C170 114 230 114 270 126 L270 132 C230 120 170 120 130 132 Z" fill={C.bandS} />
+      {/* 鉢巻。無い見た目では、額に前髪を少し下ろす */}
+      {C.headband ? <>
+        <path d="M130 112 C170 100 230 100 270 112 L270 132 C230 120 170 120 130 132 Z" fill={C.band} />
+        <path d="M130 126 C170 114 230 114 270 126 L270 132 C230 120 170 120 130 132 Z" fill={C.bandS} />
+      </> : C.hairStyle === 'messy'
+        ? <path d="M134 126 L150 150 L162 124 L182 146 L194 120 L214 144 L226 120 L244 142 L254 120 L266 130 L266 112 L134 112 Z" fill={C.hair} />
+        : <path d="M134 130 C150 112 176 106 200 108 C186 116 178 126 176 136 C200 118 236 112 266 130 L266 112 L134 112 Z" fill={C.hair} />}
       {/* 太眉 */}
       <g transform={`translate(0 ${browUp})`} fill={C.hair}>
         <path d={angry ? 'M156 140 L192 150 L190 160 L154 150 Z' : 'M154 144 L192 146 L192 156 L154 154 Z'} />
@@ -88,6 +123,8 @@ const Head: React.FC<{ face: Face; amp: number; blink: boolean; t: number }> = (
         : face === 'calm'
           ? <path d="M180 210 Q202 220 222 206" fill="none" {...ln} strokeWidth={5} />
           : <path d="M182 212 L218 212" {...ln} strokeWidth={5} />}
+      {/* あごひげ（口ひげは付けない。口の動きが見えなくなるので） */}
+      {C.beard && <path d="M170 220 Q200 252 230 220 L234 232 Q200 268 166 232 Z" fill={C.hair} />}
       {face === 'surprised' && <path d="M276 150 C270 166 284 174 290 162 C294 154 284 150 276 150 Z" fill={C.sweat} />}
     </g>
   );
@@ -95,7 +132,9 @@ const Head: React.FC<{ face: Face; amp: number; blink: boolean; t: number }> = (
 
 /* ───── 腕 ───── */
 const Arm: React.FC<{ s: [number, number]; e: [number, number]; h: [number, number]; hand: 'fist' | 'open' | 'point'; flip?: boolean }> =
-  ({ s, e, h, hand, flip }) => (
+  ({ s, e, h, hand, flip }) => {
+  const C = useContext(LookCtx);
+  return (
     <g>
       {/* 袖（肩〜ひじ） */}
       {/* 前腕（たくましく）。袖より先に描いて、袖口を上にかぶせる */}
@@ -130,8 +169,10 @@ const Arm: React.FC<{ s: [number, number]; e: [number, number]; h: [number, numb
       )}
     </g>
   );
+};
 
 const Arms: React.FC<{ pose: Pose; t: number }> = ({ pose, t }) => {
+  const C = useContext(LookCtx);
   const L: [number, number] = [118, 284], R: [number, number] = [282, 284];
   const wave = Math.round(Math.sin(t * 6)) * 5;
   switch (pose) {
@@ -157,7 +198,9 @@ const Arms: React.FC<{ pose: Pose; t: number }> = ({ pose, t }) => {
 };
 
 /* ───── 胴と脚 ───── */
-const Body: React.FC = () => (
+const Body: React.FC = () => {
+  const C = useContext(LookCtx);
+  return (
   <g>
     {/* 首 */}
     <rect x={180} y={222} width={40} height={32} fill={C.skinS} />
@@ -188,7 +231,8 @@ const Body: React.FC = () => (
     <path d="M92 540 L172 540 L176 562 C150 572 104 572 82 562 Z" fill={C.skin} />
     <path d="M228 540 L308 540 L318 562 C296 572 250 572 224 562 Z" fill={C.skinS} />
   </g>
-);
+  );
+};
 
 /** ベクターのままのマスター（ドット化する前） */
 export const FighterVector: React.FC<{ pose: Pose; amp: number; blink: boolean; t: number }> = ({ pose, amp, blink, t }) => {
@@ -209,7 +253,8 @@ export const FighterVector: React.FC<{ pose: Pose; amp: number; blink: boolean; 
 const isBlink = (frame: number) => frame % 97 < 4;
 
 /** 動画で使うマスター。1ドット = scale px。足元が箱の下端に来る */
-export const Character: React.FC<{ pose: Pose; frame: number; amp: number; scale?: number }> = ({ pose, frame, amp, scale = 4 }) => {
+export const Character: React.FC<{ pose: Pose; frame: number; amp: number; scale?: number; look?: string }> = ({ pose, frame, amp, scale = 4, look = 'sensei' }) => {
+  const L = LOOKS[look] ?? LOOKS.sensei;
   const t = frame / 30;
   // 口は3段階（閉・半開き・開き）に丸める。中間の形が多いとドット絵らしくない
   const a = amp < 0.15 ? 0 : amp < 0.5 ? 0.4 : 1;
@@ -217,8 +262,10 @@ export const Character: React.FC<{ pose: Pose; frame: number; amp: number; scale
   const bob = Math.round((Math.sin(frame / 14) + 1) / 2) * scale;
   return (
     <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', transform: `translateY(${bob}px)` }}>
-      <PixelSprite viewBox="40 -44 320 624" w={80} h={156} scale={scale} palette={PALETTE} outline={C.ol}>
-        <FighterVector pose={pose} amp={a} blink={isBlink(frame)} t={Math.floor(frame / 6) * 6 / 30} />
+      <PixelSprite viewBox="40 -44 320 624" w={80} h={156} scale={scale} palette={paletteOf(L)} outline={C.ol}>
+        <LookCtx.Provider value={L}>
+          <FighterVector pose={pose} amp={a} blink={isBlink(frame)} t={Math.floor(frame / 6) * 6 / 30} />
+        </LookCtx.Provider>
       </PixelSprite>
     </div>
   );
