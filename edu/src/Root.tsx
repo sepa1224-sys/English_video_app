@@ -1,5 +1,6 @@
 import { Composition } from 'remotion';
 import { Episode } from './Episode';
+import { Sheet } from './chara/Sheet';
 import { FPS, totalFrames, type Episode as Ep } from './types';
 
 // 台本は書き出し時に --props で渡す（scripts/render.mjs）。長さは台本から決める
@@ -16,5 +17,6 @@ export const Root = () => (
       width={1080} height={1920} fps={FPS} durationInFrames={90} calculateMetadata={meta} />
     <Composition id="EduLong" component={Episode} defaultProps={{ episode: { ...SAMPLE, format: 'long' as const } }}
       width={1920} height={1080} fps={FPS} durationInFrames={90} calculateMetadata={meta} />
+    <Composition id="CharaSheet" component={Sheet} width={2000} height={1100} fps={FPS} durationInFrames={60} />
   </>
 );

@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "studio": "remotion studio",
-    "sync-cast": "node scripts/sync-cast.mjs",
     "voice": "node scripts/voice.mjs",
     "render": "node scripts/render.mjs"
   },
