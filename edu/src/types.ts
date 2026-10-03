@@ -27,7 +27,9 @@ export type Beat = {
   line: string; // 読み上げる日本語（セリフ）
   en?: string; // セリフのあとに英語の声で読む英文（例文など）
   caption?: string; // 字幕。無ければ line（＋en）をそのまま出す
-  pose?: 'idle' | 'talk' | 'point' | 'surprised' | 'fist' | 'arms'; // マスターの構え
+  pose?: 'idle' | 'talk' | 'point' | 'surprised' | 'laugh' | 'fist' | 'arms'; // マスター（仙人）の構え
+  // フィーバー：仙人が宙に浮き、背景が光る。クイズの正解発表・いちばん大事な一言・オチに使う
+  fever?: boolean;
   visual?: Visual;
   think?: number; // 声のあとに足す秒数（クイズの考える時間など）
   // voice.mjs が書き込む

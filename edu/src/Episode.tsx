@@ -3,31 +3,37 @@ import {
   AbsoluteFill, Audio, Easing, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig,
 } from 'remotion';
 
-import { Character, type Pose } from './chara/Chibi';
-import { PersonaFace } from './chara/Faces';
+import { Sennin, Student, type SenninPose } from './chara/Sprites';
 import { type Beat, type Episode as Ep, type Label, type Speaker, type Visual, FPS, TAIL, beatFrames } from './types';
 
 // フォントは手元のファイルから（Google Fonts の日本語は分割が多く、書き出しが時間切れになる）
 import { ROUNDED, HAND } from './fonts';
 
 
-const PINK = '#ff7b9c';
-const NAVY = '#fbf4ea'; // 背景（クリーム）。名前は旧デザインの名残
-const INK = '#4a3530'; // 文字（こげ茶）
-const YELLOW = '#f2a81d';
-const GREEN = '#2fa866';
-const RED = '#e0475b';
-const CARD = '#ffffff';
-const SHADOW = '0 10px 30px -12px rgba(74,53,48,0.35)';
+const PINK = '#ff6f91';
+const NAVY = '#15132b'; // 背景（夜の道場）
+const INK = '#ffffff'; // 文字
+const YELLOW = '#ffcf3a';
+const GREEN = '#6ee87a';
+const RED = '#ff5a5a';
+const CARD = '#0d0c22'; // ウィンドウの地
+const SHADOW = '6px 6px 0 rgba(0,0,0,0.55)'; // ドット絵風の、ぼかさない影
+// RPGの会話ウィンドウの枠（白い太枠＋内側の細い紫）
+const WINDOW: React.CSSProperties = {
+  background: CARD, border: '6px solid #f2efe6', borderRadius: 12,
+  boxShadow: `inset 0 0 0 4px #5b57a6, ${SHADOW}`,
+};
+// 文字の縁取り（ゲームの文字のように、くっきりした黒い影）
+const PIXEL_TEXT = '4px 4px 0 #000';
 
 // 英文のかたまりの色。音読教材（SVO色分け）と同じ考え方
 const LABEL_COLOR: Record<Label, string> = {
-  S: '#2f7fd8', V: '#e0475b', O: '#2fa866', C: '#e08a1e', M: '#8a8299', '+': '#9b5cc9', '': INK,
+  S: '#6fb7ff', V: '#ff6f6f', O: '#6ee87a', C: '#ffbf4d', M: '#b9b6d6', '+': '#d29bff', '': INK,
 };
 const LABEL_NAME: Record<Label, string> = { S: '主語', V: '動詞', O: '目的語', C: '補語', M: '修飾', '+': 'つなぎ', '': '' };
 
 const NAMES: Record<Speaker, string> = {
-  master: 'マスター', spartan: 'スパルタ先生', ikemen: 'イケメン', tsundere: 'ツンデレ',
+  master: '仙人', spartan: 'スパルタ師範代', ikemen: 'イケメン', tsundere: 'ツンデレ',
   osananajimi: '幼なじみ', megane: 'メガネ', nekketsu: '熱血',
 };
 
@@ -45,15 +51,15 @@ const layoutFor = (W: number, H: number): Layout => (H > W
       stage: { left: 50, top: 260, width: W - 100, height: 760 },
       caption: { left: 50, top: 1030, width: W - 100 },
       // 字幕（最大3行）の下からキャラ。ショートの下端はタイトル等と重なるので足元が隠れる程度は許す
-      master: { left: W - 500, top: H - 590, width: 500, height: 540 },
-      avatar: { left: 50, top: H - 540, size: 280 },
+      master: { left: W - 560, top: H - 600, width: 560, height: 560 },
+      avatar: { left: -10, top: H - 560, size: 520 },
     }
   : { // 横（長尺）
       W, H, vertical: false,
       stage: { left: 60, top: 150, width: 1300, height: 640 },
       caption: { left: 60, top: 830, width: 1300 },
-      master: { left: W - 560, top: H - 600, width: 540, height: 580 },
-      avatar: { left: 1400, top: 140, size: 300 },
+      master: { left: W - 600, top: H - 620, width: 600, height: 600 },
+      avatar: { left: 1360, top: 60, size: 440 },
     });
 
 export const Episode: React.FC<{ episode: Ep }> = ({ episode }) => {
@@ -102,28 +108,50 @@ const useBeat = (starts: number[]) => {
   return { f, i, local: f - starts[i] };
 };
 
+// 星の位置は毎回同じになるよう、決まった式で散らす
+const STARS = Array.from({ length: 70 }, (_, i) => ({
+  x: (i * 7919) % 1000 / 1000, y: (i * 104729) % 1000 / 1000 * 0.75, s: 1 + (i % 3), tw: i % 7,
+}));
+
 const Backdrop: React.FC<{ L: Layout }> = ({ L }) => {
-  const t = useCurrentFrame() / FPS;
+  const f = useCurrentFrame();
   return (
-    <AbsoluteFill style={{ overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0,
-        background: `radial-gradient(${L.W * 0.55}px ${L.W * 0.45}px at ${L.W * 0.12 + Math.sin(t * 0.5) * 60}px ${L.H * 0.12 + Math.cos(t * 0.4) * 60}px, #ffd0dc, transparent 70%),
-                     radial-gradient(${L.W * 0.5}px ${L.W * 0.45}px at ${L.W * 0.9 + Math.cos(t * 0.45) * 60}px ${L.H * 0.85 + Math.sin(t * 0.35) * 60}px, #d5e7ff, transparent 70%),
-                     radial-gradient(${L.W * 0.35}px ${L.W * 0.3}px at ${L.W * 0.85}px ${L.H * 0.2}px, #fff0c9, transparent 70%)` }} />
-      {/* 黒板の罫線をうっすら */}
-      <div style={{ position: 'absolute', inset: 0, opacity: 0.07,
-        backgroundImage: 'linear-gradient(rgba(74,53,48,1) 2px, transparent 2px), linear-gradient(90deg, rgba(74,53,48,1) 2px, transparent 2px)',
-        backgroundSize: '80px 80px' }} />
+    <AbsoluteFill style={{ overflow: 'hidden', background: 'linear-gradient(#0e0c22, #241f4d 70%, #3a2a4a)' }}>
+      {STARS.map((st, i) => (
+        <div key={i} style={{ position: 'absolute', left: st.x * L.W, top: st.y * L.H, width: st.s * 4, height: st.s * 4,
+          background: '#fff', opacity: 0.35 + 0.65 * (Math.floor((f + st.tw * 9) / 20) % 2) }} />
+      ))}
+      {/* 道場の床（板目） */}
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: L.H * 0.16,
+        background: 'repeating-linear-gradient(90deg, #6b4a2f 0 120px, #5a3d27 120px 124px)', borderTop: '8px solid #2a1a10' }} />
+      {/* 走査線（ブラウン管の横縞） */}
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.08,
+        backgroundImage: 'repeating-linear-gradient(0deg, #000 0 2px, transparent 2px 6px)' }} />
+    </AbsoluteFill>
+  );
+};
+
+/** フィーバー：光線が回り、入った瞬間に画面がフラッシュする */
+const FeverFX: React.FC<{ local: number; L: Layout }> = ({ local, L }) => {
+  const flash = interpolate(local, [0, 8], [0.85, 0], { extrapolateRight: 'clamp' });
+  const rot = local * 1.5;
+  const cx = L.master.left + L.master.width / 2, cy = L.master.top + L.master.height * 0.45;
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+      <div style={{ position: 'absolute', left: cx - L.H, top: cy - L.H, width: L.H * 2, height: L.H * 2, opacity: 0.35,
+        background: `repeating-conic-gradient(from ${rot}deg, ${YELLOW} 0deg 8deg, transparent 8deg 22deg)`,
+        maskImage: 'radial-gradient(circle, #000 15%, transparent 65%)', WebkitMaskImage: 'radial-gradient(circle, #000 15%, transparent 65%)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: '#fff', opacity: flash }} />
     </AbsoluteFill>
   );
 };
 
 const Header: React.FC<{ episode: Ep; L: Layout }> = ({ episode, L }) => (
   <div style={{ position: 'absolute', left: L.vertical ? 50 : 60, top: L.vertical ? 120 : 40, right: 50, display: 'flex', alignItems: 'center', gap: 20 }}>
-    <div style={{ padding: '8px 22px', borderRadius: 14, background: PINK, color: '#fff', fontSize: L.vertical ? 40 : 34, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: SHADOW }}>
+    <div style={{ ...WINDOW, padding: '6px 22px', color: YELLOW, fontSize: L.vertical ? 40 : 34, fontWeight: 800, whiteSpace: 'nowrap', textShadow: PIXEL_TEXT }}>
       {episode.series ?? (episode.kind === 'grammar' ? '気合の文法' : '気合の英単語')}
     </div>
-    <div style={{ fontSize: L.vertical ? 46 : 40, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{episode.title}</div>
+    <div style={{ fontSize: L.vertical ? 46 : 40, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textShadow: PIXEL_TEXT }}>{episode.title}</div>
   </div>
 );
 
@@ -155,7 +183,7 @@ const Visualize: React.FC<{ v: Visual; local: number; beatLocal: number; beat: B
     case 'title':
       return (
         <div style={{ textAlign: 'center', transform: `scale(${k}) rotate(${(1 - k) * -6}deg)` }}>
-          <div style={{ fontSize: 120 * big, lineHeight: 1.15, fontWeight: 800, color: INK, WebkitTextStroke: '16px #fff', paintOrder: 'stroke fill', textShadow: `0 10px 0 ${PINK}` }}>
+          <div style={{ fontSize: 120 * big, lineHeight: 1.15, fontWeight: 800, color: YELLOW, WebkitTextStroke: '14px #000', paintOrder: 'stroke fill', textShadow: `8px 8px 0 ${PINK}` }}>
             {v.text.split('\n').map((l, i) => <div key={i}>{l}</div>)}
           </div>
           {v.sub && <div style={{ marginTop: 30, fontSize: 52 * big, color: YELLOW }}>{v.sub}</div>}
@@ -170,12 +198,12 @@ const Visualize: React.FC<{ v: Visual; local: number; beatLocal: number; beat: B
           <div style={{ fontSize: Math.min(190, 1500 / Math.max(6, letters.length)) * big, fontWeight: 800, letterSpacing: 2, fontFamily: 'sans-serif' }}>
             {letters.map((c, i) => {
               const p = pop(local, i * 2, 220);
-              return <span key={i} style={{ display: 'inline-block', color: '#2f7fd8', transform: `translateY(${(1 - p) * -80}px) scale(${p})`,
-                WebkitTextStroke: `12px #fff`, paintOrder: 'stroke fill', textShadow: '0 8px 0 rgba(74,53,48,0.15)' }}>{c === ' ' ? ' ' : c}</span>;
+              return <span key={i} style={{ display: 'inline-block', color: '#6fe3ff', transform: `translateY(${(1 - p) * -80}px) scale(${p})`,
+                WebkitTextStroke: `12px #000`, paintOrder: 'stroke fill', textShadow: `8px 8px 0 #2b4bb8` }}>{c === ' ' ? ' ' : c}</span>;
             })}
           </div>
-          <div style={{ marginTop: 30, fontSize: 86 * big, fontWeight: 800, opacity: jaK, transform: `translateY(${(1 - jaK) * 40}px)` }}>{v.ja}</div>
-          {v.note && <div style={{ marginTop: 26, fontSize: 46 * big, color: '#8a7a72', opacity: pop(local, 24) }}>{v.note}</div>}
+          <div style={{ marginTop: 30, fontSize: 86 * big, fontWeight: 800, opacity: jaK, transform: `translateY(${(1 - jaK) * 40}px)`, textShadow: PIXEL_TEXT }}>{v.ja}</div>
+          {v.note && <div style={{ marginTop: 26, fontSize: 46 * big, color: '#c9c6e8', opacity: pop(local, 24), textShadow: PIXEL_TEXT }}>{v.note}</div>}
         </div>
       );
     }
@@ -184,7 +212,7 @@ const Visualize: React.FC<{ v: Visual; local: number; beatLocal: number; beat: B
       return (
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 340 * big, transform: `scale(${k}) rotate(${Math.sin(t * 3) * 6}deg) translateY(${Math.sin(t * 2.4) * 16}px)` }}>{v.emoji}</div>
-          {v.label && <div style={{ fontSize: 64 * big, fontWeight: 800, marginTop: 10, opacity: pop(local, 10) }}>{v.label}</div>}
+          {v.label && <div style={{ fontSize: 64 * big, fontWeight: 800, marginTop: 10, opacity: pop(local, 10), textShadow: PIXEL_TEXT }}>{v.label}</div>}
         </div>
       );
     }
@@ -195,39 +223,38 @@ const Visualize: React.FC<{ v: Visual; local: number; beatLocal: number; beat: B
       const right = pop(local, Math.round(FPS * 1.4));
       return (
         <div style={{ width: '100%', textAlign: 'center' }}>
-          <div style={{ position: 'relative', display: 'inline-block', fontSize: 70 * big, fontWeight: 800, color: '#9a8d86', fontFamily: 'sans-serif', padding: '10px 30px', background: CARD, borderRadius: 24, boxShadow: SHADOW }}>
+          <div style={{ ...WINDOW, position: 'relative', display: 'inline-block', fontSize: 70 * big, fontWeight: 800, color: '#a6a3c4', fontFamily: 'sans-serif', padding: '10px 30px' }}>
             {v.wrong}
             <div style={{ position: 'absolute', left: 0, right: 0, top: '52%', height: 10, background: RED, transform: `scaleX(${stamp})`, transformOrigin: 'left' }} />
             <div style={{ position: 'absolute', right: -70, top: -90, fontSize: 200, color: RED, transform: `scale(${stamp * 1.0 + (1 - stamp) * 3}) rotate(-12deg)`, opacity: stamp }}>✕</div>
           </div>
-          <div style={{ marginTop: 50, fontSize: 70 * big, fontWeight: 800, color: GREEN, fontFamily: 'sans-serif', opacity: right, transform: `scale(${0.7 + right * 0.3})` }}>
+          <div style={{ marginTop: 50, fontSize: 70 * big, fontWeight: 800, color: GREEN, fontFamily: 'sans-serif', opacity: right, transform: `scale(${0.7 + right * 0.3})`, textShadow: PIXEL_TEXT }}>
             ⭕ {v.right}
           </div>
-          {v.why && <div style={{ marginTop: 30, fontSize: 48 * big, color: YELLOW, opacity: pop(local, Math.round(FPS * 2)) }}>{v.why}</div>}
+          {v.why && <div style={{ marginTop: 30, fontSize: 48 * big, color: YELLOW, opacity: pop(local, Math.round(FPS * 2)), textShadow: PIXEL_TEXT }}>{v.why}</div>}
         </div>
       );
     }
     case 'compare': {
       const a = pop(local), b = pop(local, 10);
       const card = (x: { label: string; en: string; ja?: string }, p: number, from: number, color: string) => (
-        <div style={{ flex: 1, padding: 34, borderRadius: 30, background: CARD, border: `5px solid ${color}`, boxShadow: SHADOW,
+        <div style={{ ...WINDOW, flex: 1, padding: 34, border: `6px solid ${color}`,
           transform: `translateX(${(1 - p) * from}px)`, opacity: p, textAlign: 'center' }}>
           <div style={{ fontSize: 46 * big, color, fontWeight: 800 }}>{x.label}</div>
           <div style={{ marginTop: 16, fontSize: 58 * big, fontWeight: 800, fontFamily: 'sans-serif' }}>{x.en}</div>
-          {x.ja && <div style={{ marginTop: 12, fontSize: 40 * big, color: '#8a7a72' }}>{x.ja}</div>}
+          {x.ja && <div style={{ marginTop: 12, fontSize: 40 * big, color: '#c9c6e8' }}>{x.ja}</div>}
         </div>
       );
       return (
         <div style={{ width: '100%', display: 'flex', flexDirection: L.vertical ? 'column' : 'row', gap: 34 }}>
-          {card(v.a, a, -900, '#2f7fd8')}
+          {card(v.a, a, -900, '#6fb7ff')}
           {card(v.b, b, 900, PINK)}
         </div>
       );
     }
     case 'rule':
       return (
-        <div style={{ width: '100%', padding: '40px 50px', borderRadius: 30, background: '#3f6b55', border: '12px solid #c9a46a', color: '#fff',
-          boxShadow: '0 30px 60px -20px rgba(0,0,0,.7)', transform: `scale(${k})` }}>
+        <div style={{ ...WINDOW, width: '100%', padding: '40px 50px', transform: `scale(${k})` }}>
           {v.title && <div style={{ fontFamily: HAND, fontSize: 70 * big, color: YELLOW, marginBottom: 20 }}>{v.title}</div>}
           {v.lines.map((l, i) => {
             const p = pop(local, 8 + i * 10);
@@ -255,7 +282,7 @@ const Sentence: React.FC<{ v: Extract<Visual, { kind: 'sentence' }>; local: numb
           const color = LABEL_COLOR[c.l] ?? '#fff';
           return (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', transform: `translateY(${(1 - p) * 60}px) scale(${p})` }}>
-              <div style={{ position: 'relative', padding: '6px 18px', borderRadius: 16, background: CARD, borderBottom: `8px solid ${color}`, boxShadow: SHADOW,
+              <div style={{ position: 'relative', padding: '6px 18px', borderRadius: 8, background: CARD, border: `4px solid ${color}`, boxShadow: SHADOW,
                 fontSize: size, fontWeight: 800, fontFamily: 'sans-serif', color }}>
                 {c.w}
                 {marked && (
@@ -270,7 +297,7 @@ const Sentence: React.FC<{ v: Extract<Visual, { kind: 'sentence' }>; local: numb
           );
         })}
       </div>
-      {v.ja && <div style={{ marginTop: 40, fontSize: 54 * big, color: '#6a5a52', opacity: jaK }}>{v.ja}</div>}
+      {v.ja && <div style={{ marginTop: 40, fontSize: 54 * big, color: '#e6e3ff', opacity: jaK, textShadow: PIXEL_TEXT }}>{v.ja}</div>}
     </div>
   );
 };
@@ -281,7 +308,7 @@ const Quiz: React.FC<{ v: Extract<Visual, { kind: 'quiz' }>; local: number; beat
   const bar = !v.reveal && thinkLen ? interpolate(beatLocal, [thinkFrom, thinkFrom + thinkLen], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : null;
   return (
     <div style={{ width: '100%' }}>
-      <div style={{ fontSize: 66 * big, fontWeight: 800, textAlign: 'center', marginBottom: 34, fontFamily: 'sans-serif', opacity: pop(local) }}>{v.q}</div>
+      <div style={{ fontSize: 66 * big, fontWeight: 800, textAlign: 'center', marginBottom: 34, fontFamily: 'sans-serif', opacity: pop(local), textShadow: PIXEL_TEXT }}>{v.q}</div>
       <div style={{ display: 'grid', gridTemplateColumns: v.choices.length > 2 ? '1fr 1fr' : '1fr', gap: 24 }}>
         {v.choices.map((c, i) => {
           const p = pop(local, 6 + i * 5);
@@ -289,17 +316,17 @@ const Quiz: React.FC<{ v: Extract<Visual, { kind: 'quiz' }>; local: number; beat
           const dim = v.reveal && i !== v.answer;
           const glow = isAns ? pop(beatLocal, 4, 220) : 0;
           return (
-            <div key={i} style={{ padding: '22px 30px', borderRadius: 24, fontSize: 56 * big, fontWeight: 800, fontFamily: 'sans-serif',
-              background: isAns ? GREEN : CARD, color: isAns ? '#fff' : INK, border: `5px solid ${isAns ? GREEN : '#eadfd3'}`, boxShadow: SHADOW,
+            <div key={i} style={{ ...WINDOW, padding: '22px 30px', fontSize: 56 * big, fontWeight: 800, fontFamily: 'sans-serif',
+              background: isAns ? '#1f5a2a' : CARD, color: INK, borderColor: isAns ? GREEN : '#f2efe6',
               opacity: p * (dim ? 0.35 : 1), transform: `scale(${p * (1 + glow * 0.06)})` }}>
-              <span style={{ color: isAns ? '#fff' : PINK, marginRight: 16 }}>{'ABCD'[i]}</span>{c}
+              <span style={{ color: isAns ? GREEN : YELLOW, marginRight: 16 }}>{isAns ? '▶' : ''}{'ABCD'[i]}</span>{c}
             </div>
           );
         })}
       </div>
       {bar != null && (
-        <div style={{ marginTop: 40, height: 22, borderRadius: 11, background: '#eadfd3' }}>
-          <div style={{ width: `${bar * 100}%`, height: '100%', borderRadius: 11, background: YELLOW, margin: '0 auto' }} />
+        <div style={{ marginTop: 40, height: 28, background: '#000', border: '4px solid #f2efe6' }}>
+          <div style={{ width: `${bar * 100}%`, height: '100%', background: YELLOW }} />
         </div>
       )}
     </div>
@@ -314,18 +341,26 @@ const MasterTrack: React.FC<{ beats: Beat[]; starts: number[]; L: Layout }> = ({
   const b = beats[i];
   const speaking = b.who === 'master';
   // 最後にマスターが取った構えを保つ（生徒が話している間も、急に姿勢を変えない）
-  let pose: Pose = 'idle';
-  for (let j = i; j >= 0; j--) if (beats[j].who === 'master') { pose = (beats[j].pose ?? 'talk') as Pose; break; }
-  const amp = speaking ? (b.env?.[local] ?? 0) : 0;
+  let pose: SenninPose = 'idle';
+  for (let j = i; j >= 0; j--) if (beats[j].who === 'master') { pose = (beats[j].pose ?? 'talk') as SenninPose; break; }
+  // フィーバー：台本で指定したビートと、クイズの答えを出すビート
+  const fever = !!b.fever || (b.visual?.kind === 'quiz' && !!b.visual.reveal);
+  // 口パクは2コマに1回だけ更新する（パカパカしすぎない）
+  const amp = speaking ? (b.env?.[local - (local % 2)] ?? 0) : 0;
   const enter = spring({ frame: f, fps: FPS, config: { damping: 14, stiffness: 110 } });
   const posePop = speaking ? spring({ frame: local, fps: FPS, config: { damping: 8, stiffness: 220 } }) : 1;
+  const rise = fever ? spring({ frame: local, fps: FPS, config: { damping: 12, stiffness: 90 } }) : 0;
+  const float = fever ? Math.sin(local / 8) * 14 - rise * 90 : 0;
   const m = L.master;
   return (
-    <div style={{ position: 'absolute', left: m.left, top: m.top, width: m.width, height: m.height,
-      transform: `translateX(${(1 - enter) * 600}px) scale(${0.94 + posePop * 0.06})`, transformOrigin: 'bottom center',
-      filter: speaking ? 'none' : 'saturate(0.6) opacity(0.85)' }}>
-      <Character pose={pose} frame={f} amp={amp} />
-    </div>
+    <>
+      {fever && <FeverFX local={local} L={L} />}
+      <div style={{ position: 'absolute', left: m.left, top: m.top, width: m.width, height: m.height,
+        transform: `translateX(${(1 - enter) * 700}px) translateY(${float}px) scale(${(0.94 + posePop * 0.06) * (1 + rise * 0.12)})`,
+        transformOrigin: 'bottom center', filter: speaking || fever ? 'none' : 'brightness(0.7)' }}>
+        <Sennin pose={pose} fever={fever} amp={amp} size={m.width} />
+      </div>
+    </>
   );
 };
 
@@ -339,29 +374,26 @@ const SpeakerTrack: React.FC<{ beats: Beat[]; starts: number[]; L: Layout }> = (
   const text = b.caption ?? (b.en ? `${b.line}\n${b.en}` : b.line);
   const c = L.caption;
   const a = L.avatar;
-  const color = isMaster ? PINK : '#7fb2f0';
   return (
     <>
       {!isMaster && (
-        <div style={{ position: 'absolute', left: a.left, top: a.top, width: a.size, height: a.size + 60,
-          transform: `translateY(${(1 - enter) * 200}px) scale(${1 + amp * 0.06}) rotate(${Math.sin(local / 4) * amp * 4}deg)`, transformOrigin: 'bottom center' }}>
-          <div style={{ width: a.size, height: a.size, borderRadius: '50%', background: CARD, border: `8px solid ${color}`, overflow: 'hidden', boxShadow: SHADOW,
-            display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <PersonaFace who={b.who} frame={local} amp={amp} size={a.size * 0.95} />
-          </div>
-          <div style={{ textAlign: 'center', marginTop: 8, fontSize: 34, fontWeight: 800, color: INK }}>{NAMES[b.who]}</div>
+        <div style={{ position: 'absolute', left: a.left, top: a.top, width: a.size, height: a.size,
+          transform: `translateX(${(1 - enter) * -500}px)` }}>
+          <Student who={b.who} size={a.size} amp={b.env?.[local - (local % 2)] ?? 0} local={local} />
         </div>
       )}
-      <div style={{ position: 'absolute', left: c.left, top: c.top, width: c.width, textAlign: 'center', opacity: Math.min(1, enter * 1.5) }}>
+      <div style={{ ...WINDOW, position: 'absolute', left: c.left, top: c.top, width: c.width, padding: '26px 34px 22px',
+        opacity: Math.min(1, enter * 1.5) }}>
+        {/* 話している人の名前の札 */}
+        <div style={{ ...WINDOW, position: 'absolute', left: 24, top: -40, padding: '0 18px', fontSize: L.vertical ? 34 : 30, fontWeight: 800,
+          color: isMaster ? YELLOW : '#6fe3ff', boxShadow: 'none' }}>{NAMES[b.who]}</div>
         {text.split('\n').map((l, k) => {
           const en = /^[\x00-\x7F’'"“”…—–]+$/.test(l.trim());
           return (
-            <div key={k} style={{ display: 'inline-block', margin: '4px 0', padding: '8px 26px', borderRadius: 22,
-              fontSize: (L.vertical ? 56 : 48) * (en ? 1.05 : 1), lineHeight: 1.3, fontWeight: 800,
-              fontFamily: en ? 'sans-serif' : ROUNDED, color: en ? '#d94f70' : INK,
-              background: CARD, boxShadow: SHADOW, border: `4px solid ${isMaster ? '#ffc2d1' : '#cfe0f7'}` }}>{l}</div>
+            <div key={k} style={{ fontSize: (L.vertical ? 52 : 46) * (en ? 1.05 : 1), lineHeight: 1.35, fontWeight: 800,
+              fontFamily: en ? 'sans-serif' : ROUNDED, color: en ? YELLOW : INK, textShadow: PIXEL_TEXT }}>{l}</div>
           );
-        }).reduce<React.ReactNode[]>((acc, el, k) => (k ? [...acc, <br key={`b${k}`} />, el] : [el]), [])}
+        })}
       </div>
     </>
   );
