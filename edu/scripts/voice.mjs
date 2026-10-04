@@ -84,8 +84,16 @@ async function voicevox(text, c, out) {
   fs.rmSync(wav);
 }
 
+// 読み上げ用に直す（画面の字幕は元のまま）。
+// 「言うぞッ！」「えッ！」のように句読点や文末の直前にある小さい「ッ／っ」を ElevenLabs が「つ」と読むので外す。
+// 「ガッツ」「やった」のような語の中の促音はそのまま
+function spoken(text) {
+  return text.replace(/[ッっ]+(?=[！？!?。、，,…ー〜～\s」』）)]|$)/g, '');
+}
+
 async function say(who, text, lang, out) {
   const c = cast[who] ?? cast.master;
+  if (lang === 'ja') text = spoken(text);
   // 英文は英語ネイティブの声で（ElevenLabs のキャラなら en_voice、なければ無料の仮の声）
   if (lang === 'en') return c.en_voice ? eleven(text, c.en_voice, out, c.model) : edge(text, c.en ?? 'en-US-GuyNeural', '-6%', '+0Hz', out);
   if (c.provider === 'voicevox') return voicevox(text, c, out);
@@ -109,7 +117,11 @@ function envelope(file) {
 
 for (const b of ep.beats) {
   const out = path.join(outDir, `${b.id}.mp3`);
-  if (!fs.existsSync(out) || process.env.FORCE) {
+  // 読み上げる文が変わったら（台本の手直し・読みの直し）その声だけ作り直す
+  const said = spoken(b.line) + (b.en ? ' / ' + b.en : '');
+  const prev = fs.existsSync(out + '.txt') ? fs.readFileSync(out + '.txt', 'utf8')
+    : b.line + (b.en ? ' / ' + b.en : ''); // 記録が無い古い声は、元のセリフのまま読んだもの
+  if (!fs.existsSync(out) || process.env.FORCE || prev !== said) {
     fs.rmSync(out + '.sped', { force: true });
     const ja = path.join(outDir, `${b.id}.ja.mp3`);
     await say(b.who, b.line, 'ja', ja);
@@ -126,6 +138,7 @@ for (const b of ep.beats) {
     }
     fs.rmSync(ja);
   }
+  fs.writeFileSync(out + '.txt', said);
   // キャラの話す速さ（cast.json の speed、既定 1.1）。ショートは間延びすると離脱されるので少し速める
   const speed = (cast[b.who] ?? cast.master).speed ?? 1.1;
   if (speed !== 1 && !fs.existsSync(out + '.sped')) {
