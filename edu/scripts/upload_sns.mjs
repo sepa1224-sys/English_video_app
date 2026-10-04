@@ -1,6 +1,6 @@
 // 作った解説ショートを気合のアプリ（/admin/sns-videos）に「承認待ち」で送る。
 //   node scripts/upload_sns.mjs <エピソードID>
-// 動画とサムネは Vercel Blob に直接アップロードし（関数の4.5MB制限を避ける）、そのURLを登録する。
+// 動画とサムネは Vercel Blob（非公開）に直接アップロードし（関数の4.5MB制限を避ける）、そのURLを登録する。
 // 合言葉は ../.env の SNS_UPLOAD_SECRET（Vercel の env と同じ値）。
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,7 +20,7 @@ const video = fs.readFileSync(path.join(root, '..', 'output', 'edu', `${id}.mp4`
 const thumbPath = path.join(root, '..', 'output', 'edu', `${id}.jpg`);
 
 const put = (name, body, contentType) => upload(`sns-video/${id}/${name}`, new Blob([body], { type: contentType }), {
-  access: 'public', handleUploadUrl: `${APP}/api/sns-video/upload`, clientPayload: secret, contentType,
+  access: 'private', handleUploadUrl: `${APP}/api/sns-video/upload`, clientPayload: secret, contentType,
 });
 
 console.log(`⬆ 動画をアップロード中（${(video.length / 1e6).toFixed(1)}MB）`);
