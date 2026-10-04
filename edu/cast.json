@@ -1,10 +1,45 @@
 {
-  "_note": "キャラごとの声。provider は eleven（ElevenLabs・本番）か edge（無料の仮）。voice は日本語のセリフ、en_voice は例文などの英文を読む声（どちらも ElevenLabs の voice_id）。model は eleven_v3（感情が乗る）",
-  "master":      { "provider": "eleven", "name": "Jun（仙人）",          "voice": "JOcmGzB8OFjY8MhjHHEf", "en_voice": "pqHfZKP75CvOlQylNhV4", "en_name": "Bill" },
-  "nekketsu":    { "provider": "eleven", "name": "Mitsuwo（熱血）",      "voice": "zdWu2I1sJrZsmxJG5rie", "en_voice": "TX3LPaxmHKxFdv7VOQHJ", "en_name": "Liam" },
-  "megane":      { "provider": "eleven", "name": "Kenzo（メガネ）",      "voice": "b34JylakFZPlGS0BnwyY", "en_voice": "onwK4e9ZLuTAKqWW03F9", "en_name": "Daniel" },
-  "ikemen":      { "provider": "eleven", "name": "Akira（イケメン）",    "voice": "DOL4zlUH4vnnX1hByxsw", "en_voice": "IKne3meq5aSn9XLyUdCD", "en_name": "Charlie" },
-  "tsundere":    { "provider": "eleven", "name": "Sakuya（ツンデレ）",   "voice": "8kgj5469z1URcH4MB2G4", "en_voice": "cgSgspJ2msm6clMCkdW9", "en_name": "Jessica" },
-  "osananajimi": { "provider": "eleven", "name": "Yui（幼なじみ）",      "voice": "fUjY9K2nAIwlALOwSiwc", "en_voice": "EXAVITQu4vr4xnSDxMaL", "en_name": "Sarah" },
-  "spartan":     { "provider": "eleven", "name": "Miiko（スパルタ師範代）", "voice": "1czwMoQxv9Ni4H7M5hXx", "en_voice": "Xb7hH8MSUJpSbSDYk0k2", "en_name": "Alice" }
+ "_note": "キャラごとの声（ElevenLabs のボイスデザインで作ったオリジナルの声）。日本語のセリフも英文も同じ voice で読む（声質をそろえるため）。作り直しは scripts/design_voices.py",
+ "master": {
+  "provider": "eleven",
+  "name": "kiai_sennin（仙人）",
+  "voice": "BDwfAweFRa3GDfyU5LGI",
+  "en_voice": "BDwfAweFRa3GDfyU5LGI"
+ },
+ "nekketsu": {
+  "provider": "eleven",
+  "name": "kiai_nekketsu（熱血）",
+  "voice": "GXBVxk2IEChNyohcFD8y",
+  "en_voice": "GXBVxk2IEChNyohcFD8y"
+ },
+ "megane": {
+  "provider": "eleven",
+  "name": "kiai_megane（メガネ）",
+  "voice": "SgwteG0jNb7R9g1L2adp",
+  "en_voice": "SgwteG0jNb7R9g1L2adp"
+ },
+ "ikemen": {
+  "provider": "eleven",
+  "name": "kiai_ikemen（イケメン）",
+  "voice": "c1Lb8f6uRYXe4sA2iW1i",
+  "en_voice": "c1Lb8f6uRYXe4sA2iW1i"
+ },
+ "tsundere": {
+  "provider": "eleven",
+  "name": "kiai_tsundere（ツンデレ）",
+  "voice": "y0ZWMEq5YQNnZdvoDGZ0",
+  "en_voice": "y0ZWMEq5YQNnZdvoDGZ0"
+ },
+ "osananajimi": {
+  "provider": "eleven",
+  "name": "kiai_osananajimi（幼なじみ）",
+  "voice": "vtEiAtr4FJqoehZ0FSBl",
+  "en_voice": "vtEiAtr4FJqoehZ0FSBl"
+ },
+ "spartan": {
+  "provider": "eleven",
+  "name": "kiai_spartan（スパルタ師範代）",
+  "voice": "P5zvV8KIZPzLn0HTizVe",
+  "en_voice": "P5zvV8KIZPzLn0HTizVe"
+ }
 }
