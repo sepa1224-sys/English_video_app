@@ -1,10 +1,11 @@
 {
- "_note": "キャラごとの声（ElevenLabs のボイスデザインで作ったオリジナルの声）。日本語のセリフも英文も同じ voice で読む（声質をそろえるため）。作り直しは scripts/design_voices.py",
+ "_note": "キャラごとの声（ElevenLabs のボイスデザインで作ったオリジナルの声）。日本語のセリフも英文も同じ voice で読む（声質をそろえるため）。作り直しは scripts/design_voices.py。model（既定 eleven_multilingual_v2）と speed（既定 1.1）はキャラごとに変えられる",
  "master": {
   "provider": "eleven",
   "name": "kiai_sennin（仙人）",
   "voice": "BDwfAweFRa3GDfyU5LGI",
-  "en_voice": "BDwfAweFRa3GDfyU5LGI"
+  "en_voice": "BDwfAweFRa3GDfyU5LGI",
+  "speed": 1.0
  },
  "nekketsu": {
   "provider": "eleven",

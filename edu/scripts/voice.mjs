@@ -39,7 +39,8 @@ function edge(text, voice, rate, pitch, out) {
 }
 
 // eleven_v3 は感情が乗りやすい（掛け合い向き）。一時的なエラーは少し待って3回まで試す
-async function eleven(text, voiceId, out, model = 'eleven_v3') {
+// 既定は eleven_multilingual_v2。eleven_v3 は感情豊かだが、セリフごとに声色がぶれて別人に聞こえた（仙人で確認）
+async function eleven(text, voiceId, out, model = 'eleven_multilingual_v2') {
   for (let i = 0; i < 3; i++) {
     const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: 'POST',
@@ -86,9 +87,9 @@ async function voicevox(text, c, out) {
 async function say(who, text, lang, out) {
   const c = cast[who] ?? cast.master;
   // 英文は英語ネイティブの声で（ElevenLabs のキャラなら en_voice、なければ無料の仮の声）
-  if (lang === 'en') return c.en_voice ? eleven(text, c.en_voice, out) : edge(text, c.en ?? 'en-US-GuyNeural', '-6%', '+0Hz', out);
+  if (lang === 'en') return c.en_voice ? eleven(text, c.en_voice, out, c.model) : edge(text, c.en ?? 'en-US-GuyNeural', '-6%', '+0Hz', out);
   if (c.provider === 'voicevox') return voicevox(text, c, out);
-  if (c.provider === 'eleven') return eleven(text, c.voice, out);
+  if (c.provider === 'eleven') return eleven(text, c.voice, out, c.model);
   return edge(text, c.voice, c.rate, c.pitch, out);
 }
 
