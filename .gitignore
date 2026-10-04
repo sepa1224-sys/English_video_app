@@ -53,3 +53,4 @@ config/
 credentials.json
 .DS_Store
 assets/bgm/_raw/
+logs/

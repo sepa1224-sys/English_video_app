@@ -10,10 +10,11 @@
   "dependencies": {
     "@remotion/cli": "^4.0.532",
     "@remotion/fonts": "^4.0.532",
+    "@types/react": "^19.3.0",
+    "@vercel/blob": "^2.8.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "remotion": "^4.0.532",
-    "@types/react": "^19.3.0",
     "typescript": "^5.6.0"
   }
 }
