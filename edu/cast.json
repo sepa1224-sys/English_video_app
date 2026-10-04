@@ -1,10 +1,10 @@
 {
-  "_note": "キャラごとの声。provider は edge（無料・仮）か eleven（ElevenLabs）。eleven にするときは voice に ElevenLabs の voice_id を入れる。en は英文を読む声（edge）。rate/pitch は edge のみ有効",
-  "master":      { "provider": "edge", "voice": "ja-JP-KeitaNeural",  "rate": "-12%", "pitch": "-14Hz", "en": "en-US-GuyNeural" },
-  "spartan":     { "provider": "edge", "voice": "ja-JP-NanamiNeural", "rate": "+4%",  "pitch": "-8Hz",  "en": "en-US-AriaNeural" },
-  "ikemen":      { "provider": "edge", "voice": "ja-JP-KeitaNeural",  "rate": "+6%",  "pitch": "+4Hz",  "en": "en-US-ChristopherNeural" },
-  "tsundere":    { "provider": "edge", "voice": "ja-JP-NanamiNeural", "rate": "+10%", "pitch": "+18Hz", "en": "en-US-AnaNeural" },
-  "osananajimi": { "provider": "edge", "voice": "ja-JP-NanamiNeural", "rate": "-4%",  "pitch": "+6Hz",  "en": "en-US-JennyNeural" },
-  "megane":      { "provider": "edge", "voice": "ja-JP-KeitaNeural",  "rate": "+8%",  "pitch": "+22Hz", "en": "en-US-EricNeural" },
-  "nekketsu":    { "provider": "edge", "voice": "ja-JP-KeitaNeural",  "rate": "+14%", "pitch": "+8Hz",  "en": "en-US-RogerNeural" }
+  "_note": "キャラごとの声。provider は eleven（ElevenLabs・本番）か edge（無料の仮）。voice は日本語のセリフ、en_voice は例文などの英文を読む声（どちらも ElevenLabs の voice_id）。model は eleven_v3（感情が乗る）",
+  "master":      { "provider": "eleven", "name": "Jun（仙人）",          "voice": "JOcmGzB8OFjY8MhjHHEf", "en_voice": "pqHfZKP75CvOlQylNhV4", "en_name": "Bill" },
+  "nekketsu":    { "provider": "eleven", "name": "Mitsuwo（熱血）",      "voice": "zdWu2I1sJrZsmxJG5rie", "en_voice": "TX3LPaxmHKxFdv7VOQHJ", "en_name": "Liam" },
+  "megane":      { "provider": "eleven", "name": "Kenzo（メガネ）",      "voice": "b34JylakFZPlGS0BnwyY", "en_voice": "onwK4e9ZLuTAKqWW03F9", "en_name": "Daniel" },
+  "ikemen":      { "provider": "eleven", "name": "Akira（イケメン）",    "voice": "DOL4zlUH4vnnX1hByxsw", "en_voice": "IKne3meq5aSn9XLyUdCD", "en_name": "Charlie" },
+  "tsundere":    { "provider": "eleven", "name": "Sakuya（ツンデレ）",   "voice": "8kgj5469z1URcH4MB2G4", "en_voice": "cgSgspJ2msm6clMCkdW9", "en_name": "Jessica" },
+  "osananajimi": { "provider": "eleven", "name": "Yui（幼なじみ）",      "voice": "fUjY9K2nAIwlALOwSiwc", "en_voice": "EXAVITQu4vr4xnSDxMaL", "en_name": "Sarah" },
+  "spartan":     { "provider": "eleven", "name": "Miiko（スパルタ師範代）", "voice": "1czwMoQxv9Ni4H7M5hXx", "en_voice": "Xb7hH8MSUJpSbSDYk0k2", "en_name": "Alice" }
 }
