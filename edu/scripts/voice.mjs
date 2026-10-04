@@ -115,32 +115,38 @@ function envelope(file) {
   return out.map((v) => Math.round((v / max) * 100) / 100);
 }
 
+// 日本語と英文のあいだの間（秒）。短いと英文まで一息に聞こえて聞き取れない
+const EN_GAP = 0.8;
+
 for (const b of ep.beats) {
   const out = path.join(outDir, `${b.id}.mp3`);
-  // 読み上げる文が変わったら（台本の手直し・読みの直し）その声だけ作り直す
-  const said = spoken(b.line) + (b.en ? ' / ' + b.en : '');
+  // キャラの話す速さ（cast.json の speed、既定 1.1）。ショートは間延びすると離脱されるので少し速める。
+  // 速めるのは日本語だけ。英文は聞き取らせるのが目的なので、元の速さのまま
+  const speed = (cast[b.who] ?? cast.master).speed ?? 1.1;
+  // 読み上げる文や作り方が変わったら（台本の手直し・読みの直し）その声だけ作り直す
+  const said = spoken(b.line) + (b.en ? ` / ${b.en} #gap${EN_GAP}` : '');
   const prev = fs.existsSync(out + '.txt') ? fs.readFileSync(out + '.txt', 'utf8')
     : b.line + (b.en ? ' / ' + b.en : ''); // 記録が無い古い声は、元のセリフのまま読んだもの
   if (!fs.existsSync(out) || process.env.FORCE || prev !== said) {
-    fs.rmSync(out + '.sped', { force: true });
     const ja = path.join(outDir, `${b.id}.ja.mp3`);
     await say(b.who, b.line, 'ja', ja);
+    const tempo = speed !== 1 ? `,atempo=${speed}` : '';
     if (b.en) {
-      // 日本語 → 0.25秒 → 英文。英文は英語の声で
+      // 日本語（速める）→ 間 → 英文（そのまま）。英文は英語の声で
       const en = path.join(outDir, `${b.id}.en.mp3`);
       await say(b.who, b.en, 'en', en);
-      ff(['-i', ja, '-f', 'lavfi', '-t', '0.25', '-i', 'anullsrc=r=44100:cl=mono', '-i', en,
-        '-filter_complex', '[0:a]aresample=44100,aformat=channel_layouts=mono[a];[2:a]aresample=44100,aformat=channel_layouts=mono[c];[a][1:a][c]concat=n=3:v=0:a=1',
+      ff(['-i', ja, '-f', 'lavfi', '-t', String(EN_GAP), '-i', 'anullsrc=r=44100:cl=mono', '-i', en,
+        '-filter_complex', `[0:a]aresample=44100,aformat=channel_layouts=mono${tempo}[a];[2:a]aresample=44100,aformat=channel_layouts=mono[c];[a][1:a][c]concat=n=3:v=0:a=1`,
         '-c:a', 'libmp3lame', '-b:a', '160k', out]);
       fs.rmSync(en);
     } else {
-      fs.copyFileSync(ja, out);
+      ff(['-i', ja, '-filter:a', `aresample=44100${tempo}`, '-c:a', 'libmp3lame', '-b:a', '160k', out]);
     }
     fs.rmSync(ja);
+    fs.writeFileSync(out + '.sped', String(speed)); // 速さは作るときに反映済み
   }
   fs.writeFileSync(out + '.txt', said);
-  // キャラの話す速さ（cast.json の speed、既定 1.1）。ショートは間延びすると離脱されるので少し速める
-  const speed = (cast[b.who] ?? cast.master).speed ?? 1.1;
+  // 古い作り方の声（全体をあとから速めていた）で、まだ速めていないもの
   if (speed !== 1 && !fs.existsSync(out + '.sped')) {
     const tmp = out.replace(/\.mp3$/, '.tmp.mp3');
     ff(['-i', out, '-filter:a', `atempo=${speed}`, '-c:a', 'libmp3lame', '-b:a', '160k', tmp]);
