@@ -63,6 +63,12 @@ const layoutFor = (W: number, H: number): Layout => (H > W
       avatar: { left: 1360, top: 60, size: 440 },
     });
 
+// BGM（ElevenLabs Music で作ったレトロRPG風。public/bgm/）。声の邪魔をしないよう、話している間は下げる
+const BGM_TRACKS = ['01_dojo', '02_quest', '03_village'];
+const BGM_TALK = 0.07;   // セリフ中
+const BGM_IDLE = 0.16;   // 考える時間・間
+const bgmFor = (ep: Ep) => ep.bgm ?? BGM_TRACKS[[...ep.id].reduce((n, c) => n + c.charCodeAt(0), 0) % BGM_TRACKS.length];
+
 export const Episode: React.FC<{ episode: Ep }> = ({ episode }) => {
   const { width, height } = useVideoConfig();
   const L = layoutFor(width, height);
@@ -80,9 +86,20 @@ export const Episode: React.FC<{ episode: Ep }> = ({ episode }) => {
     return starts[j];
   });
 
+  const total = from + Math.round(TAIL * FPS);
+  // 声が無い長めの時間（クイズの考える時間）だけ BGM を上げる。セリフ間の短い間では上げ下げしない
+  const idle = beats.flatMap((b, i) => (b.think ? [[starts[i] + Math.round(((b.dur ?? 0) + 0.3) * FPS), starts[i] + beatFrames(b)]] : []));
+  const lift = (f: number) => Math.max(0, ...idle.map(([a, z]) => Math.min(1, (f - a) / 8, (z - f) / 8)));
+  const bgm = bgmFor(episode);
+  const bgmVolume = (f: number) => {
+    const fade = interpolate(f, [0, 10, total - 45, total], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+    return (BGM_TALK + (BGM_IDLE - BGM_TALK) * lift(f)) * fade;
+  };
+
   return (
     <AbsoluteFill style={{ background: NAVY, fontFamily: DOT, color: INK }}>
       <Backdrop L={L} />
+      {bgm !== 'none' && <Audio src={staticFile(`bgm/${bgm}.mp3`)} volume={bgmVolume} loop />}
       <Header episode={episode} L={L} />
       {beats.map((b, i) => (
         <Sequence key={b.id} from={starts[i]} durationInFrames={beatFrames(b) + (i === beats.length - 1 ? Math.round(TAIL * FPS) : 0)}>

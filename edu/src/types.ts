@@ -43,6 +43,7 @@ export type Episode = {
   kind: 'word' | 'grammar';
   title: string; // 画面上部に出す題（短く）
   series?: string; // 「3分文法」など。左上のバッジ
+  bgm?: string; // public/bgm/ の曲名（例 '02_quest'）。無ければIDから自動で選ぶ。'none' で無し
   beats: Beat[];
 };
 
