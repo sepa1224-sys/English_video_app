@@ -9,7 +9,7 @@
   {
    "id": "b01",
    "who": "nekketsu",
-   "line": "金がないときは、こう言うんだッ！",
+   "line": "お金がないときは、こう言うんだッ！",
    "en": "I don't afford it!",
    "visual": {
     "kind": "word",
@@ -35,7 +35,7 @@
    "id": "b03",
    "who": "master",
    "pose": "point",
-   "line": "核はひとつ。〜する余裕がある、じゃ",
+   "line": "意味はひとつ。〜する余裕がある、じゃ",
    "visual": {
     "kind": "rule",
     "title": "afford の核",
@@ -50,13 +50,13 @@
   {
    "id": "b04",
    "who": "nekketsu",
-   "line": "余裕だと？金の話じゃないのかッ！"
+   "line": "余裕だと？お金の話じゃないのかッ！"
   },
   {
    "id": "b05",
    "who": "master",
    "pose": "talk",
-   "line": "まずは金じゃ",
+   "line": "まずはお金じゃ",
    "en": "I can't afford a new car.",
    "visual": {
     "kind": "sentence",
