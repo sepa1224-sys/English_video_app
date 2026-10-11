@@ -94,7 +94,8 @@ def captions(ep: dict) -> dict:
     # 更新の頻度は書かない（毎日は出していないので、「毎日1本」は実態と違う）。絵文字も使わない（インスタ運用部の決まりに合わせる）
     yt = (f"{hook}\n\n{pts}\n\n仙人と弟子たちの掛け合いで、英語のつまずきを1分で解決！\n"
           f"チャンネル登録で、新しい動画が届きます。\n\n" + " ".join(f"#{t}" for t in ["shorts", *tags]))
-    ig = (f"{hook}\n\n{pts}\n\n保存して見返してね\n\n" + " ".join(f"#{t}" for t in tags + ["英語勉強", "英語の勉強"]))
+    # インスタのハッシュタグは1投稿5個まで（2025年12月から）
+    ig = (f"{hook}\n\n{pts}\n\n保存して見返してね\n\n" + " ".join(f"#{t}" for t in tags[:5]))
     tt = f"{hook} " + " ".join(f"#{t}" for t in tags[:5])
     return {"youtube": yt, "instagram": ig, "tiktok": tt}
 
