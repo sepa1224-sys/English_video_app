@@ -95,7 +95,7 @@ TOOL = {
         "type": "object",
         "properties": {
             "title": {"type": "string", "description": "画面上部に出す題。16字以内"},
-            "youtube_title": {"type": "string", "description": "YouTubeのタイトル。60字以内"},
+            "youtube_title": {"type": "string", "description": "YouTubeのタイトル。60字以内。何が分かる動画かを、そのまま書く。「9割が」「たった○日で」のような根拠のない数字や誇張、【】で囲んだ煽り文句は使わない"},
             "beats": {
                 "type": "array",
                 "items": {
