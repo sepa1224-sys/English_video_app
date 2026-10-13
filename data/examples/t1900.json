@@ -58,5 +58,1445 @@
   "en": "This factory produces cars for many countries.",
   "target": "produces",
   "ja": "この工場は多くの国のために車を生産している。"
+ },
+ "11": {
+  "word": "decide",
+  "en": "She decided to study medicine after high school.",
+  "target": "decided",
+  "ja": "彼女は高校卒業後に医学を学ぶことを決めた。"
+ },
+ "12": {
+  "word": "offer",
+  "en": "The hotel offers free breakfast to guests.",
+  "target": "offers",
+  "ja": "そのホテルは宿泊客に無料の朝食を提供している。"
+ },
+ "13": {
+  "word": "require",
+  "en": "This job requires good communication skills.",
+  "target": "requires",
+  "ja": "この仕事は良いコミュニケーション能力を必要とする。"
+ },
+ "14": {
+  "word": "share",
+  "en": "We shared a pizza during the movie.",
+  "target": "shared",
+  "ja": "私たちは映画を見ながらピザを分け合った。"
+ },
+ "15": {
+  "word": "store",
+  "en": "Farmers store grain in large containers for winter.",
+  "target": "store",
+  "ja": "農家は冬に備えて穀物を大きな容器に蓄える。"
+ },
+ "16": {
+  "word": "tend",
+  "en": "He tends to forget his umbrella on rainy days.",
+  "target": "tends",
+  "ja": "彼は雨の日に傘を忘れる傾向がある。"
+ },
+ "17": {
+  "word": "concern",
+  "en": "My parents are concerned about my late nights.",
+  "target": "concerned",
+  "ja": "両親は私が夜遅くまで起きていることを心配している。"
+ },
+ "18": {
+  "word": "describe",
+  "en": "The witness described the man's face in detail.",
+  "target": "described",
+  "ja": "目撃者はその男の顔について詳しく述べた。"
+ },
+ "19": {
+  "word": "involve",
+  "en": "The project involves several teams from different countries.",
+  "target": "involves",
+  "ja": "そのプロジェクトはいくつかの国のチームを関与させる。"
+ },
+ "20": {
+  "word": "reduce",
+  "en": "The company reduced its prices last month.",
+  "target": "reduced",
+  "ja": "その会社は先月、価格を下げた。"
+ },
+ "21": {
+  "word": "design",
+  "en": "An engineer designed this bridge in the 1990s.",
+  "target": "designed",
+  "ja": "あるエンジニアが1990年代にこの橋を設計した。"
+ },
+ "22": {
+  "word": "force",
+  "en": "The storm forced us to cancel our trip.",
+  "target": "forced",
+  "ja": "嵐は私たちに旅行の中止を強いた。"
+ },
+ "23": {
+  "word": "limit",
+  "en": "The park limits the number of visitors each day.",
+  "target": "limits",
+  "ja": "その公園は毎日の来場者数を制限している。"
+ },
+ "24": {
+  "word": "bear",
+  "en": "She couldn't bear the pain in her leg.",
+  "target": "bear",
+  "ja": "彼女は脚の痛みに耐えられなかった。"
+ },
+ "25": {
+  "word": "affect",
+  "en": "The cold weather affected the crops badly.",
+  "target": "affected",
+  "ja": "寒い天候が作物に悪影響を及ぼした。"
+ },
+ "26": {
+  "word": "deal",
+  "en": "The manager dealt with the customer's complaint quickly.",
+  "target": "dealt",
+  "ja": "支配人はその客の苦情を素早く処理した。"
+ },
+ "27": {
+  "word": "avoid",
+  "en": "He avoided eye contact during the interview.",
+  "target": "avoided",
+  "ja": "彼は面接中、目を合わせるのを避けた。"
+ },
+ "28": {
+  "word": "relate",
+  "en": "Doctors relate this illness to poor diet.",
+  "target": "relate",
+  "ja": "医師たちはこの病気を悪い食生活に関連づけている。"
+ },
+ "29": {
+  "word": "realize",
+  "en": "Suddenly, she realized she had left her keys home.",
+  "target": "realized",
+  "ja": "彼女は突然、家に鍵を忘れたことに気づいた。"
+ },
+ "30": {
+  "word": "encourage",
+  "en": "The teacher encouraged us to ask more questions.",
+  "target": "encouraged",
+  "ja": "先生は私たちにもっと質問するよう奨励した。"
+ },
+ "31": {
+  "word": "compare",
+  "en": "Please compare these two photos carefully.",
+  "target": "compare",
+  "ja": "この2枚の写真を注意深く比較してください。"
+ },
+ "32": {
+  "word": "measure",
+  "en": "The nurse measured the patient's blood pressure.",
+  "target": "measured",
+  "ja": "看護師は患者の血圧を測った。"
+ },
+ "33": {
+  "word": "exist",
+  "en": "Many rare species still exist in this forest.",
+  "target": "exist",
+  "ja": "多くの珍しい種がこの森にまだ存在している。"
+ },
+ "34": {
+  "word": "mark",
+  "en": "The teacher marked each wrong answer with a red pen.",
+  "target": "marked",
+  "ja": "先生は赤ペンで間違った答えに印をつけた。"
+ },
+ "35": {
+  "word": "challenge",
+  "en": "The lawyer challenged the judge's decision.",
+  "target": "challenged",
+  "ja": "その弁護士は裁判官の決定に異議を唱えた。"
+ },
+ "36": {
+  "word": "depend",
+  "en": "Children depend on their parents for support.",
+  "target": "depend",
+  "ja": "子供は支えを親に頼っている。"
+ },
+ "37": {
+  "word": "object",
+  "en": "Several residents objected to the new highway plan.",
+  "target": "objected",
+  "ja": "何人かの住民が新しい高速道路計画に反対した。"
+ },
+ "38": {
+  "word": "demand",
+  "en": "The workers demanded higher wages from the company.",
+  "target": "demanded",
+  "ja": "労働者たちは会社に賃上げを要求した。"
+ },
+ "39": {
+  "word": "found",
+  "en": "He founded a small software company in 2005.",
+  "target": "founded",
+  "ja": "彼は2005年に小さなソフトウェア会社を設立した。"
+ },
+ "40": {
+  "word": "complete",
+  "en": "She completed the marathon in under four hours.",
+  "target": "completed",
+  "ja": "彼女は4時間以内にマラソンを完走した。"
+ },
+ "41": {
+  "word": "idea",
+  "en": "I had an idea for a new business.",
+  "target": "idea",
+  "ja": "私は新しい事業についての考えを持っていた。"
+ },
+ "42": {
+  "word": "accord",
+  "en": "The two countries reached an accord on trade.",
+  "target": "accord",
+  "ja": "その2国は貿易についての合意に達した。"
+ },
+ "43": {
+  "word": "company",
+  "en": "She started her own company after college.",
+  "target": "company",
+  "ja": "彼女は大学卒業後に自分の会社を始めた。"
+ },
+ "44": {
+  "word": "interest",
+  "en": "He showed great interest in ancient history.",
+  "target": "interest",
+  "ja": "彼は古代史に大きな興味を示した。"
+ },
+ "45": {
+  "word": "research",
+  "en": "The scientist published her research on climate change.",
+  "target": "research",
+  "ja": "その科学者は気候変動についての研究を発表した。"
+ },
+ "46": {
+  "word": "cause",
+  "en": "Heavy rain was the cause of the flood.",
+  "target": "cause",
+  "ja": "大雨がその洪水の原因だった。"
+ },
+ "47": {
+  "word": "reason",
+  "en": "She gave a good reason for being late.",
+  "target": "reason",
+  "ja": "彼女は遅刻の正当な理由を述べた。"
+ },
+ "48": {
+  "word": "effect",
+  "en": "The medicine had a strong effect on his headache.",
+  "target": "effect",
+  "ja": "その薬は彼の頭痛に強い影響を与えた。"
+ },
+ "49": {
+  "word": "influence",
+  "en": "Her teacher had a great influence on her future.",
+  "target": "influence",
+  "ja": "彼女の先生は彼女の将来に大きな影響を与えた。"
+ },
+ "50": {
+  "word": "situation",
+  "en": "The company is in a difficult situation right now.",
+  "target": "situation",
+  "ja": "その会社は今、厳しい状況にある。"
+ },
+ "51": {
+  "word": "environment",
+  "en": "We must protect the environment for future generations.",
+  "target": "environment",
+  "ja": "私たちは将来の世代のために環境を守らなければならない。"
+ },
+ "52": {
+  "word": "skill",
+  "en": "She has the skill to fix any computer problem.",
+  "target": "skill",
+  "ja": "彼女はどんなコンピューターの問題も解決する技能を持っている。"
+ },
+ "53": {
+  "word": "matter",
+  "en": "There is an important matter we need to discuss.",
+  "target": "matter",
+  "ja": "私たちが話し合う必要のある重要な事柄がある。"
+ },
+ "54": {
+  "word": "view",
+  "en": "In my view, the plan will succeed next year.",
+  "target": "view",
+  "ja": "私の見解では、その計画は来年成功するだろう。"
+ },
+ "55": {
+  "word": "value",
+  "en": "Old letters have great value to my grandmother.",
+  "target": "value",
+  "ja": "古い手紙は私の祖母にとって大きな価値がある。"
+ },
+ "56": {
+  "word": "species",
+  "en": "This lake is home to many rare species of fish.",
+  "target": "species",
+  "ja": "この湖には多くの珍しい種の魚が生息している。"
+ },
+ "57": {
+  "word": "thought",
+  "en": "A sudden thought crossed her mind during the meeting.",
+  "target": "thought",
+  "ja": "会議中、ある考えが彼女の心に突然浮かんだ。"
+ },
+ "58": {
+  "word": "knowledge",
+  "en": "His deep knowledge of history impressed the teacher.",
+  "target": "knowledge",
+  "ja": "歴史についての彼の深い知識は先生を感心させた。"
+ },
+ "59": {
+  "word": "memory",
+  "en": "I still have a clear memory of that summer trip.",
+  "target": "memory",
+  "ja": "私はあの夏の旅行の記憶をまだ鮮明に持っている。"
+ },
+ "60": {
+  "word": "practice",
+  "en": "Regular practice will improve your English speaking skills.",
+  "target": "practice",
+  "ja": "定期的な実践があなたの英語を話す技能を向上させる。"
+ },
+ "61": {
+  "word": "benefit",
+  "en": "Exercise brings many benefits to your health.",
+  "target": "benefits",
+  "ja": "運動は健康に多くの利益をもたらす。"
+ },
+ "62": {
+  "word": "theory",
+  "en": "Scientists proposed a new theory about the universe.",
+  "target": "theory",
+  "ja": "科学者たちは宇宙についての新しい学説を提唱した。"
+ },
+ "63": {
+  "word": "issue",
+  "en": "Pollution is a serious issue in this city.",
+  "target": "issue",
+  "ja": "汚染はこの都市における深刻な問題である。"
+ },
+ "64": {
+  "word": "experiment",
+  "en": "The students conducted an experiment in chemistry class.",
+  "target": "experiment",
+  "ja": "生徒たちは化学の授業で実験を行った。"
+ },
+ "65": {
+  "word": "article",
+  "en": "I read an interesting article about space travel.",
+  "target": "article",
+  "ja": "私は宇宙旅行についての興味深い記事を読んだ。"
+ },
+ "66": {
+  "word": "focus",
+  "en": "The camera could not find the right focus.",
+  "target": "focus",
+  "ja": "そのカメラは正しい焦点を見つけることができなかった。"
+ },
+ "67": {
+  "word": "subject",
+  "en": "We changed the subject to avoid an argument.",
+  "target": "subject",
+  "ja": "私たちは口論を避けるために話題を変えた。"
+ },
+ "68": {
+  "word": "project",
+  "en": "Our team started a new project last month.",
+  "target": "project",
+  "ja": "私たちのチームは先月新しい計画を始めた。"
+ },
+ "69": {
+  "word": "quality",
+  "en": "This store sells clothes of very high quality.",
+  "target": "quality",
+  "ja": "この店は非常に質の高い衣服を販売している。"
+ },
+ "70": {
+  "word": "role",
+  "en": "Each member plays an important role in the team.",
+  "target": "role",
+  "ja": "各メンバーはチームで重要な役割を果たしている。"
+ },
+ "71": {
+  "word": "term",
+  "en": "Please explain this term before we continue the lesson.",
+  "target": "term",
+  "ja": "授業を続ける前にこの用語を説明してください。"
+ },
+ "72": {
+  "word": "statement",
+  "en": "The company released a statement about the accident.",
+  "target": "statement",
+  "ja": "その会社は事故についての声明を発表した。"
+ },
+ "73": {
+  "word": "material",
+  "en": "Wood is a common material for making furniture.",
+  "target": "material",
+  "ja": "木材は家具を作るための一般的な材料である。"
+ },
+ "74": {
+  "word": "evidence",
+  "en": "Police found no evidence at the crime scene.",
+  "target": "evidence",
+  "ja": "警察は犯罪現場で証拠を見つけられなかった。"
+ },
+ "75": {
+  "word": "source",
+  "en": "The sun is the main source of energy on Earth.",
+  "target": "source",
+  "ja": "太陽は地球上の主要なエネルギー源である。"
+ },
+ "76": {
+  "word": "community",
+  "en": "The local community helped clean the park together.",
+  "target": "community",
+  "ja": "地域社会の人々が一緒に公園を清掃した。"
+ },
+ "77": {
+  "word": "technology",
+  "en": "New technology has changed the way we communicate.",
+  "target": "technology",
+  "ja": "新しい科学技術は私たちの意思疎通の方法を変えた。"
+ },
+ "78": {
+  "word": "culture",
+  "en": "Each country has its own unique culture and customs.",
+  "target": "culture",
+  "ja": "それぞれの国には独自の文化と習慣がある。"
+ },
+ "79": {
+  "word": "appropriate",
+  "en": "Please wear appropriate clothes for the interview.",
+  "target": "appropriate",
+  "ja": "面接には適切な服装をしてきてください。"
+ },
+ "80": {
+  "word": "likely",
+  "en": "It is likely to rain later this afternoon.",
+  "target": "likely",
+  "ja": "今日の午後遅くに雨が降りそうだ。"
+ },
+ "81": {
+  "word": "possible",
+  "en": "It is possible to finish this task by tomorrow.",
+  "target": "possible",
+  "ja": "この仕事を明日までに終えることは可能だ。"
+ },
+ "82": {
+  "word": "individual",
+  "en": "Each individual student received special attention from the teacher.",
+  "target": "individual",
+  "ja": "個々の生徒が先生から特別な注意を受けた。"
+ },
+ "83": {
+  "word": "public",
+  "en": "The mayor held a public meeting last night.",
+  "target": "public",
+  "ja": "市長は昨夜、公の会合を開いた。"
+ },
+ "84": {
+  "word": "common",
+  "en": "Headaches are a common problem among office workers.",
+  "target": "common",
+  "ja": "頭痛は会社員の間で共通の問題である。"
+ },
+ "85": {
+  "word": "certain",
+  "en": "She was certain that she had locked the door.",
+  "target": "certain",
+  "ja": "彼女はドアに鍵をかけたと確信していた。"
+ },
+ "86": {
+  "word": "similar",
+  "en": "Her opinion is similar to mine on this issue.",
+  "target": "similar",
+  "ja": "この問題について彼女の意見は私のものと似ている。"
+ },
+ "87": {
+  "word": "recent",
+  "en": "We read about recent changes in the local economy.",
+  "target": "recent",
+  "ja": "私たちは地域経済における最近の変化について読んだ。"
+ },
+ "88": {
+  "word": "major",
+  "en": "Traffic jams are a major problem in this city.",
+  "target": "major",
+  "ja": "交通渋滞はこの都市における主要な問題である。"
+ },
+ "89": {
+  "word": "patient",
+  "en": "The nurse was very patient with the frightened child.",
+  "target": "patient",
+  "ja": "その看護師は怖がっている子どもに対して非常に忍耐強かった。"
+ },
+ "90": {
+  "word": "particular",
+  "en": "He paid particular attention to every small detail.",
+  "target": "particular",
+  "ja": "彼はすべての小さな詳細に特定の注意を払った。"
+ },
+ "91": {
+  "word": "physical",
+  "en": "Regular exercise brings many physical benefits.",
+  "target": "physical",
+  "ja": "定期的な運動は多くの身体的な利益をもたらす。"
+ },
+ "92": {
+  "word": "various",
+  "en": "The store sells various kinds of bread.",
+  "target": "various",
+  "ja": "その店はさまざまな種類のパンを売っている。"
+ },
+ "93": {
+  "word": "available",
+  "en": "Tickets are available at the front desk.",
+  "target": "available",
+  "ja": "チケットはフロントで手に入る。"
+ },
+ "94": {
+  "word": "native",
+  "en": "This bird is native to South America.",
+  "target": "native",
+  "ja": "この鳥は南アメリカ原産です。"
+ },
+ "95": {
+  "word": "political",
+  "en": "She studies political systems around the world.",
+  "target": "political",
+  "ja": "彼女は世界各国の政治制度を研究している。"
+ },
+ "96": {
+  "word": "due",
+  "en": "The train is due to arrive at noon.",
+  "target": "due",
+  "ja": "その電車は正午に到着する予定だ。"
+ },
+ "97": {
+  "word": "blank",
+  "en": "He filled in the blank space on the form.",
+  "target": "blank",
+  "ja": "彼は用紙の空白部分に記入した。"
+ },
+ "98": {
+  "word": "ancient",
+  "en": "Tourists visited an ancient temple in Kyoto.",
+  "target": "ancient",
+  "ja": "観光客たちは京都の古代の寺院を訪れた。"
+ },
+ "99": {
+  "word": "correct",
+  "en": "Please choose the correct answer from the list.",
+  "target": "correct",
+  "ja": "リストの中から正しい答えを選んでください。"
+ },
+ "100": {
+  "word": "despite",
+  "en": "Despite the rain, the children kept playing outside.",
+  "target": "Despite",
+  "ja": "雨にもかかわらず、子供たちは外で遊び続けた。"
+ },
+ "101": {
+  "word": "notice",
+  "en": "She noticed a small crack in the wall.",
+  "target": "noticed",
+  "ja": "彼女は壁の小さなひびに気づいた。"
+ },
+ "102": {
+  "word": "refer",
+  "en": "He often refers to his notes during class.",
+  "target": "refers to",
+  "ja": "彼は授業中よくノートを参照する。"
+ },
+ "103": {
+  "word": "approach",
+  "en": "The car slowly approached the old bridge.",
+  "target": "approached",
+  "ja": "車はゆっくりと古い橋に近づいた。"
+ },
+ "104": {
+  "word": "wonder",
+  "en": "I wondered why the shop was closed.",
+  "target": "wondered",
+  "ja": "私はなぜその店が閉まっているのかなと思った。"
+ },
+ "105": {
+  "word": "imagine",
+  "en": "Try to imagine life without electricity.",
+  "target": "imagine",
+  "ja": "電気のない生活を想像してみて。"
+ },
+ "106": {
+  "word": "recognize",
+  "en": "Can you recognize her voice on the phone?",
+  "target": "recognize",
+  "ja": "電話で彼女の声だとわかりますか。"
+ },
+ "107": {
+  "word": "solve",
+  "en": "The students solved the puzzle in ten minutes.",
+  "target": "solved",
+  "ja": "生徒たちは10分でそのパズルを解いた。"
+ },
+ "108": {
+  "word": "occur",
+  "en": "A strange idea occurred to me last night.",
+  "target": "occurred",
+  "ja": "昨夜、奇妙な考えが心に浮かんだ。"
+ },
+ "109": {
+  "word": "argue",
+  "en": "Tom argued that the plan was too risky.",
+  "target": "argued",
+  "ja": "トムはその計画は危険すぎると主張した。"
+ },
+ "110": {
+  "word": "claim",
+  "en": "She claims that she saw the accident happen.",
+  "target": "claims",
+  "ja": "彼女はその事故を見たと主張している。"
+ },
+ "111": {
+  "word": "express",
+  "en": "He expressed his gratitude with a warm smile.",
+  "target": "expressed",
+  "ja": "彼は温かい笑顔で感謝を表した。"
+ },
+ "112": {
+  "word": "draw",
+  "en": "The teacher asked him to draw a picture of his family.",
+  "target": "draw",
+  "ja": "先生は彼に家族の絵を描くように頼んだ。"
+ },
+ "113": {
+  "word": "waste",
+  "en": "Don't waste your money on cheap toys.",
+  "target": "waste",
+  "ja": "安いおもちゃにお金を浪費してはいけない。"
+ },
+ "114": {
+  "word": "advance",
+  "en": "New medicine has advanced greatly in recent years.",
+  "target": "advanced",
+  "ja": "近年、新しい薬は大いに進歩した。"
+ },
+ "115": {
+  "word": "spread",
+  "en": "The news spread quickly through the small town.",
+  "target": "spread",
+  "ja": "そのニュースは小さな町に急速に広まった。"
+ },
+ "116": {
+  "word": "prepare",
+  "en": "My mother prepared dinner for the whole family.",
+  "target": "prepared",
+  "ja": "母は家族全員のために夕食を準備した。"
+ },
+ "117": {
+  "word": "gain",
+  "en": "The company gained many new customers this year.",
+  "target": "gained",
+  "ja": "その会社は今年多くの新規顧客を獲得した。"
+ },
+ "118": {
+  "word": "achieve",
+  "en": "She achieved her dream of becoming a doctor.",
+  "target": "achieved",
+  "ja": "彼女は医者になるという夢を達成した。"
+ },
+ "119": {
+  "word": "establish",
+  "en": "The king established a new school in the village.",
+  "target": "established",
+  "ja": "王はその村に新しい学校を設立した。"
+ },
+ "120": {
+  "word": "supply",
+  "en": "The farm supplies fresh vegetables to local shops.",
+  "target": "supplies",
+  "ja": "その農場は地元の店に新鮮な野菜を供給している。"
+ },
+ "121": {
+  "word": "suppose",
+  "en": "I suppose the train will arrive on time.",
+  "target": "suppose",
+  "ja": "電車は時間通りに着くと思う。"
+ },
+ "122": {
+  "word": "perform",
+  "en": "The band performed three songs at the festival.",
+  "target": "performed",
+  "ja": "そのバンドはフェスで3曲演奏した。"
+ },
+ "123": {
+  "word": "prefer",
+  "en": "I prefer tea to coffee in the morning.",
+  "target": "prefer",
+  "ja": "私は朝、コーヒーより紅茶のほうが好きだ。"
+ },
+ "124": {
+  "word": "determine",
+  "en": "Scientists determined the cause of the fire.",
+  "target": "determined",
+  "ja": "科学者たちは火災の原因を突き止めた。"
+ },
+ "125": {
+  "word": "treat",
+  "en": "The nurse treated his wound with great care.",
+  "target": "treated",
+  "ja": "看護師は彼の傷を丁寧に治療した。"
+ },
+ "126": {
+  "word": "prove",
+  "en": "Time will prove that his choice was right.",
+  "target": "prove",
+  "ja": "時が経てば彼の選択が正しかったと証明されるだろう。"
+ },
+ "127": {
+  "word": "apply",
+  "en": "You can apply this method to other problems.",
+  "target": "apply",
+  "ja": "この方法は他の問題にも適用できる。"
+ },
+ "128": {
+  "word": "mention",
+  "en": "He mentioned a new restaurant near the station.",
+  "target": "mentioned",
+  "ja": "彼は駅の近くの新しいレストランに言及した。"
+ },
+ "129": {
+  "word": "communicate",
+  "en": "Dolphins communicate with each other using sounds.",
+  "target": "communicate",
+  "ja": "イルカは音を使って互いに情報交換をする。"
+ },
+ "130": {
+  "word": "contain",
+  "en": "This box contains old letters and photographs.",
+  "target": "contains",
+  "ja": "この箱は古い手紙と写真を含んでいる。"
+ },
+ "131": {
+  "word": "contact",
+  "en": "Please contact me if you have any questions.",
+  "target": "contact",
+  "ja": "質問があれば私に連絡を取ってください。"
+ },
+ "132": {
+  "word": "regard",
+  "en": "Many people regard him as a great leader.",
+  "target": "regard",
+  "ja": "多くの人が彼を偉大な指導者と見なしている。"
+ },
+ "133": {
+  "word": "respect",
+  "en": "Students should respect their teachers and classmates.",
+  "target": "respect",
+  "ja": "生徒は先生やクラスメートを尊敬すべきだ。"
+ },
+ "134": {
+  "word": "search",
+  "en": "The police searched the park for the missing dog.",
+  "target": "searched",
+  "ja": "警察はいなくなった犬を捜して公園を捜索した。"
+ },
+ "135": {
+  "word": "connect",
+  "en": "This road connects the village to the city.",
+  "target": "connects",
+  "ja": "この道はその村と都市をつないでいる。"
+ },
+ "136": {
+  "word": "decline",
+  "en": "Sales declined sharply after the price increase.",
+  "target": "declined",
+  "ja": "値上げの後、売り上げは急激に減少した。"
+ },
+ "137": {
+  "word": "prevent",
+  "en": "Heavy rain prevented us from leaving the house.",
+  "target": "prevented",
+  "ja": "大雨が私たちが家を出るのを妨げた。"
+ },
+ "138": {
+  "word": "suffer",
+  "en": "Many patients suffer from headaches in summer.",
+  "target": "suffer",
+  "ja": "多くの患者は夏に頭痛に苦しむ。"
+ },
+ "139": {
+  "word": "survive",
+  "en": "Few animals survive the harsh winter in this area.",
+  "target": "survive",
+  "ja": "この地域では厳しい冬を生き残る動物は少ない。"
+ },
+ "140": {
+  "word": "publish",
+  "en": "The author published her first novel last year.",
+  "target": "published",
+  "ja": "その作家は去年、最初の小説を出版した。"
+ },
+ "141": {
+  "word": "opportunity",
+  "en": "She got an opportunity to study abroad last year.",
+  "target": "opportunity",
+  "ja": "彼女は去年、海外で学ぶ機会を得た。"
+ },
+ "142": {
+  "word": "task",
+  "en": "He finished the task before dinner.",
+  "target": "task",
+  "ja": "彼は夕食前にその仕事を終えた。"
+ },
+ "143": {
+  "word": "industry",
+  "en": "This town depends on the fishing industry.",
+  "target": "industry",
+  "ja": "この町は漁業という産業に頼っている。"
+ },
+ "144": {
+  "word": "medium",
+  "en": "Television is a powerful medium for advertising.",
+  "target": "medium",
+  "ja": "テレビは広告のための強力な媒体だ。"
+ },
+ "145": {
+  "word": "economy",
+  "en": "The country's economy grew quickly after the war.",
+  "target": "economy",
+  "ja": "その国の経済は戦後急速に成長した。"
+ },
+ "146": {
+  "word": "policy",
+  "en": "The government announced a new education policy.",
+  "target": "policy",
+  "ja": "政府は新しい教育政策を発表した。"
+ },
+ "147": {
+  "word": "account",
+  "en": "Please give me a detailed account of the accident.",
+  "target": "account",
+  "ja": "その事故についての詳しい説明をしてください。"
+ },
+ "148": {
+  "word": "trade",
+  "en": "Japan does a lot of trade with China.",
+  "target": "trade",
+  "ja": "日本は中国と多くの貿易をしている。"
+ },
+ "149": {
+  "word": "model",
+  "en": "My grandmother was a model for me as a child.",
+  "target": "model",
+  "ja": "祖母は子供の頃の私にとって模範だった。"
+ },
+ "150": {
+  "word": "figure",
+  "en": "Look at the figure at the bottom of the page.",
+  "target": "figure",
+  "ja": "ページの下にある数字を見てください。"
+ },
+ "151": {
+  "word": "cell",
+  "en": "Each cell in our body has a nucleus.",
+  "target": "cell",
+  "ja": "私たちの体の各細胞には核がある。"
+ },
+ "152": {
+  "word": "image",
+  "en": "His speech gave people a strong image of him.",
+  "target": "image",
+  "ja": "彼のスピーチは人々に彼の強い印象を与えた。"
+ },
+ "153": {
+  "word": "emotion",
+  "en": "She couldn't hide her emotion when she read the letter.",
+  "target": "emotion",
+  "ja": "彼女はその手紙を読んだとき感情を隠せなかった。"
+ },
+ "154": {
+  "word": "stress",
+  "en": "Too much stress can make you sick.",
+  "target": "stress",
+  "ja": "あまりに多くのストレスは体を悪くすることがある。"
+ },
+ "155": {
+  "word": "decade",
+  "en": "He has lived in this town for a decade.",
+  "target": "decade",
+  "ja": "彼はこの町に10年間住んでいる。"
+ },
+ "156": {
+  "word": "range",
+  "en": "Prices in that shop cover a wide range.",
+  "target": "range",
+  "ja": "その店の価格は幅広い範囲にわたっている。"
+ },
+ "157": {
+  "word": "character",
+  "en": "My sister has a gentle character.",
+  "target": "character",
+  "ja": "私の姉は穏やかな性格をしている。"
+ },
+ "158": {
+  "word": "advantage",
+  "en": "Speaking two languages gives you a big advantage.",
+  "target": "advantage",
+  "ja": "2つの言語を話せることは大きな利点になる。"
+ },
+ "159": {
+  "word": "phrase",
+  "en": "The teacher explained a useful phrase in English.",
+  "target": "phrase",
+  "ja": "先生は英語の便利な句を説明した。"
+ },
+ "160": {
+  "word": "damage",
+  "en": "The storm caused serious damage to the farm.",
+  "target": "damage",
+  "ja": "その嵐は農場に深刻な損害を与えた。"
+ },
+ "161": {
+  "word": "impact",
+  "en": "The news had a big impact on the town.",
+  "target": "impact",
+  "ja": "そのニュースは町に大きな影響を与えた。"
+ },
+ "162": {
+  "word": "method",
+  "en": "They found a new method to save energy.",
+  "target": "method",
+  "ja": "彼らはエネルギーを節約する新しい方法を見つけた。"
+ },
+ "163": {
+  "word": "resource",
+  "en": "Water is a precious resource in this area.",
+  "target": "resource",
+  "ja": "水はこの地域では貴重な資源だ。"
+ },
+ "164": {
+  "word": "region",
+  "en": "Many birds live in this mountain region.",
+  "target": "region",
+  "ja": "多くの鳥がこの山岳地域に生息している。"
+ },
+ "165": {
+  "word": "medicine",
+  "en": "The doctor gave me medicine for my cold.",
+  "target": "medicine",
+  "ja": "医者は私の風邪のために薬をくれた。"
+ },
+ "166": {
+  "word": "detail",
+  "en": "She explained every detail of the plan carefully.",
+  "target": "detail",
+  "ja": "彼女は計画の詳細を一つ一つ丁寧に説明した。"
+ },
+ "167": {
+  "word": "feature",
+  "en": "One key feature of this phone is its camera.",
+  "target": "feature",
+  "ja": "この電話の重要な特徴の一つはカメラだ。"
+ },
+ "168": {
+  "word": "function",
+  "en": "The main function of this button is to start the machine.",
+  "target": "function",
+  "ja": "このボタンの主な機能は機械を始動させることだ。"
+ },
+ "169": {
+  "word": "access",
+  "en": "Students need access to the library after class.",
+  "target": "access",
+  "ja": "生徒たちは放課後に図書館を利用する必要がある。"
+ },
+ "170": {
+  "word": "item",
+  "en": "Each item on the list was checked twice.",
+  "target": "item",
+  "ja": "リストの各品目は2回確認された。"
+ },
+ "171": {
+  "word": "income",
+  "en": "Her income increased after she changed jobs.",
+  "target": "income",
+  "ja": "転職した後、彼女の収入は増えた。"
+ },
+ "172": {
+  "word": "attitude",
+  "en": "He always has a positive attitude toward work.",
+  "target": "attitude",
+  "ja": "彼はいつも仕事に対して前向きな態度を持っている。"
+ },
+ "173": {
+  "word": "site",
+  "en": "They chose a quiet site for the new school.",
+  "target": "site",
+  "ja": "彼らは新しい学校のために静かな用地を選んだ。"
+ },
+ "174": {
+  "word": "aspect",
+  "en": "Let's think about another aspect of this problem.",
+  "target": "aspect",
+  "ja": "この問題の別の側面について考えてみよう。"
+ },
+ "175": {
+  "word": "structure",
+  "en": "The structure of this bridge is very strong.",
+  "target": "structure",
+  "ja": "この橋の構造はとても頑丈だ。"
+ },
+ "176": {
+  "word": "habit",
+  "en": "Reading before bed is a good habit.",
+  "target": "habit",
+  "ja": "寝る前に読書することは良い習慣だ。"
+ },
+ "177": {
+  "word": "link",
+  "en": "There is a clear link between sleep and health.",
+  "target": "link",
+  "ja": "睡眠と健康には明らかな関連がある。"
+ },
+ "178": {
+  "word": "instance",
+  "en": "He gave an instance of a common mistake.",
+  "target": "instance",
+  "ja": "彼はよくある間違いの一例を挙げた。"
+ },
+ "179": {
+  "word": "positive",
+  "en": "Try to stay positive even in hard times.",
+  "target": "positive",
+  "ja": "つらい時でも肯定的でいるようにしなさい。"
+ },
+ "180": {
+  "word": "negative",
+  "en": "His negative comment made everyone feel sad.",
+  "target": "negative",
+  "ja": "彼の否定的な発言はみんなを悲しませた。"
+ },
+ "181": {
+  "word": "complex",
+  "en": "The instructions were too complex to understand.",
+  "target": "complex",
+  "ja": "その説明はあまりに複雑で理解できなかった。"
+ },
+ "182": {
+  "word": "current",
+  "en": "Please tell me about the current situation.",
+  "target": "current",
+  "ja": "現在の状況について教えてください。"
+ },
+ "183": {
+  "word": "mental",
+  "en": "Chess requires a lot of mental effort.",
+  "target": "mental",
+  "ja": "チェスには多くの精神的な努力が必要だ。"
+ },
+ "184": {
+  "word": "specific",
+  "en": "She gave a specific example to explain her idea.",
+  "target": "specific",
+  "ja": "彼女は自分の考えを説明するために具体的な例を挙げた。"
+ },
+ "185": {
+  "word": "significant",
+  "en": "This experiment showed a significant change in results.",
+  "target": "significant",
+  "ja": "この実験は結果に重要な変化を示した。"
+ },
+ "186": {
+  "word": "essential",
+  "en": "Water is essential for all living things.",
+  "target": "essential",
+  "ja": "水はすべての生き物にとって必要不可欠だ。"
+ },
+ "187": {
+  "word": "official",
+  "en": "The president made an official statement yesterday.",
+  "target": "official",
+  "ja": "大統領は昨日、公式の声明を出した。"
+ },
+ "188": {
+  "word": "financial",
+  "en": "The company faced serious financial problems last year.",
+  "target": "financial",
+  "ja": "その会社は去年、深刻な財政上の問題に直面した。"
+ },
+ "189": {
+  "word": "academic",
+  "en": "She published her research in an academic journal.",
+  "target": "academic",
+  "ja": "彼女は自分の研究を学術雑誌に発表した。"
+ },
+ "190": {
+  "word": "aware",
+  "en": "He suddenly became aware of the danger.",
+  "target": "aware",
+  "ja": "彼は突然その危険に気づいた。"
+ },
+ "191": {
+  "word": "worth",
+  "en": "This old book is worth a lot of money.",
+  "target": "worth",
+  "ja": "この古い本はかなりのお金に値する。"
+ },
+ "192": {
+  "word": "potential",
+  "en": "She has the potential to become a great singer.",
+  "target": "potential",
+  "ja": "彼女は偉大な歌手になる潜在的な力を持っている。"
+ },
+ "193": {
+  "word": "active",
+  "en": "He plays an active role in the club.",
+  "target": "active",
+  "ja": "彼はそのクラブで積極的な役割を果たしている。"
+ },
+ "194": {
+  "word": "digital",
+  "en": "They bought a new digital camera last week.",
+  "target": "digital",
+  "ja": "彼らは先週、新しいデジタル方式のカメラを買った。"
+ },
+ "195": {
+  "word": "mobile",
+  "en": "We used a mobile stage for the concert.",
+  "target": "mobile",
+  "ja": "私たちはそのコンサートで可動式の舞台を使った。"
+ },
+ "196": {
+  "word": "novel",
+  "en": "The scientist came up with a novel idea.",
+  "target": "novel",
+  "ja": "その科学者は斬新な考えを思いついた。"
+ },
+ "197": {
+  "word": "plastic",
+  "en": "Yoga makes your body more plastic.",
+  "target": "plastic",
+  "ja": "ヨガはあなたの体をより柔軟にする。"
+ },
+ "198": {
+  "word": "chemical",
+  "en": "The factory produces various chemical products.",
+  "target": "chemical",
+  "ja": "その工場はさまざまな化学の製品を生産している。"
+ },
+ "199": {
+  "word": "necessary",
+  "en": "Water is necessary for all living things.",
+  "target": "necessary",
+  "ja": "水はすべての生き物にとって必要なものだ。"
+ },
+ "200": {
+  "word": "eventually",
+  "en": "After many failures, he eventually succeeded.",
+  "target": "eventually",
+  "ja": "何度も失敗した後、彼は結局成功した。"
+ },
+ "201": {
+  "word": "identify",
+  "en": "Police managed to identify the man in the photo.",
+  "target": "identify",
+  "ja": "警察はその写真の男を特定することができた。"
+ },
+ "202": {
+  "word": "represent",
+  "en": "In the play, she represents hope for the villagers.",
+  "target": "represents",
+  "ja": "その劇の中で、彼女は村人たちにとって希望を表している。"
+ },
+ "203": {
+  "word": "indicate",
+  "en": "Dark clouds indicate that a storm is coming.",
+  "target": "indicate",
+  "ja": "黒い雲は嵐が来ることを指し示している。"
+ },
+ "204": {
+  "word": "manage",
+  "en": "Somehow, he managed to finish the race.",
+  "target": "managed",
+  "ja": "彼はなんとかレースを完走することができた。"
+ },
+ "205": {
+  "word": "attend",
+  "en": "About fifty guests attended the wedding party.",
+  "target": "attended",
+  "ja": "約50人の招待客がその結婚パーティーに出席した。"
+ },
+ "206": {
+  "word": "maintain",
+  "en": "The old bridge still maintains its original shape.",
+  "target": "maintains",
+  "ja": "その古い橋は今もなお元の形を維持している。"
+ },
+ "207": {
+  "word": "survey",
+  "en": "Researchers surveyed local residents about the new park.",
+  "target": "surveyed",
+  "ja": "研究者たちはその新しい公園について地元住民を調査した。"
+ },
+ "208": {
+  "word": "replace",
+  "en": "Electric cars will soon replace gasoline ones.",
+  "target": "replace",
+  "ja": "電気自動車はまもなくガソリン車に取って代わるだろう。"
+ },
+ "209": {
+  "word": "sort",
+  "en": "She sorted the letters into two piles.",
+  "target": "sorted",
+  "ja": "彼女はその手紙を二つの山に分類した。"
+ },
+ "210": {
+  "word": "conduct",
+  "en": "The team conducted an experiment in the lab.",
+  "target": "conducted",
+  "ja": "そのチームは研究室で実験を実施した。"
+ },
+ "211": {
+  "word": "associate",
+  "en": "Many people associate the color red with danger.",
+  "target": "associate",
+  "ja": "多くの人は赤色を危険と結び付けて考える。"
+ },
+ "212": {
+  "word": "attempt",
+  "en": "The climbers attempted to reach the summit before dark.",
+  "target": "attempted",
+  "ja": "登山者たちは暗くなる前に頂上に達しようと試みた。"
+ },
+ "213": {
+  "word": "promote",
+  "en": "The company launched a campaign to promote its new drink.",
+  "target": "promote",
+  "ja": "その会社は新しい飲み物を促進するキャンペーンを始めた。"
+ },
+ "214": {
+  "word": "earn",
+  "en": "She earns enough money to support her family.",
+  "target": "earns",
+  "ja": "彼女は家族を養うのに十分なお金を稼いでいる。"
+ },
+ "215": {
+  "word": "unite",
+  "en": "A common goal united the small town.",
+  "target": "united",
+  "ja": "共通の目標がその小さな町を団結させた。"
+ },
+ "216": {
+  "word": "feed",
+  "en": "Every morning, he feeds the birds in his garden.",
+  "target": "feeds",
+  "ja": "毎朝、彼は庭の鳥たちに食べ物を与えている。"
+ },
+ "217": {
+  "word": "seek",
+  "en": "Many young workers seek better opportunities abroad.",
+  "target": "seek",
+  "ja": "多くの若い労働者は海外でより良い機会を追い求めている。"
+ },
+ "218": {
+  "word": "observe",
+  "en": "I observed a strange light in the sky last night.",
+  "target": "observed",
+  "ja": "私は昨夜、空に奇妙な光が見えることに気づいた。"
+ },
+ "219": {
+  "word": "reveal",
+  "en": "The report revealed the true cost of the project.",
+  "target": "revealed",
+  "ja": "その報告書はプロジェクトの本当の費用を明らかにした。"
+ },
+ "220": {
+  "word": "estimate",
+  "en": "Experts estimate the damage at ten million dollars.",
+  "target": "estimate",
+  "ja": "専門家たちはその損害を1000万ドルと推定している。"
+ },
+ "221": {
+  "word": "reflect",
+  "en": "Her smile reflected the joy she felt inside.",
+  "target": "reflected",
+  "ja": "彼女の笑顔は内に感じた喜びを反映していた。"
+ },
+ "222": {
+  "word": "attract",
+  "en": "The bright colors attract many tourists to the market.",
+  "target": "attract",
+  "ja": "鮮やかな色が多くの観光客をその市場に引きつける。"
+ },
+ "223": {
+  "word": "decrease",
+  "en": "Sales decreased sharply after the price increase.",
+  "target": "decreased",
+  "ja": "値上げの後、売り上げは急激に減少した。"
+ },
+ "224": {
+  "word": "ignore",
+  "en": "He ignored his phone and kept reading the book.",
+  "target": "ignored",
+  "ja": "彼は電話を無視して本を読み続けた。"
+ },
+ "225": {
+  "word": "match",
+  "en": "Her scarf matches the color of her shoes.",
+  "target": "matches",
+  "ja": "彼女のスカーフは靴の色と合っている。"
+ },
+ "226": {
+  "word": "define",
+  "en": "The teacher asked us to define the word clearly.",
+  "target": "define",
+  "ja": "先生は私たちにその単語を明確に定義するよう求めた。"
+ },
+ "227": {
+  "word": "adapt",
+  "en": "New students quickly adapt to school life.",
+  "target": "adapt",
+  "ja": "新入生たちはすぐに学校生活に適応する。"
+ },
+ "228": {
+  "word": "contribute",
+  "en": "Volunteers contributed many hours to the project.",
+  "target": "contributed",
+  "ja": "ボランティアたちはそのプロジェクトに多くの時間を貢献した。"
+ },
+ "229": {
+  "word": "exchange",
+  "en": "We exchanged phone numbers before saying goodbye.",
+  "target": "exchanged",
+  "ja": "私たちは別れる前に電話番号を交換した。"
+ },
+ "230": {
+  "word": "display",
+  "en": "The museum displays paintings from the last century.",
+  "target": "displays",
+  "ja": "その美術館は前世紀の絵画を展示している。"
+ },
+ "231": {
+  "word": "respond",
+  "en": "She responded quickly to my email.",
+  "target": "responded",
+  "ja": "彼女は私のメールにすぐに反応した。"
+ },
+ "232": {
+  "word": "hide",
+  "en": "The cat hid under the sofa during the storm.",
+  "target": "hid",
+  "ja": "その猫は嵐の間ソファの下に隠れた。"
+ },
+ "233": {
+  "word": "doubt",
+  "en": "I doubt that he will arrive on time.",
+  "target": "doubt",
+  "ja": "彼が時間通りに来るとは私は思わない。"
+ },
+ "234": {
+  "word": "remove",
+  "en": "Workers removed the old sign from the wall.",
+  "target": "removed",
+  "ja": "作業員たちは古い看板を壁から取り除いた。"
+ },
+ "235": {
+  "word": "wind",
+  "en": "The river winds through the quiet valley below.",
+  "target": "winds",
+  "ja": "その川は静かな谷間を曲がりくねって流れている。"
+ },
+ "236": {
+  "word": "assume",
+  "en": "We assumed the meeting would start on time.",
+  "target": "assumed",
+  "ja": "私たちは会議が時間通りに始まると当然のことと思った。"
+ },
+ "237": {
+  "word": "relax",
+  "en": "After work, he likes to relax in a hot bath.",
+  "target": "relax",
+  "ja": "仕事の後、彼は熱いお風呂でくつろぐのが好きだ。"
+ },
+ "238": {
+  "word": "satisfy",
+  "en": "The delicious meal satisfied everyone at the table.",
+  "target": "satisfied",
+  "ja": "そのおいしい料理はテーブルにいた全員を満足させた。"
+ },
+ "239": {
+  "word": "desire",
+  "en": "She desires a quiet life in the countryside.",
+  "target": "desires",
+  "ja": "彼女は田舎での静かな生活を強く望んでいる。"
+ },
+ "240": {
+  "word": "succeed",
+  "en": "After years of effort, she succeeded in her business.",
+  "target": "succeeded",
+  "ja": "何年もの努力の後、彼女は事業で成功した。"
+ },
+ "241": {
+  "word": "concept",
+  "en": "The professor explained a new concept in economics.",
+  "target": "concept",
+  "ja": "教授は経済学の新しい概念を説明した。"
+ },
+ "242": {
+  "word": "fashion",
+  "en": "Long skirts came back into fashion this year.",
+  "target": "fashion",
+  "ja": "今年、ロングスカートが再び流行した。"
+ },
+ "243": {
+  "word": "device",
+  "en": "This device measures your heart rate at night.",
+  "target": "device",
+  "ja": "この装置は夜間の心拍数を測定する。"
+ },
+ "244": {
+  "word": "charge",
+  "en": "The hotel added a small charge for breakfast.",
+  "target": "charge",
+  "ja": "ホテルは朝食に少額の料金を加えた。"
+ },
+ "245": {
+  "word": "contrast",
+  "en": "There is a sharp contrast between the two paintings.",
+  "target": "contrast",
+  "ja": "その2枚の絵には鮮やかな対照がある。"
+ },
+ "246": {
+  "word": "colleague",
+  "en": "She invited her colleagues to lunch on Friday.",
+  "target": "colleagues",
+  "ja": "彼女は金曜日に同僚たちを昼食に誘った。"
+ },
+ "247": {
+  "word": "pain",
+  "en": "He felt a sudden pain in his left knee.",
+  "target": "pain",
+  "ja": "彼は左ひざに突然の痛みを感じた。"
+ },
+ "248": {
+  "word": "bill",
+  "en": "My mother paid the electricity bill yesterday.",
+  "target": "bill",
+  "ja": "母は昨日、電気の請求書を支払った。"
+ },
+ "249": {
+  "word": "content",
+  "en": "The teacher checked the content of each report.",
+  "target": "content",
+  "ja": "先生は各レポートの内容を確認した。"
+ },
+ "250": {
+  "word": "section",
+  "en": "He works in the sales section of the company.",
+  "target": "section",
+  "ja": "彼は会社の営業部門で働いている。"
  }
 }

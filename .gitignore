@@ -54,3 +54,7 @@ credentials.json
 .DS_Store
 assets/bgm/_raw/
 logs/
+
+# ローカルだけの設定
+.claude/settings.local.json
+.agents/

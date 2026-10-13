@@ -1,0 +1,184 @@
+{
+ "id": "g002",
+ "format": "short",
+ "kind": "grammar",
+ "title": "yesterdayと現在完了",
+ "youtube_title": "I have finished yesterday はなぜダメ？現在完了と過去形の違い",
+ "topic": "現在完了 vs 過去形（yesterday と一緒に使えない理由）",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "宿題は昨日終わったッ！英語で言うとこうだッ！",
+   "en": "I have finished my homework yesterday.",
+   "visual": {
+    "kind": "title",
+    "text": "yesterdayと現在完了",
+    "sub": "一緒に使えるの？"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "megane",
+   "line": "残念、それ間違いですね。超あるあるです",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I have finished my homework yesterday.",
+    "right": "I finished my homework yesterday.",
+    "why": "yesterday は過去形と"
+   }
+  },
+  {
+   "id": "b03",
+   "who": "master",
+   "line": "have のついた形は、今の話じゃ",
+   "pose": "point",
+   "fever": true,
+   "visual": {
+    "kind": "compare",
+    "a": {
+     "label": "have finished",
+     "en": "I have finished.",
+     "ja": "今、終わっている"
+    },
+    "b": {
+     "label": "finished",
+     "en": "I finished yesterday.",
+     "ja": "昨日、終わった"
+    }
+   }
+  },
+  {
+   "id": "b04",
+   "who": "master",
+   "line": "昨日は、もう終わった過去であろう",
+   "pose": "talk"
+  },
+  {
+   "id": "b05",
+   "who": "master",
+   "line": "いつかがはっきり過去なら、過去形じゃ",
+   "pose": "point",
+   "visual": {
+    "kind": "rule",
+    "title": "ルール",
+    "lines": [
+     "have＋finished など → 今とつながる話",
+     "yesterday・last week・ago → 過去形"
+    ]
+   }
+  },
+  {
+   "id": "b06",
+   "who": "megane",
+   "line": "正しくはこうですね",
+   "en": "I finished my homework yesterday.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "finished",
+      "l": "V"
+     },
+     {
+      "w": "my homework",
+      "l": "O"
+     },
+     {
+      "w": "yesterday.",
+      "l": "M"
+     }
+    ],
+    "ja": "昨日、宿題を終えた",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b07",
+   "who": "master",
+   "line": "今終わっておる、ならこっちじゃ",
+   "pose": "talk",
+   "en": "I have already finished my homework.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "have already finished",
+      "l": "V"
+     },
+     {
+      "w": "my homework.",
+      "l": "O"
+     }
+    ],
+    "ja": "もう宿題は終わっている",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b08",
+   "who": "nekketsu",
+   "line": "よっしゃ、今度こそ当てるッ！",
+   "think": 3,
+   "visual": {
+    "kind": "quiz",
+    "q": "I ___ him last week.",
+    "choices": [
+     "have met",
+     "met"
+    ],
+    "answer": 1,
+    "reveal": false
+   }
+  },
+  {
+   "id": "b09",
+   "who": "master",
+   "line": "last week があるから、過去形じゃ",
+   "pose": "point",
+   "visual": {
+    "kind": "quiz",
+    "q": "I ___ him last week.",
+    "choices": [
+     "have met",
+     "met"
+    ],
+    "answer": 1,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b10",
+   "who": "nekketsu",
+   "line": "分かったッ！昨日の失敗はもう過去形だッ！"
+  },
+  {
+   "id": "b11",
+   "who": "megane",
+   "line": "いえ、今に残してください。現在完了で"
+  },
+  {
+   "id": "b12",
+   "who": "master",
+   "line": "うまいこと言うのう",
+   "pose": "laugh",
+   "visual": {
+    "kind": "image",
+    "emoji": "📝",
+    "label": "間違いは今につなげて覚える"
+   }
+  }
+ ]
+}
