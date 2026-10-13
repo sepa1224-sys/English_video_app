@@ -255,4 +255,6 @@ def main_random(a) -> int:
 
 
 if __name__ == "__main__":
+    from book_guard import disabled
+    disabled("shorts_quiz.py（単語帳の3秒クイズ）")
     sys.exit(main())

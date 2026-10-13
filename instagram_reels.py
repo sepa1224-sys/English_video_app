@@ -71,6 +71,8 @@ def caption(meta: dict) -> str:
 
 
 def post_reel(user_id: str, tok: str, video: Path, text: str) -> str:
+    from book_guard import check
+    check(video, text)
     # 1) 入れ物を作る（resumable で、動画ファイルを直接送る）
     r = requests.post(f"{API}/{user_id}/media", timeout=60, data={
         "media_type": "REELS", "upload_type": "resumable", "caption": text,

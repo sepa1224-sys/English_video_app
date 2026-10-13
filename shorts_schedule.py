@@ -205,4 +205,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    from book_guard import disabled
+    disabled("shorts_schedule.py（単語帳の3秒クイズの予約投稿）")
     sys.exit(main())

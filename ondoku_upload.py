@@ -62,6 +62,8 @@ def to_rfc3339(text: str) -> str:
 
 def upload(yt, video: Path, title: str, description: str, tags: list[str],
            privacy: str, publish_at: str | None = None) -> str:
+    from book_guard import check
+    check(video, title, description, tags)
     status = {"privacyStatus": privacy, "selfDeclaredMadeForKids": False}
     if publish_at:
         # 予約公開は private でしか受け付けられない。指定時刻にYouTube側が公開する。

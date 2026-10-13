@@ -140,4 +140,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    from book_guard import disabled
+    disabled("word_video_chunked.py（単語帳の聞き流し）")
     sys.exit(main())

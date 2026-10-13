@@ -64,6 +64,9 @@ def get_credentials():
 
 
 def upload_video(youtube, file_path, title, description, tags, privacy):
+    import sys, os; sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+    from book_guard import check
+    check(file_path, title, description, tags)
     """動画をアップロードして video_id を返す"""
     body = {
         "snippet": {

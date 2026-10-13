@@ -205,6 +205,8 @@ def main():
     }
     # Non-resumable single-request upload (stays on www.googleapis.com; the
     # resumable flow redirects to a regional upload host that times out here).
+    from book_guard import check
+    check(video_path, body)
     media = MediaFileUpload(video_path, mimetype="video/mp4", resumable=False)
     print("  - Uploading (single request, please wait)...")
     resp = yt.videos().insert(part="snippet,status", body=body, media_body=media).execute()

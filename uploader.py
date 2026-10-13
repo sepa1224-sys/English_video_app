@@ -121,6 +121,8 @@ def upload_thumbnail(youtube, video_id: str, thumbnail_path: str):
     return response
 
 def upload_to_youtube(video_file: str, title: str, description: str, category_id: str = "27", privacy_status: str = "private", tags: list = None, thumbnail_path: str = None, publish_at: str = None):
+    from book_guard import check
+    check(video_file, title, description, tags)
     """
     動画をYouTubeにアップロードする。
     
