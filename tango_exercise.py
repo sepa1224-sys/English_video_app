@@ -37,7 +37,7 @@ WORD_VOICE = "Xb7hH8MSUJpSbSDYk0k2"   # Alice（英語ネイティブ・はっ�
 TAGS = ["英単語", "大学受験", "英語学習", "気合イングリッシュ", "気合の英単語", "英単語エクササイズ", "受験英語"]
 
 # 冒頭と締めのセリフ（誰が・何を）。キャラは edu/cast.json の名前
-INTRO = [("master", "単語帳『気合の英単語 初段』。この絵で、英単語を鍛えるぞ！")]
+INTRO = [("master", "気合の英単語！", "きあいのえいたんご！")]  # 字幕・読み
 HOWTO = [
     ("nekketsu", "絵を見たら、3秒以内に英語で言ってみろ！"),
     ("megane", "答えが出たら、発音のあとについて声に出しましょう。"),
@@ -73,11 +73,11 @@ def api_key() -> str:
     raise SystemExit("ELEVENLABS_API_KEY が見つかりません（.env）")
 
 
-def tts(text: str, voice: str, out: Path, speed: float = 1.0) -> None:
+def tts(text: str, voice: str, out: Path, speed: float = 1.0, model: str = "eleven_multilingual_v2") -> None:
     for i in range(3):
         r = requests.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
                           headers={"xi-api-key": api_key(), "Content-Type": "application/json"},
-                          json={"text": text, "model_id": "eleven_multilingual_v2"}, timeout=120)
+                          json={"text": text, "model_id": model}, timeout=120)
         if r.ok:
             break
         if r.status_code < 500 and r.status_code != 429:
@@ -100,14 +100,16 @@ def spoken(text: str) -> str:
     return re.sub(r"[ッっ]+(?=[！？!?。、，,…ー〜～\s」』）)]|$)", "", text)
 
 
-def line_audio(who: str, text: str) -> dict:
+def line_audio(who: str, text: str, reading: str | None = None) -> dict:
+    """reading は読み上げ用（字幕は text のまま）。「気合」を「きあい」と読ませたいときなど"""
     c = CAST.get(who, CAST["master"])
     speed = c.get("speed", 1.1)
-    key = hashlib.sha1(f"{c['voice']}|{speed}|{spoken(text)}".encode()).hexdigest()[:12]
+    say = spoken(reading or text)
+    key = hashlib.sha1(f"{c['voice']}|{speed}|{say}".encode()).hexdigest()[:12]
     p = PUB / "lines" / f"{who}_{key}.mp3"
     if not p.exists():
         p.parent.mkdir(parents=True, exist_ok=True)
-        tts(spoken(text), c["voice"], p, speed)
+        tts(say, c["voice"], p, speed)
     return {"who": who, "line": text, "audio": f"tango/lines/{p.name}", "dur": duration(p)}
 
 
@@ -123,16 +125,67 @@ def peak_normalize(p: Path, target: float = -3.0) -> None:
         tmp.replace(p)
 
 
+def transcribe(p: Path) -> str:
+    """ElevenLabs の文字起こし（scribe）で、発音がその単語に聞こえるか確かめる"""
+    with open(p, "rb") as fh:
+        r = requests.post("https://api.elevenlabs.io/v1/speech-to-text", headers={"xi-api-key": api_key()},
+                          data={"model_id": "scribe_v1", "language_code": "en"}, files={"file": fh}, timeout=60)
+    r.raise_for_status()
+    return r.json().get("text", "")
+
+
+def norm(s: str) -> str:
+    return re.sub(r"[^a-z]", "", s.lower())
+
+
+def phones(s: str) -> set[str]:
+    """CMU 発音辞書の発音（強勢の印は外す）。語が辞書に無ければ空"""
+    try:
+        import pronouncing
+    except ImportError:
+        return set()
+    out = {""}
+    for w in re.findall(r"[a-z']+", s.lower()):
+        ps = {re.sub(r"\d", "", x) for x in pronouncing.phones_for_word(w)}
+        if not ps:
+            return set()
+        out = {f"{a} {b}".strip() for a in out for b in ps}
+    return out
+
+
+def sounds_like(heard: str, word: str) -> bool:
+    """同じ綴り、または同じ発音（main と Maine）なら合格"""
+    return norm(heard) == norm(word) or bool(phones(heard) & phones(word))
+
+
+# 単語ひとつだけだと読み違えることがある（base を「バルジー」と読んだ）。
+# 文字起こしで違う語に聞こえたら、読ませ方とモデルを変えて作り直す
+WORD_TRIES = [("{w}.", "eleven_multilingual_v2"), ("{w}", "eleven_turbo_v2_5"),
+              ("{w}!", "eleven_multilingual_v2"), ("{w}.", "eleven_flash_v2_5")]
+CHECKS = PUB / "voice" / "checked.json"
+
+
 def word_audio(headword: str) -> tuple[str, float]:
     p = PUB / "voice" / f"{slug(headword)}.mp3"
-    mark = p.with_suffix(".normed")
-    if not p.exists():
-        p.parent.mkdir(parents=True, exist_ok=True)
-        # 文として読ませると単語だけより発音が安定する
-        tts(f"{headword}.", WORD_VOICE, p, 0.9)
-    if not mark.exists():
+    p.parent.mkdir(parents=True, exist_ok=True)
+    checks = json.loads(CHECKS.read_text(encoding="utf-8")) if CHECKS.exists() else {}
+    if headword not in checks:
+        heard = []
+        for i, (fmt, model) in enumerate(WORD_TRIES):
+            if i or not p.exists():
+                tts(fmt.format(w=headword), WORD_VOICE, p, 0.9, model)
+            got = transcribe(p)
+            heard.append(got)
+            if sounds_like(got, headword):
+                break
+            print(f"    ↻ {headword}：「{got}」に聞こえたので作り直し")
+        else:
+            # 1語だけの文字起こしはぶれることもある。どれも合わなければ最初の読ませ方に戻し、人が聞いて確かめる
+            print(f"    ⚠ 要確認：{headword} → {heard}")
+            tts(WORD_TRIES[0][0].format(w=headword), WORD_VOICE, p, 0.9, WORD_TRIES[0][1])
         peak_normalize(p)
-        mark.touch()
+        checks[headword] = heard[-1]
+        CHECKS.write_text(json.dumps(checks, ensure_ascii=False, indent=1), encoding="utf-8")
     return f"tango/voice/{p.name}", duration(p)
 
 
@@ -203,7 +256,7 @@ def build_props(keiko: int, limit: int | None) -> dict:
         "range": [entries[0]["no"], entries[-1]["no"]],
         "series": SERIES,
         "book": {"label": book()["label"]},
-        "intro": [line_audio(w, t) for w, t in INTRO],
+        "intro": [line_audio(*x) for x in INTRO],
         "howto": [line_audio(w, t.format(keiko=keiko)) for w, t in HOWTO],
         "outro": [line_audio(w, t) for w, t in OUTRO],
         "words": words,
@@ -218,7 +271,7 @@ THINK, AFTER1, AFTER2, LINE_GAP = 3.5, 0.9, 1.6, 0.35
 def timeline(p: dict) -> dict:
     t = 0.0
     marks = {"intro": 0.0}
-    t += max(5.0, sum(x["dur"] + LINE_GAP for x in p["intro"]) + 0.6)
+    t += max(3.0, sum(x["dur"] + LINE_GAP for x in p["intro"]) + 0.6)
     marks["howto"] = t
     t += sum(x["dur"] + LINE_GAP for x in p["howto"]) + 0.6
     marks["words"] = t
