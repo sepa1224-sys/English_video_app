@@ -1,0 +1,161 @@
+{
+ "id": "g004",
+ "format": "short",
+ "kind": "grammar",
+ "title": "can と be able to",
+ "youtube_title": "can と be able to の違い：will can が言えない理由と言い換え方",
+ "topic": "can と be able to の違い",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "来年の目標、英語で宣言するッ！",
+   "en": "I will can speak English!",
+   "visual": {
+    "kind": "title",
+    "text": "will can はアリ？",
+    "sub": "can と be able to"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "megane",
+   "line": "残念、それは文法的にアウトですね",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I will can speak English.",
+    "right": "I will be able to speak English.",
+    "why": "will と can は並べられない"
+   }
+  },
+  {
+   "id": "b03",
+   "who": "master",
+   "line": "will と can は並べられんのじゃ",
+   "pose": "point",
+   "fever": true
+  },
+  {
+   "id": "b04",
+   "who": "megane",
+   "line": "どちらも動詞を助ける言葉。二つ重ねは禁止です"
+  },
+  {
+   "id": "b05",
+   "who": "master",
+   "line": "そこで be able to に言い換えるのじゃ",
+   "pose": "talk",
+   "visual": {
+    "kind": "rule",
+    "title": "ルール",
+    "lines": [
+     "can ＝ できる",
+     "will や must の後ろに can は置けない",
+     "そのときは be able to を使う"
+    ]
+   }
+  },
+  {
+   "id": "b06",
+   "who": "master",
+   "line": "来年は泳げるようになる、じゃ",
+   "pose": "talk",
+   "en": "I will be able to swim next year.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "will be able to swim",
+      "l": "V"
+     },
+     {
+      "w": "next year.",
+      "l": "M"
+     }
+    ],
+    "ja": "来年は泳げるようになる",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b07",
+   "who": "nekketsu",
+   "line": "じゃあ問題だッ！かかってこい！",
+   "visual": {
+    "kind": "quiz",
+    "q": "You must ___ drive a car.",
+    "choices": [
+     "can",
+     "be able to"
+    ],
+    "answer": 1,
+    "reveal": false
+   },
+   "think": 3
+  },
+  {
+   "id": "b08",
+   "who": "nekketsu",
+   "line": "can だッ！間違いないッ！"
+  },
+  {
+   "id": "b09",
+   "who": "master",
+   "line": "答えは be able to じゃ",
+   "pose": "surprised",
+   "visual": {
+    "kind": "quiz",
+    "q": "You must ___ drive a car.",
+    "choices": [
+     "can",
+     "be able to"
+    ],
+    "answer": 1,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b10",
+   "who": "megane",
+   "line": "must も助動詞。ついさっき習いましたよね"
+  },
+  {
+   "id": "b11",
+   "who": "nekketsu",
+   "line": "よっしゃ覚えた！今度こそ言うぞッ！",
+   "en": "I will be able to speak English!",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "will be able to speak",
+      "l": "V"
+     },
+     {
+      "w": "English!",
+      "l": "O"
+     }
+    ],
+    "ja": "英語が話せるようになる",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b12",
+   "who": "megane",
+   "line": "文法は完璧。あとは中身ですね"
+  }
+ ]
+}
