@@ -10,3 +10,6 @@ loadFont({ family: HAND, url: staticFile('fonts/YuseiMagic-Regular.ttf') });
 // ドット文字（レトロゲーム風の画面用）。DotGothic16 / SIL Open Font License 1.1（public/fonts/DotGothic16-OFL.txt）
 export const DOT = 'KiaiDot';
 loadFont({ family: DOT, url: staticFile('fonts/DotGothic16-Regular.ttf') });
+// 見出しの極太（単語帳「気合の英単語」の表紙と同じ）。Dela Gothic One / SIL Open Font License 1.1（public/fonts/DelaGothicOne-OFL.txt）
+export const DELA = 'KiaiDela';
+loadFont({ family: DELA, url: staticFile('fonts/DelaGothicOne-Regular.ttf') });

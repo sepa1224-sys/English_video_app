@@ -2,6 +2,8 @@ import { Composition } from 'remotion';
 import { Episode } from './Episode';
 import { Sheet } from './chara/Sheet';
 import { FPS, totalFrames, type Episode as Ep } from './types';
+import { ChannelBanner, ChannelIcon, TangoExercise, TangoThumb } from './tango/Tango';
+import { sections, type TangoData } from './tango/types';
 
 // 台本は書き出し時に --props で渡す（scripts/render.mjs）。長さは台本から決める
 const SAMPLE: Ep = {
@@ -11,12 +13,26 @@ const SAMPLE: Ep = {
 
 const meta = ({ props }: { props: { episode: Ep } }) => ({ durationInFrames: totalFrames(props.episode) });
 
+// イメージで英単語エクササイズ。中身は tango_exercise.py が --props で渡す
+const TANGO_SAMPLE: TangoData = {
+  keiko: 1, range: [1, 1], series: 'イメージで英単語エクササイズ', book: { label: '近日発売' },
+  intro: [], howto: [], outro: [], thumbs: ['tango/art/likely.jpg'],
+  words: [{ no: 1, headword: 'likely', pos: '形', meanings: ['ありそうな、～しそうだ'], hint: ['l_____'],
+    img: 'tango/art/likely.jpg', voice: 'tango/voice/likely.mp3', voiceDur: 0.6 }],
+};
+const tangoMeta = ({ props }: { props: { data: TangoData } }) => ({ durationInFrames: sections(props.data).total });
+
 export const Root = () => (
   <>
     <Composition id="EduShort" component={Episode} defaultProps={{ episode: SAMPLE }}
       width={1080} height={1920} fps={FPS} durationInFrames={90} calculateMetadata={meta} />
     <Composition id="EduLong" component={Episode} defaultProps={{ episode: { ...SAMPLE, format: 'long' as const } }}
       width={1920} height={1080} fps={FPS} durationInFrames={90} calculateMetadata={meta} />
+    <Composition id="TangoExercise" component={TangoExercise} defaultProps={{ data: TANGO_SAMPLE }}
+      width={1920} height={1080} fps={FPS} durationInFrames={90} calculateMetadata={tangoMeta} />
+    <Composition id="TangoThumb" component={TangoThumb} defaultProps={{ data: TANGO_SAMPLE }} width={1280} height={720} fps={FPS} durationInFrames={1} />
+    <Composition id="ChannelIcon" component={ChannelIcon} width={800} height={800} fps={FPS} durationInFrames={1} />
+    <Composition id="ChannelBanner" component={ChannelBanner} width={2560} height={1440} fps={FPS} durationInFrames={1} />
     <Composition id="CharaSheet" component={Sheet} width={1620} height={2020} fps={FPS} durationInFrames={60} />
   </>
 );
