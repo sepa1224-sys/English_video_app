@@ -13,7 +13,7 @@
 セリフは edu/cast.json のキャラの声。作った声は edu/public/tango/ に貯めて、稽古をまたいで使い回す。
 """
 from __future__ import annotations
-import argparse, hashlib, json, os, re, shutil, subprocess, sys
+import argparse, hashlib, json, math, os, re, shutil, subprocess, sys
 from pathlib import Path
 
 import imageio_ffmpeg
@@ -126,10 +126,14 @@ def peak_normalize(p: Path, target: float = -3.0) -> None:
 
 
 def transcribe(p: Path) -> str:
-    """ElevenLabs の文字起こし（scribe）で、発音がその単語に聞こえるか確かめる"""
-    with open(p, "rb") as fh:
+    """ElevenLabs の文字起こし（scribe）で、発音がその単語に聞こえるか確かめる。
+    頭と最後の無音を詰めた短い音だと聞き取れないことがある（though が空になった）ので、前後に0.5秒の無音を足して渡す"""
+    pad = p.with_suffix(".pad.mp3")
+    ff("-i", str(p), "-af", "adelay=500,apad=pad_dur=0.5", "-c:a", "libmp3lame", str(pad))
+    with open(pad, "rb") as fh:
         r = requests.post("https://api.elevenlabs.io/v1/speech-to-text", headers={"xi-api-key": api_key()},
                           data={"model_id": "scribe_v1", "language_code": "en"}, files={"file": fh}, timeout=60)
+    pad.unlink()
     r.raise_for_status()
     return r.json().get("text", "")
 
@@ -264,27 +268,96 @@ def build_props(keiko: int, limit: int | None) -> dict:
     }
 
 
-# 動画の時間割（edu/src/tango/timing.ts と同じ式。説明文の目次に使う）
+# 動画の時間割。edu/src/tango/types.ts の sections() と同じ式で、コマ（1/30秒）単位に丸める。
+# 丸め方がずれると100語で1秒以上ずれるので、JS の Math.round と同じ丸めにする
+FPS = 30
 THINK, AFTER1, AFTER2, LINE_GAP = 3.5, 0.9, 1.6, 0.35
 
 
+def fr(sec: float) -> int:
+    return math.floor(sec * FPS + 0.5)
+
+
+def line_starts(lines: list[dict]) -> list[int]:
+    t, out = fr(0.3), []
+    for x in lines:
+        out.append(t)
+        t += fr(x["dur"] + LINE_GAP)
+    return out
+
+
 def timeline(p: dict) -> dict:
-    t = 0.0
-    marks = {"intro": 0.0}
-    t += max(3.0, sum(x["dur"] + LINE_GAP for x in p["intro"]) + 0.6)
+    """各場面の始まり（コマ）"""
+    lines_len = lambda ls: sum(x["dur"] + LINE_GAP for x in ls) + 0.6
+    t = 0
+    marks = {"intro": 0}
+    t += fr(max(3.0, lines_len(p["intro"])))
     marks["howto"] = t
-    t += sum(x["dur"] + LINE_GAP for x in p["howto"]) + 0.6
+    t += fr(lines_len(p["howto"]))
     marks["words"] = t
     starts = []
     for w in p["words"]:
         starts.append(t)
-        t += THINK + 0.1 + w["voiceDur"] + AFTER1 + w["voiceDur"] + AFTER2
+        t += fr(THINK + 0.1 + w["voiceDur"] + AFTER1 + w["voiceDur"] + AFTER2)
     marks["outro"] = t
+    marks["total"] = t + fr(lines_len(p["outro"]) + 1.5)
     return {**marks, "starts": starts}
 
 
-def ts(sec: float) -> str:
-    s = int(sec)
+# 音は Remotion で混ぜない。<Audio> が500個近くあると、Remotion は部品ごとに動画1本ぶんの
+# 一時 WAV を作ってディスクを使い切った（2026-10-17、空き8GBで失敗）。
+# ここで1本に混ぜ、Remotion は映像だけ（--muted）を書き出して最後に合わせる。
+SR = 48000
+
+
+def decode(path: Path) -> "np.ndarray":
+    raw = subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-v", "error", "-i", str(path), "-f", "f32le",
+                          "-ac", "2", "-ar", str(SR), "-"], capture_output=True, check=True).stdout
+    import numpy as np
+    return np.frombuffer(raw, dtype=np.float32).reshape(-1, 2)
+
+
+def mix_audio(p: dict, out: Path) -> None:
+    import numpy as np
+    tl = timeline(p)
+    total = tl["total"]
+    buf = np.zeros((int(total / FPS * SR) + SR, 2), dtype=np.float32)
+    cache: dict[str, np.ndarray] = {}
+
+    def put(rel: str, frame: int, vol: float = 1.0) -> None:
+        if rel not in cache:
+            cache[rel] = decode(EDU / "public" / rel)
+        a = cache[rel]
+        i = int(frame / FPS * SR)
+        n = min(len(a), len(buf) - i)
+        buf[i:i + n] += a[:n] * vol
+
+    for key, sec_start in (("intro", tl["intro"]), ("howto", tl["howto"]), ("outro", tl["outro"])):
+        for x, at in zip(p[key], line_starts(p[key])):
+            put(x["audio"], sec_start + at)
+    for w, st in zip(p["words"], tl["starts"]):
+        for k in (3, 2, 1):
+            put("tango/tick.mp3", st + fr(THINK - k), 0.45)
+        v1 = st + fr(THINK + 0.1)
+        put(w["voice"], v1)
+        put(w["voice"], v1 + fr(w["voiceDur"] + AFTER1))
+    # BGM（解説ショートと同じレトロRPG風・村）を小さく流し、最初と最後はフェード
+    bgm = decode(EDU / "public" / "bgm" / "03_village.mp3")
+    reps = int(np.ceil(len(buf) / len(bgm)))
+    track = np.tile(bgm, (reps, 1))[:len(buf)]
+    t = np.arange(len(buf)) / SR * FPS
+    vol = np.interp(t, [0, 20, total - 60, total], [0, 0.06, 0.06, 0]).astype(np.float32)
+    buf += track * vol[:, None]
+    buf = buf[:int(total / FPS * SR)]
+    wav = out.with_suffix(".mix.f32")
+    wav.write_bytes(np.clip(buf, -1, 1).astype(np.float32).tobytes())
+    ff("-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", str(wav), "-af", "alimiter=limit=0.95",
+       "-c:a", "aac", "-b:a", "192k", str(out))
+    wav.unlink()
+
+
+def ts(frame: int) -> str:
+    s = int(frame / FPS)
     return f"{s // 60}:{s % 60:02d}"
 
 
@@ -334,6 +407,7 @@ def render(comp: str, out: Path, props: Path | None = None, still: bool = False)
     cmd = ["npx", "remotion", "still" if still else "render", "src/index.ts", comp, str(out), "--log=error"]
     if not still:
         cmd.append(f"--concurrency={os.cpu_count() or 4}")  # 既定は半分。100語で1時間以上かかるので全部使う
+        cmd.append("--muted")  # 音は mix_audio() で別に作る
     if props:
         cmd.append(f"--props={props}")
     print("▶", " ".join(cmd))
@@ -400,8 +474,17 @@ def main() -> int:
     (OUT / f"{name}_description.txt").write_text(meta["description"], encoding="utf-8")
     render("TangoThumb", OUT / f"{name}.png", props, still=True)
     Image.open(OUT / f"{name}.png").convert("RGB").save(OUT / f"{name}.jpg", quality=90)
-    render("TangoExercise", OUT / f"{name}.mp4", props)
-    print(f"✅ {OUT / name}.mp4 （{ts(timeline(p)['outro'])} ＋締め）\n   {meta['title']}")
+    tmp = ROOT / ".tmp" / "tango"
+    tmp.mkdir(parents=True, exist_ok=True)
+    audio = tmp / f"{name}.m4a"
+    mix_audio(p, audio)
+    video = tmp / f"{name}.video.mp4"
+    render("TangoExercise", video, props)
+    ff("-i", str(video), "-i", str(audio), "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy",
+       "-shortest", "-movflags", "+faststart", str(OUT / f"{name}.mp4"))
+    video.unlink()
+    audio.unlink()
+    print(f"✅ {OUT / name}.mp4 （{ts(timeline(p)['total'])}）\n   {meta['title']}")
     return 0
 
 
