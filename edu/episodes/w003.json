@@ -1,0 +1,186 @@
+{
+ "id": "w003",
+ "format": "short",
+ "kind": "word",
+ "title": "say・tell・speak・talk",
+ "youtube_title": "say・tell・speak・talkの使い分け　「言う」と「話す」の違いを例文とクイズで解説",
+ "topic": "say / tell / speak / talk",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "言うも話すも、全部セイでいけるッ！",
+   "visual": {
+    "kind": "word",
+    "en": "say / tell / speak / talk",
+    "ja": "言う・話す",
+    "pos": "動詞",
+    "note": "日本語は同じでも、英語では使い分ける"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "nekketsu",
+   "line": "彼はぼくに本当のことを言った、だッ！",
+   "en": "He said me the truth."
+  },
+  {
+   "id": "b03",
+   "who": "megane",
+   "line": "残念ですね。典型的な間違いです",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "He said me the truth.",
+    "right": "He told me the truth.",
+    "why": "「人に」言うなら tell。say のすぐ後に人は置けない"
+   }
+  },
+  {
+   "id": "b04",
+   "who": "master",
+   "line": "セイは言葉、テルは人に伝える、じゃ",
+   "pose": "point",
+   "fever": true,
+   "visual": {
+    "kind": "rule",
+    "title": "4つの違い",
+    "lines": [
+     "say ＋ 言った言葉（say \"Hi\"）",
+     "tell ＋ 人 ＋ 内容",
+     "speak ＋ 言語・声に出すこと",
+     "talk ＋ to/with 人（会話）"
+    ]
+   }
+  },
+  {
+   "id": "b05",
+   "who": "master",
+   "line": "スピークは言語や声、トークはおしゃべりじゃ",
+   "pose": "talk"
+  },
+  {
+   "id": "b06",
+   "who": "megane",
+   "line": "言語を話すなら、こうですね",
+   "en": "She speaks three languages.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "She",
+      "l": "S"
+     },
+     {
+      "w": "speaks",
+      "l": "V"
+     },
+     {
+      "w": "three languages.",
+      "l": "O"
+     }
+    ],
+    "ja": "彼女は3つの言語を話す",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b07",
+   "who": "master",
+   "line": "そのことはあとで話そう、じゃ",
+   "pose": "talk",
+   "en": "Let's talk about it later.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "Let's",
+      "l": "+"
+     },
+     {
+      "w": "talk",
+      "l": "V"
+     },
+     {
+      "w": "about it",
+      "l": "M"
+     },
+     {
+      "w": "later.",
+      "l": "M"
+     }
+    ],
+    "ja": "そのことはあとで話そう",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b08",
+   "who": "master",
+   "line": "問題じゃ。駅までの道を教えてくれる？",
+   "pose": "point",
+   "think": 3,
+   "visual": {
+    "kind": "quiz",
+    "q": "Can you ___ me the way to the station?",
+    "choices": [
+     "say",
+     "tell",
+     "speak",
+     "talk"
+    ],
+    "answer": 1,
+    "reveal": false
+   }
+  },
+  {
+   "id": "b09",
+   "who": "nekketsu",
+   "line": "人に教えるんだから、テルだッ！",
+   "visual": {
+    "kind": "quiz",
+    "q": "Can you ___ me the way to the station?",
+    "choices": [
+     "say",
+     "tell",
+     "speak",
+     "talk"
+    ],
+    "answer": 1,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b10",
+   "who": "master",
+   "line": "正解じゃ。すぐ後に人がいたらテルじゃな",
+   "pose": "laugh"
+  },
+  {
+   "id": "b11",
+   "who": "megane",
+   "line": "まあ、私なら最初から正解でしたけどね"
+  },
+  {
+   "id": "b12",
+   "who": "nekketsu",
+   "line": "よっしゃ！先生と話したいッ！",
+   "en": "I want to talk you!"
+  },
+  {
+   "id": "b13",
+   "who": "master",
+   "line": "トゥーが抜けとる。まだまだ修行じゃのう",
+   "pose": "talk",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I want to talk you!",
+    "right": "I want to talk to you!",
+    "why": "talk は to か with を付けて相手につなぐ"
+   }
+  }
+ ]
+}

@@ -1,0 +1,210 @@
+{
+ "id": "w002",
+ "format": "short",
+ "kind": "word",
+ "title": "borrowとlend",
+ "youtube_title": "borrowとlendの違い：借りると貸すの向きと過去形lentの使い方",
+ "topic": "borrow と lend",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "ペン貸して、は英語でこうだッ！",
+   "en": "Can you borrow me your pen?",
+   "visual": {
+    "kind": "word",
+    "en": "borrow",
+    "ja": "借りる",
+    "pos": "動詞",
+    "note": "borrow A from 人 の形で"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "megane",
+   "line": "残念。borrowは借りる側の言葉ですよ",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "Can you borrow me your pen?",
+    "right": "Can you lend me your pen?",
+    "why": "貸すのは lend"
+   }
+  },
+  {
+   "id": "b03",
+   "who": "master",
+   "line": "物の流れを見るんじゃ",
+   "pose": "point",
+   "visual": {
+    "kind": "compare",
+    "a": {
+     "label": "borrow",
+     "en": "borrow from 人",
+     "ja": "借りる（自分に来る）"
+    },
+    "b": {
+     "label": "lend",
+     "en": "lend to 人",
+     "ja": "貸す（相手へ行く）"
+    }
+   }
+  },
+  {
+   "id": "b04",
+   "who": "master",
+   "line": "来るならボロー、出ていくならレンドじゃ",
+   "pose": "talk",
+   "fever": true
+  },
+  {
+   "id": "b05",
+   "who": "nekketsu",
+   "line": "よっしゃ！借りる側で言い直すッ！",
+   "en": "Can I borrow your pen?",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "Can",
+      "l": "+"
+     },
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "borrow",
+      "l": "V"
+     },
+     {
+      "w": "your pen?",
+      "l": "O"
+     }
+    ],
+    "ja": "ペンを借りてもいい？",
+    "mark": [
+     2
+    ]
+   }
+  },
+  {
+   "id": "b06",
+   "who": "megane",
+   "line": "貸してくれる？ならこうですね",
+   "en": "Could you lend me your pen?",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "Could",
+      "l": "+"
+     },
+     {
+      "w": "you",
+      "l": "S"
+     },
+     {
+      "w": "lend",
+      "l": "V"
+     },
+     {
+      "w": "me",
+      "l": "O"
+     },
+     {
+      "w": "your pen?",
+      "l": "O"
+     }
+    ],
+    "ja": "ペンを貸してくれる？",
+    "mark": [
+     2
+    ]
+   }
+  },
+  {
+   "id": "b07",
+   "who": "master",
+   "line": "fromとtoの向きもセットで覚えるんじゃ",
+   "pose": "point",
+   "visual": {
+    "kind": "rule",
+    "title": "かたち",
+    "lines": [
+     "borrow A from 人 ＝ 人からAを借りる",
+     "lend 人 A ＝ 人にAを貸す",
+     "lend A to 人 でも同じ"
+    ]
+   }
+  },
+  {
+   "id": "b08",
+   "who": "master",
+   "line": "問題じゃ。昨日、彼に自転車を貸した",
+   "pose": "talk",
+   "think": 3,
+   "visual": {
+    "kind": "quiz",
+    "q": "I ___ him my bike yesterday.",
+    "choices": [
+     "borrowed",
+     "lent"
+    ],
+    "answer": 1,
+    "reveal": false
+   }
+  },
+  {
+   "id": "b09",
+   "who": "master",
+   "line": "答えはlent。lendの過去形じゃ",
+   "pose": "point",
+   "visual": {
+    "kind": "quiz",
+    "q": "I ___ him my bike yesterday.",
+    "choices": [
+     "borrowed",
+     "lent"
+    ],
+    "answer": 1,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b10",
+   "who": "nekketsu",
+   "line": "lendedだと思ってたッ！"
+  },
+  {
+   "id": "b11",
+   "who": "megane",
+   "line": "不規則動詞です。lend lent lentですね",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I lended him my bike.",
+    "right": "I lent him my bike.",
+    "why": "lend の過去形は lent"
+   }
+  },
+  {
+   "id": "b12",
+   "who": "nekketsu",
+   "line": "師匠！千円をレンドしてくれッ！",
+   "visual": {
+    "kind": "image",
+    "emoji": "💴",
+    "label": "Lend me 1,000 yen!"
+   }
+  },
+  {
+   "id": "b13",
+   "who": "megane",
+   "line": "師匠、お財布ごと隠しましたね",
+   "visual": {
+    "kind": "image",
+    "emoji": "👛",
+    "label": "lend されなかった"
+   }
+  }
+ ]
+}

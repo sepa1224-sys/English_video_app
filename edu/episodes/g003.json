@@ -1,0 +1,175 @@
+{
+ "id": "g003",
+ "format": "short",
+ "kind": "grammar",
+ "title": "He play はなぜダメ？",
+ "youtube_title": "三単現のsとは？He play が間違いになる理由と、sを付けるタイミング",
+ "topic": "三単現の s（He play と言ってしまう問題）",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "毎日サッカーするって言うぞッ！",
+   "en": "He play soccer every day.",
+   "visual": {
+    "kind": "title",
+    "text": "He play はアウト？",
+    "sub": "三単現の s"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "megane",
+   "line": "残念、sが抜けてますね",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "He play soccer every day.",
+    "right": "He plays soccer every day.",
+    "why": "主語が he なら動詞に s"
+   }
+  },
+  {
+   "id": "b03",
+   "who": "nekketsu",
+   "line": "なんで彼だけ特別扱いなんだッ！"
+  },
+  {
+   "id": "b04",
+   "who": "master",
+   "line": "自分と相手以外の一人なら、動詞にsじゃ",
+   "pose": "point",
+   "fever": true,
+   "visual": {
+    "kind": "rule",
+    "title": "三単現の s",
+    "lines": [
+     "主語が「自分・相手以外の1人（1つ）」",
+     "→ 動詞に s を付ける",
+     "I play / You play / He plays"
+    ]
+   }
+  },
+  {
+   "id": "b05",
+   "who": "master",
+   "line": "しかも、今の習慣や事実を言う文の話じゃ",
+   "pose": "talk"
+  },
+  {
+   "id": "b06",
+   "who": "master",
+   "line": "例えば、彼女は猫が好き",
+   "pose": "talk",
+   "en": "She likes cats.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "She",
+      "l": "S"
+     },
+     {
+      "w": "likes",
+      "l": "V"
+     },
+     {
+      "w": "cats.",
+      "l": "O"
+     }
+    ],
+    "ja": "彼女は猫が好きだ",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b07",
+   "who": "master",
+   "line": "うちの父は東京で働いている",
+   "pose": "talk",
+   "en": "My dad works in Tokyo.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "My dad",
+      "l": "S"
+     },
+     {
+      "w": "works",
+      "l": "V"
+     },
+     {
+      "w": "in Tokyo.",
+      "l": "M"
+     }
+    ],
+    "ja": "父は東京で働いている",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b08",
+   "who": "megane",
+   "line": "人の名前や物でも、一つならsですね"
+  },
+  {
+   "id": "b09",
+   "who": "master",
+   "line": "では問題じゃ",
+   "pose": "talk",
+   "think": 3,
+   "visual": {
+    "kind": "quiz",
+    "q": "They ___ tennis after school.",
+    "choices": [
+     "play",
+     "plays"
+    ],
+    "answer": 0,
+    "reveal": false
+   }
+  },
+  {
+   "id": "b10",
+   "who": "master",
+   "line": "二人以上なら、sはいらんのじゃ",
+   "pose": "point",
+   "visual": {
+    "kind": "quiz",
+    "q": "They ___ tennis after school.",
+    "choices": [
+     "play",
+     "plays"
+    ],
+    "answer": 0,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b11",
+   "who": "nekketsu",
+   "line": "俺は一人で燃える男！だから俺にもsだッ！",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I plays soccer.",
+    "right": "I play soccer.",
+    "why": "I は自分。s は付かない"
+   }
+  },
+  {
+   "id": "b12",
+   "who": "megane",
+   "line": "自分は対象外って、さっき習いましたよね"
+  },
+  {
+   "id": "b13",
+   "who": "master",
+   "line": "燃える前に、話を聞くんじゃ",
+   "pose": "laugh"
+  }
+ ]
+}
