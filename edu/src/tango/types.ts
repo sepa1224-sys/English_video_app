@@ -24,7 +24,7 @@ export const LINE_GAP = 0.35; // セリフとセリフの間
 export const sec = (s: number) => Math.round(s * FPS);
 export const wordLen = (w: Word) => THINK + 0.1 + w.voiceDur + AFTER1 + w.voiceDur + AFTER2;
 export const linesLen = (ls: Line[]) => ls.reduce((n, l) => n + l.dur + LINE_GAP, 0) + 0.6;
-export const introLen = (d: TangoData) => Math.max(5, linesLen(d.intro));
+export const introLen = (d: TangoData) => Math.max(3, linesLen(d.intro)); // 冒頭は短く（一言だけ）
 
 export const sections = (d: TangoData) => {
   const intro = sec(introLen(d));
