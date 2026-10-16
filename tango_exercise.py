@@ -105,7 +105,7 @@ def line_audio(who: str, text: str, reading: str | None = None) -> dict:
     c = CAST.get(who, CAST["master"])
     speed = c.get("speed", 1.1)
     say = spoken(reading or text)
-    key = hashlib.sha1(f"{c['voice']}|{speed}|{say}".encode()).hexdigest()[:12]
+    key = hashlib.sha256(f"{c['voice']}|{speed}|{say}".encode()).hexdigest()[:12]  # 声のファイル名を決めるだけ（暗号用ではない）
     p = PUB / "lines" / f"{who}_{key}.mp3"
     if not p.exists():
         p.parent.mkdir(parents=True, exist_ok=True)
