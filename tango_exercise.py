@@ -36,7 +36,10 @@ PLAYLIST = "イメージで英単語エクササイズ（気合の英単語 初�
 # 単語の発音はアメリカ英語の声（Bella・教育向け）。最初は Alice（イギリス英語）だったが、
 # source が sauce に聞こえるなど入試の発音と違うので替えた（2026-10-18 坂本さんの指示）
 WORD_VOICE = "hpp4J3VqNfWAUOO0d1Us"
-VOICE_DIR = PUB / "voice_us"
+# モデルは eleven_v3。multilingual_v2 では according to の語尾が上がり（続きがある読み方）、
+# 文に入れて切り出しても不自然だった。v3 はそのまま読ませて語尾が下がった（2026-10-18 坂本さんが選んだ）
+WORD_MODEL = "eleven_v3"
+VOICE_DIR = PUB / "voice_v3"
 TAGS = ["英単語", "大学受験", "英語学習", "気合イングリッシュ", "気合の英単語", "英単語エクササイズ", "受験英語"]
 
 # 冒頭と締めのセリフ（誰が・何を）。キャラは edu/cast.json の名前
@@ -92,7 +95,8 @@ def tts(text: str, voice: str, out: Path, speed: float = 1.0, model: str = "elev
     raw = out.with_suffix(".raw.mp3")
     raw.write_bytes(r.content)
     # 頭と最後の無音を詰める（単語の発音は答えの表示と同時に聞こえてほしい）
-    trim = "silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse"
+    # -50dB だと出だしの弱い母音（according の a）まで削ることがあるので -60dB
+    trim = "silenceremove=start_periods=1:start_threshold=-60dB,areverse,silenceremove=start_periods=1:start_threshold=-60dB,areverse"
     tempo = f",atempo={speed}" if speed != 1 else ""
     ff("-i", str(raw), "-af", f"aresample=44100,{trim}{tempo}", "-c:a", "libmp3lame", "-b:a", "160k", str(out))
     raw.unlink()
@@ -165,10 +169,47 @@ def sounds_like(heard: str, word: str) -> bool:
     return norm(heard) == norm(word) or bool(phones(heard) & phones(word))
 
 
-# 単語ひとつだけだと読み違えることがある（base を「バルジー」と読んだ）。
-# 文字起こしで違う語に聞こえたら、読ませ方とモデルを変えて作り直す
-WORD_TRIES = [("{w}.", "eleven_multilingual_v2"), ("{w}", "eleven_turbo_v2_5"),
-              ("{w}!", "eleven_multilingual_v2"), ("{w}.", "eleven_flash_v2_5")]
+def f0_track(p: Path, sr: int = 16000) -> "np.ndarray":
+    """10ミリ秒ごとの声の高さ（Hz）。声が無いところは nan"""
+    import numpy as np
+    raw = subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-v", "error", "-i", str(p), "-ac", "1", "-ar", str(sr),
+                          "-f", "f32le", "-"], capture_output=True, check=True).stdout
+    x = np.frombuffer(raw, np.float32)
+    win, hop, out = int(0.04 * sr), int(0.01 * sr), []
+    for i in range(0, len(x) - win, hop):
+        f = x[i:i + win] * np.hanning(win)
+        if np.sqrt((f ** 2).mean()) < 0.02:
+            out.append(np.nan)
+            continue
+        ac = np.correlate(f, f, "full")[win - 1:]
+        lo, hi = int(sr / 400), int(sr / 80)
+        k = lo + int(np.argmax(ac[lo:hi]))
+        out.append(sr / k if ac[k] > 0.3 * ac[0] else np.nan)
+    return np.array(out)
+
+
+def tail_slope(p: Path) -> float | None:
+    """最後の有声のかたまりで、声の高さが0.1秒あたり何Hz動くか（プラス＝語尾が上がる）"""
+    import numpy as np
+    f = f0_track(p)
+    idx = np.where(~np.isnan(f))[0]
+    if len(idx) < 4:
+        return None
+    runs = np.split(idx, np.where(np.diff(idx) > 2)[0] + 1)
+    run = runs[-1] if len(runs[-1]) >= 4 else np.concatenate(runs[-2:])
+    return float(np.polyfit(np.arange(len(run)), f[run], 1)[0] * 10)
+
+
+def median_f0(p: Path) -> float | None:
+    import numpy as np
+    f = f0_track(p)
+    return float(np.nanmedian(f)) if (~np.isnan(f)).sum() >= 4 else None
+
+
+# 確かめること：①その語に聞こえるか（文字起こし）②語尾が上がっていないか（声の高さ）。
+# v3 は同じ文でも読むたびに違うので、だめなら同じ頼み方で作り直す
+WORD_TRIES = 6
+RISE = 0.0  # 0.1秒あたり少しでも上がっていたら「語尾が上がる」（according to が +2.8 で上がって聞こえた）
 CHECKS = VOICE_DIR / "checked.json"
 
 
@@ -177,21 +218,28 @@ def word_audio(headword: str) -> tuple[str, float]:
     p.parent.mkdir(parents=True, exist_ok=True)
     checks = json.loads(CHECKS.read_text(encoding="utf-8")) if CHECKS.exists() else {}
     if headword not in checks:
-        heard = []
-        for i, (fmt, model) in enumerate(WORD_TRIES):
+        best, notes = None, []
+        for i in range(WORD_TRIES):
             if i or not p.exists():
-                tts(fmt.format(w=headword), WORD_VOICE, p, 0.9, model)
-            got = transcribe(p)
-            heard.append(got)
-            if sounds_like(got, headword):
+                tts(f"{headword}.", WORD_VOICE, p, 1.0, WORD_MODEL)
+            peak_normalize(p)  # 声の高さの測り方は音量に左右されるので、そろえてから測る
+            got, rise = transcribe(p), tail_slope(p)
+            bad = (f"「{got}」に聞こえた" if not sounds_like(got, headword)
+                   else f"語尾が上がった（{rise:+.1f}）" if rise is not None and rise > RISE else "")
+            if not bad:
                 break
-            print(f"    ↻ {headword}：「{got}」に聞こえたので作り直し")
+            notes.append(bad)
+            # 聞き取りは合っていて語尾だけ上がるものは、いちばん上がり方が小さいものを残しておく
+            if sounds_like(got, headword) and (best is None or rise < best[0]):
+                best = (rise, p.read_bytes())
+            print(f"    ↻ {headword}：{bad}ので作り直し")
         else:
-            # 1語だけの文字起こしはぶれることもある。どれも合わなければ最初の読ませ方に戻し、人が聞いて確かめる
-            print(f"    ⚠ 要確認：{headword} → {heard}")
-            tts(WORD_TRIES[0][0].format(w=headword), WORD_VOICE, p, 0.9, WORD_TRIES[0][1])
+            print(f"    ⚠ 要確認：{headword} → {notes}")
+            if best:
+                p.write_bytes(best[1])
+                rise = best[0]
         peak_normalize(p)
-        checks[headword] = heard[-1]
+        checks[headword] = {"heard": got, "rise": None if rise is None else round(rise, 1), "notes": notes}
         CHECKS.write_text(json.dumps(checks, ensure_ascii=False, indent=1), encoding="utf-8")
     return f"tango/{VOICE_DIR.name}/{p.name}", duration(p)
 
@@ -252,6 +300,25 @@ def build_props(keiko: int, limit: int | None) -> dict:
     if limit:
         entries = entries[:limit]
     common_assets()
+    # v3 は読むたびに声色がぶれることがある。声の高さがほかの語と大きく違う語は1回だけ作り直す
+    for e in entries:
+        word_audio(e["headword"])
+    meds = {e["headword"]: median_f0(VOICE_DIR / f"{slug(e['headword'])}.mp3") for e in entries}
+    vals = sorted(m for m in meds.values() if m)
+    center = vals[len(vals) // 2]
+    checks = json.loads(CHECKS.read_text(encoding="utf-8"))
+    for h, m in meds.items():
+        if m and abs(m / center - 1) > 0.2 and not checks[h].get("pitch_redo"):
+            print(f"    ↻ {h}：声の高さが {m:.0f}Hz（ほかは {center:.0f}Hz 前後）なので作り直し")
+            checks.pop(h)
+            CHECKS.write_text(json.dumps(checks, ensure_ascii=False, indent=1), encoding="utf-8")
+            word_audio(h)
+            checks = json.loads(CHECKS.read_text(encoding="utf-8"))
+            checks[h]["pitch_redo"] = True
+            m2 = median_f0(VOICE_DIR / f"{slug(h)}.mp3")
+            if m2 and abs(m2 / center - 1) > 0.2:
+                print(f"    ⚠ 要確認：{h} は作り直しても声の高さが {m2:.0f}Hz")
+            CHECKS.write_text(json.dumps(checks, ensure_ascii=False, indent=1), encoding="utf-8")
     words = []
     for i, e in enumerate(entries, 1):
         v, d = word_audio(e["headword"])
