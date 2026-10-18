@@ -288,7 +288,13 @@ def line_starts(lines: list[dict]) -> list[int]:
 
 def timeline(p: dict) -> dict:
     """各場面の始まり（コマ）"""
-    lines_len = lambda ls: sum(x["dur"] + LINE_GAP for x in ls) + 0.6
+    def lines_len(ls: list[dict]) -> float:
+        # 足す順番も types.ts の linesLen（reduce で n + dur + LINE_GAP）と同じにする。
+        # n + (dur + LINE_GAP) と足すと小数の誤差で 274.5 と 274.4999… に分かれ、丸めて1コマずれた
+        n = 0.0
+        for x in ls:
+            n = n + x["dur"] + LINE_GAP
+        return n + 0.6
     t = 0
     marks = {"intro": 0}
     t += fr(max(3.0, lines_len(p["intro"])))
@@ -484,6 +490,12 @@ def main() -> int:
     # 空き5GBほどのディスクを使い切った（2026-10-18）。3,000コマずつに分けて書き出し、最後につなぐ
     video = tmp / f"{name}.video.mp4"
     total, step, parts = timeline(p)["total"], 3000, []
+    # 音（Python の時間割）と映像（Remotion）の長さが1コマでも違えば、音と絵がずれるので止める
+    r = subprocess.run(["npx", "remotion", "compositions", "src/index.ts", f"--props={props}"],
+                       cwd=EDU, capture_output=True, text=True, check=True)
+    m = re.search(r"TangoExercise\s+\d+\s+\S+\s+(\d+)", r.stdout)
+    if not m or int(m[1]) != total:
+        raise SystemExit(f"長さが合いません：Python {total}コマ／Remotion {m[1] if m else '?'}コマ（types.ts と timeline() を見比べる）")
     for a in range(0, total, step):
         part = tmp / f"{name}.part{a // step:02d}.mp4"
         if not part.exists():
