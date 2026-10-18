@@ -79,11 +79,24 @@ def api_key() -> str:
     raise SystemExit("ELEVENLABS_API_KEY が見つかりません（.env）")
 
 
+def post(url: str, **kw) -> requests.Response:
+    """通信が一瞬切れることがある（SSL: UNEXPECTED_EOF で100語の途中で止まった）。少し待って5回まで試す"""
+    import time
+    for i in range(5):
+        try:
+            return requests.post(url, **kw)
+        except requests.exceptions.RequestException as e:
+            if i == 4:
+                raise
+            print(f"    通信エラー（{type(e).__name__}）／{5 * (i + 1)}秒後にやり直し")
+            time.sleep(5 * (i + 1))
+
+
 def tts(text: str, voice: str, out: Path, speed: float = 1.0, model: str = "eleven_multilingual_v2") -> None:
     for i in range(3):
-        r = requests.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
-                          headers={"xi-api-key": api_key(), "Content-Type": "application/json"},
-                          json={"text": text, "model_id": model}, timeout=120)
+        r = post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
+                 headers={"xi-api-key": api_key(), "Content-Type": "application/json"},
+                 json={"text": text, "model_id": model}, timeout=120)
         if r.ok:
             break
         if r.status_code < 500 and r.status_code != 429:
@@ -137,9 +150,10 @@ def transcribe(p: Path) -> str:
     頭と最後の無音を詰めた短い音だと聞き取れないことがある（though が空になった）ので、前後に0.5秒の無音を足して渡す"""
     pad = p.with_suffix(".pad.mp3")
     ff("-i", str(p), "-af", "adelay=500,apad=pad_dur=0.5", "-c:a", "libmp3lame", str(pad))
-    with open(pad, "rb") as fh:
-        r = requests.post("https://api.elevenlabs.io/v1/speech-to-text", headers={"xi-api-key": api_key()},
-                          data={"model_id": "scribe_v1", "language_code": "en"}, files={"file": fh}, timeout=60)
+    # ファイルは中身で渡す（やり直すときに読み終わったファイルを渡して空にならないように）
+    r = post("https://api.elevenlabs.io/v1/speech-to-text", headers={"xi-api-key": api_key()},
+             data={"model_id": "scribe_v1", "language_code": "en"},
+             files={"file": (pad.name, pad.read_bytes(), "audio/mpeg")}, timeout=60)
     pad.unlink()
     r.raise_for_status()
     return r.json().get("text", "")
@@ -578,7 +592,7 @@ def main() -> int:
     for x in [*parts, lst]:
         x.unlink()
     ff("-i", str(video), "-i", str(audio), "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy",
-       "-shortest", "-movflags", "+faststart", str(OUT / f"{name}.mp4"))
+       "-movflags", "+faststart", str(OUT / f"{name}.mp4"))  # -shortest は最後の3コマを落としたので付けない（音は mix_audio で同じ長さに切ってある）
     video.unlink()
     audio.unlink()
     print(f"✅ {OUT / name}.mp4 （{ts(timeline(p)['total'])}）\n   {meta['title']}")
