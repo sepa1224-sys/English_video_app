@@ -402,9 +402,11 @@ def description(p: dict) -> str:
 """
 
 
-def render(comp: str, out: Path, props: Path | None = None, still: bool = False) -> None:
+def render(comp: str, out: Path, props: Path | None = None, still: bool = False, frames: str | None = None) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     cmd = ["npx", "remotion", "still" if still else "render", "src/index.ts", comp, str(out), "--log=error"]
+    if frames:
+        cmd.append(f"--frames={frames}")
     if not still:
         cmd.append(f"--concurrency={os.cpu_count() or 4}")  # 既定は半分。100語で1時間以上かかるので全部使う
         cmd.append("--muted")  # 音は mix_audio() で別に作る
@@ -478,8 +480,21 @@ def main() -> int:
     tmp.mkdir(parents=True, exist_ok=True)
     audio = tmp / f"{name}.m4a"
     mix_audio(p, audio)
+    # Remotion は書き出し中の1コマずつの画像を一時フォルダに貯める。13分ぶん（2万3千コマ）だと
+    # 空き5GBほどのディスクを使い切った（2026-10-18）。3,000コマずつに分けて書き出し、最後につなぐ
     video = tmp / f"{name}.video.mp4"
-    render("TangoExercise", video, props)
+    total, step, parts = timeline(p)["total"], 3000, []
+    for a in range(0, total, step):
+        part = tmp / f"{name}.part{a // step:02d}.mp4"
+        if not part.exists():
+            render("TangoExercise", part.with_suffix(".tmp.mp4"), props, frames=f"{a}-{min(a + step, total) - 1}")
+            part.with_suffix(".tmp.mp4").replace(part)  # 途中で止まっても、できた区切りは作り直さない
+        parts.append(part)
+    lst = tmp / f"{name}.parts.txt"
+    lst.write_text("".join(f"file '{x}'\n" for x in parts), encoding="utf-8")
+    ff("-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(video))
+    for x in [*parts, lst]:
+        x.unlink()
     ff("-i", str(video), "-i", str(audio), "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy",
        "-shortest", "-movflags", "+faststart", str(OUT / f"{name}.mp4"))
     video.unlink()
