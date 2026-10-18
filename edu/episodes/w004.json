@@ -1,0 +1,171 @@
+{
+ "id": "w004",
+ "format": "short",
+ "kind": "word",
+ "title": "see・look・watch",
+ "youtube_title": "see・look・watchの違い　「テレビを見る」はどれか、イメージで使い分けを解説",
+ "topic": "see / look / watch",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "テレビを見るは、シーで決まりだッ！",
+   "visual": {
+    "kind": "word",
+    "en": "see / look / watch",
+    "ja": "見る",
+    "pos": "動詞",
+    "note": "同じ「見る」でも見かたが違う"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "megane",
+   "line": "残念、それはウォッチですね。",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I see TV every night.",
+    "right": "I watch TV every night.",
+    "why": "動く画面をじっと見続けるのは watch"
+   }
+  },
+  {
+   "id": "b03",
+   "who": "master",
+   "line": "見かたが違うんじゃ。",
+   "pose": "point",
+   "visual": {
+    "kind": "rule",
+    "title": "見かたの違い",
+    "lines": [
+     "see：自然に目に入る",
+     "look：自分から目を向ける（look at）",
+     "watch：動きをじっと見続ける"
+    ]
+   }
+  },
+  {
+   "id": "b04",
+   "who": "master",
+   "line": "シーは勝手に見える。ルックは目を向ける。",
+   "pose": "talk"
+  },
+  {
+   "id": "b05",
+   "who": "master",
+   "line": "ウォッチは、動きをじっと追うんじゃ。",
+   "pose": "point",
+   "fever": true
+  },
+  {
+   "id": "b06",
+   "who": "megane",
+   "line": "ルックは後ろにアットが要りますね。",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "Look at",
+      "l": "V"
+     },
+     {
+      "w": "this picture.",
+      "l": "O"
+     }
+    ],
+    "ja": "この写真を見て",
+    "mark": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "b07",
+   "who": "nekketsu",
+   "line": "この写真を見ろッ！",
+   "en": "Look at this picture."
+  },
+  {
+   "id": "b08",
+   "who": "megane",
+   "line": "帰り道で猫を見かけた。",
+   "en": "I saw a cat on my way home.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "saw",
+      "l": "V"
+     },
+     {
+      "w": "a cat",
+      "l": "O"
+     },
+     {
+      "w": "on my way home.",
+      "l": "M"
+     }
+    ],
+    "ja": "帰り道で猫を見かけた（自然に目に入った）",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b09",
+   "who": "master",
+   "line": "問題じゃ。空いておるのはどれかのう。",
+   "pose": "talk",
+   "think": 3,
+   "visual": {
+    "kind": "quiz",
+    "q": "I ___ the birds flying for an hour.",
+    "choices": [
+     "saw",
+     "looked",
+     "watched"
+    ],
+    "answer": 2,
+    "reveal": false
+   }
+  },
+  {
+   "id": "b10",
+   "who": "master",
+   "line": "ウォッチじゃ。一時間、動きを追っておる。",
+   "pose": "point",
+   "visual": {
+    "kind": "quiz",
+    "q": "I ___ the birds flying for an hour.",
+    "choices": [
+     "saw",
+     "looked",
+     "watched"
+    ],
+    "answer": 2,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b11",
+   "who": "nekketsu",
+   "line": "よっしゃ！師匠も一日中ウォッチするぞッ！",
+   "visual": {
+    "kind": "image",
+    "emoji": "👀",
+    "label": "一日中ウォッチ"
+   }
+  },
+  {
+   "id": "b12",
+   "who": "master",
+   "line": "それは見張りじゃのう。",
+   "pose": "surprised"
+  }
+ ]
+}
