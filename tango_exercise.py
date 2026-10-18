@@ -33,7 +33,10 @@ CAST = json.loads((EDU / "cast.json").read_text(encoding="utf-8"))
 
 SERIES = "イメージで英単語エクササイズ"
 PLAYLIST = "イメージで英単語エクササイズ（気合の英単語 初段）"
-WORD_VOICE = "Xb7hH8MSUJpSbSDYk0k2"   # Alice（英語ネイティブ・はっきり）
+# 単語の発音はアメリカ英語の声（Bella・教育向け）。最初は Alice（イギリス英語）だったが、
+# source が sauce に聞こえるなど入試の発音と違うので替えた（2026-10-18 坂本さんの指示）
+WORD_VOICE = "hpp4J3VqNfWAUOO0d1Us"
+VOICE_DIR = PUB / "voice_us"
 TAGS = ["英単語", "大学受験", "英語学習", "気合イングリッシュ", "気合の英単語", "英単語エクササイズ", "受験英語"]
 
 # 冒頭と締めのセリフ（誰が・何を）。キャラは edu/cast.json の名前
@@ -166,11 +169,11 @@ def sounds_like(heard: str, word: str) -> bool:
 # 文字起こしで違う語に聞こえたら、読ませ方とモデルを変えて作り直す
 WORD_TRIES = [("{w}.", "eleven_multilingual_v2"), ("{w}", "eleven_turbo_v2_5"),
               ("{w}!", "eleven_multilingual_v2"), ("{w}.", "eleven_flash_v2_5")]
-CHECKS = PUB / "voice" / "checked.json"
+CHECKS = VOICE_DIR / "checked.json"
 
 
 def word_audio(headword: str) -> tuple[str, float]:
-    p = PUB / "voice" / f"{slug(headword)}.mp3"
+    p = VOICE_DIR / f"{slug(headword)}.mp3"
     p.parent.mkdir(parents=True, exist_ok=True)
     checks = json.loads(CHECKS.read_text(encoding="utf-8")) if CHECKS.exists() else {}
     if headword not in checks:
@@ -190,7 +193,7 @@ def word_audio(headword: str) -> tuple[str, float]:
         peak_normalize(p)
         checks[headword] = heard[-1]
         CHECKS.write_text(json.dumps(checks, ensure_ascii=False, indent=1), encoding="utf-8")
-    return f"tango/voice/{p.name}", duration(p)
+    return f"tango/{VOICE_DIR.name}/{p.name}", duration(p)
 
 
 def art(headword: str) -> str:
