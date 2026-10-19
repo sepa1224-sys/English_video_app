@@ -600,7 +600,9 @@ def render(comp: str, out: Path, props: Path | None = None, still: bool = False,
     if frames:
         cmd.append(f"--frames={frames}")
     if not still:
-        cmd.append(f"--concurrency={os.cpu_count() or 4}")  # 既定は半分。100語で1時間以上かかるので全部使う
+        # 並列数は4。8にすると Chrome を8つ同時に開き、メモリ8GBの Mac ではスワップが6GBまで膨らんで
+        # ディスクの空きを使い切った（2026-10-19）。少し遅くなるが止まらないほうを取る
+        cmd.append(f"--concurrency={max(2, (os.cpu_count() or 4) // 2)}")
         cmd.append("--muted")  # 音は mix_audio() で別に作る
     if props:
         cmd.append(f"--props={props}")
