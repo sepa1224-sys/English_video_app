@@ -1,0 +1,184 @@
+{
+ "id": "g005",
+ "format": "short",
+ "kind": "grammar",
+ "title": "willとgoing toの違い",
+ "youtube_title": "willとbe going toの違い　その場で決めたか、前から決めていたか",
+ "topic": "will と be going to の違い",
+ "beats": [
+  {
+   "id": "b01",
+   "who": "nekketsu",
+   "line": "電話だッ！俺が出るッ！",
+   "en": "I'm going to get it!",
+   "visual": {
+    "kind": "image",
+    "emoji": "📞",
+    "label": "電話が鳴った！"
+   }
+  },
+  {
+   "id": "b02",
+   "who": "megane",
+   "line": "今決めたのに going to ですか。不自然ですね",
+   "visual": {
+    "kind": "wrong",
+    "wrong": "I'm going to get it.",
+    "right": "I'll get it.",
+    "why": "その場で決めたことは will"
+   }
+  },
+  {
+   "id": "b03",
+   "who": "master",
+   "line": "その場で決めたら will じゃ",
+   "pose": "point",
+   "visual": {
+    "kind": "rule",
+    "title": "決めたのはいつ？",
+    "lines": [
+     "いま決めた → will",
+     "前から決めてた → be going to"
+    ]
+   }
+  },
+  {
+   "id": "b04",
+   "who": "master",
+   "line": "前から決めてたら be going to じゃ",
+   "pose": "point",
+   "fever": true
+  },
+  {
+   "id": "b05",
+   "who": "nekketsu",
+   "line": "来週、京都に行くんだッ！",
+   "en": "I'm going to visit Kyoto next week.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "'m going to visit",
+      "l": "V"
+     },
+     {
+      "w": "Kyoto",
+      "l": "O"
+     },
+     {
+      "w": "next week.",
+      "l": "M"
+     }
+    ],
+    "ja": "来週、京都に行く予定だ",
+    "mark": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "b06",
+   "who": "master",
+   "line": "宿もとってある予定。だから going to じゃ",
+   "pose": "talk"
+  },
+  {
+   "id": "b07",
+   "who": "megane",
+   "line": "頼まれて、その場で引き受けるなら",
+   "en": "OK, I'll help you.",
+   "visual": {
+    "kind": "sentence",
+    "chunks": [
+     {
+      "w": "OK,",
+      "l": "+"
+     },
+     {
+      "w": "I",
+      "l": "S"
+     },
+     {
+      "w": "'ll help",
+      "l": "V"
+     },
+     {
+      "w": "you.",
+      "l": "O"
+     }
+    ],
+    "ja": "いいよ、手伝うよ",
+    "mark": [
+     2
+    ]
+   }
+  },
+  {
+   "id": "b08",
+   "who": "master",
+   "line": "誰か来た。今決めて出るなら、どっちじゃ？",
+   "pose": "talk",
+   "think": 3,
+   "visual": {
+    "kind": "quiz",
+    "q": "Someone's at the door. I ___ get it.",
+    "choices": [
+     "'ll",
+     "'m going to"
+    ],
+    "answer": 0,
+    "reveal": false
+   }
+  },
+  {
+   "id": "b09",
+   "who": "master",
+   "line": "答えは will。その場で決めたからじゃ",
+   "pose": "point",
+   "visual": {
+    "kind": "quiz",
+    "q": "Someone's at the door. I ___ get it.",
+    "choices": [
+     "'ll",
+     "'m going to"
+    ],
+    "answer": 0,
+    "reveal": true
+   }
+  },
+  {
+   "id": "b10",
+   "who": "nekketsu",
+   "line": "よっしゃ！俺は英語ペラペラになるッ！",
+   "visual": {
+    "kind": "image",
+    "emoji": "🔥",
+    "label": "英語ペラペラ宣言"
+   }
+  },
+  {
+   "id": "b11",
+   "who": "megane",
+   "line": "前からの予定なら going to ですね。いつから？",
+   "visual": {
+    "kind": "none"
+   }
+  },
+  {
+   "id": "b12",
+   "who": "nekketsu",
+   "line": "…今決めたッ！"
+  },
+  {
+   "id": "b13",
+   "who": "master",
+   "line": "なら will じゃのう",
+   "pose": "laugh",
+   "fever": true
+  }
+ ]
+}
