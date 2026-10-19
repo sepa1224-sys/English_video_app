@@ -610,19 +610,56 @@ def render(comp: str, out: Path, props: Path | None = None, still: bool = False,
     subprocess.run(cmd, cwd=EDU, check=True)
 
 
-def upload(keiko: int, privacy: str, kind: str = "exercise") -> None:
+UPLOADED = ROOT / "data" / "tango_uploaded.json"  # 上げた動画の記録（二重に上げないため）
+
+
+class QuotaExceeded(RuntimeError):
+    pass
+
+
+def config_root() -> Path:
+    """YouTube の認証ファイル（config/）がある場所。worktree には無いので本体のチェックアウトを見る"""
+    common = subprocess.run(["git", "rev-parse", "--git-common-dir"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    for d in [ROOT, (ROOT / common).resolve().parent]:
+        if (d / "config" / "client_secret.json").exists():
+            return d
+    raise SystemExit("config/client_secret.json が見つかりません")
+
+
+def upload(keiko: int, privacy: str, kind: str = "exercise") -> str | None:
+    """作った動画を上げる。上げ済みなら何もしない。1日の上限に達したら QuotaExceeded"""
     from book_guard import check
-    from ondoku_upload import service, upload as yt_upload
+    from googleapiclient.errors import HttpError
     from googleapiclient.http import MediaFileUpload
-    base = OUT / (f"keiko{keiko}" + ("_listen" if kind == "listen" else ""))
+    name = f"keiko{keiko}" + ("_listen" if kind == "listen" else "")
+    done = json.loads(UPLOADED.read_text(encoding="utf-8")) if UPLOADED.exists() else {}
+    if name in done:
+        print(f"  {name} は上げ済み：https://www.youtube.com/watch?v={done[name]['id']}")
+        return done[name]["id"]
+    base = OUT / name
     meta = json.loads((base.with_suffix(".meta.json")).read_text(encoding="utf-8"))
     check(meta["title"], meta["description"], meta["tags"])
-    yt = service()
-    vid = yt_upload(yt, base.with_suffix(".mp4"), meta["title"], meta["description"], meta["tags"], privacy)
+    cwd = os.getcwd()
+    os.chdir(config_root())  # ondoku_upload は config/ を今いる場所から探す
+    try:
+        from ondoku_upload import service, upload as yt_upload
+        yt = service()
+        try:
+            vid = yt_upload(yt, base.with_suffix(".mp4"), meta["title"], meta["description"], meta["tags"], privacy)
+        except HttpError as e:
+            if e.resp.status == 403 and "quota" in str(e).lower():
+                raise QuotaExceeded(str(e)[:200])
+            raise
+    finally:
+        os.chdir(cwd)
+    done[name] = {"id": vid, "privacy": privacy, "title": meta["title"]}
+    UPLOADED.write_text(json.dumps(done, ensure_ascii=False, indent=1), encoding="utf-8")
     # 絵はドット絵の作り物で、実在の人や出来事と見間違えるものではないので「改変・合成コンテンツ」には当たらない。
-    # 念のため明示的に「含まない」と送る（YouTube の基準：見た目が本物そっくりの合成のみ申告が要る）
+    # 念のため明示的に「含まない」と送る（YouTube の基準：見た目が本物そっくりの合成のみ申告が要る）。
+    # status を書き換えると書かなかった項目は既定に戻るので、埋め込み可などもいっしょに送る
     yt.videos().update(part="status", body={"id": vid, "status": {
-        "privacyStatus": privacy, "selfDeclaredMadeForKids": False, "containsSyntheticMedia": False}}).execute()
+        "privacyStatus": privacy, "selfDeclaredMadeForKids": False, "containsSyntheticMedia": False,
+        "embeddable": True, "publicStatsViewable": True, "license": "youtube"}}).execute()
     yt.thumbnails().set(videoId=vid, media_body=MediaFileUpload(str(base.with_suffix(".jpg")))).execute()
     # シリーズの再生リストに入れる（無ければ動画と同じ公開範囲で作る）
     pid, req = None, yt.playlists().list(part="snippet", mine=True, maxResults=50)
@@ -635,7 +672,8 @@ def upload(keiko: int, privacy: str, kind: str = "exercise") -> None:
                                     "status": {"privacyStatus": privacy}}).execute()["id"]
     yt.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": pid,
                               "resourceId": {"kind": "youtube#video", "videoId": vid}}}).execute()
-    print(f"✅ https://www.youtube.com/watch?v={vid}（{privacy}）／再生リスト「{meta["playlist"]}」に追加")
+    print(f"✅ https://www.youtube.com/watch?v={vid}（{privacy}）／再生リスト「{meta['playlist']}」に追加")
+    return vid
 
 
 def produce(p: dict, name: str, comp: str, total: int, events: list, props: Path) -> Path:
@@ -681,6 +719,7 @@ def main() -> int:
     ap.add_argument("--channel-art", action="store_true", help="チャンネルのアイコンとバナーを作る")
     ap.add_argument("--upload", action="store_true")
     ap.add_argument("--privacy", default="private", choices=["private", "unlisted", "public"])
+    ap.add_argument("--force", action="store_true", help="動画がもうあっても作り直す")
     a = ap.parse_args()
 
     if a.channel_art:
@@ -691,17 +730,24 @@ def main() -> int:
     if not a.keiko:
         ap.error("稽古の番号を指定してください")
     if a.upload:
-        upload(a.keiko, a.privacy, a.kind)
+        try:
+            upload(a.keiko, a.privacy, a.kind)
+        except QuotaExceeded as e:
+            print(f"⏸ YouTube の1日の上限に達しました。明日もう一度上げてください：{e}")
+            return 3
         return 0
 
     listen = a.kind == "listen"
+    name = f"keiko{a.keiko}" + ("_listen" if listen else "") + (f"_try{a.words}" if a.words else "")
+    if (OUT / f"{name}.mp4").exists() and not a.force:
+        print(f"  {name}.mp4 はもうあります（作り直すなら --force）")
+        return 0
     p = build_props(a.keiko, a.words, a.kind)
     from book_guard import check
     tags = [t.replace("英単語エクササイズ", "英単語 聞き流し") for t in TAGS] if listen else TAGS
     meta = {"title": title(p), "description": description(p), "tags": tags,
             "playlist": LISTEN_PLAYLIST if listen else PLAYLIST}
     check(meta["title"], meta["description"], meta["tags"])
-    name = f"keiko{a.keiko}" + ("_listen" if listen else "") + (f"_try{a.words}" if a.words else "")
     OUT.mkdir(parents=True, exist_ok=True)
     props = OUT / f"{name}.props.json"
     props.write_text(json.dumps({"data": p}, ensure_ascii=False), encoding="utf-8")
