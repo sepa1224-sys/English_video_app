@@ -10,6 +10,7 @@ python3 tango_exercise.py --channel-art  # チャンネルのアイコン・バ�
 python3 tango_exercise.py 1 --upload     # 非公開でアップ（坂本さんの OK のあと）
 ```
 - 画面：edu/src/tango/Tango.tsx（Remotion。解説ショートと同じ edu/ の中）
+- 聞き流し（--kind listen）：英単語の発音（v3）→ 日本語の意味（Microsoft の Keita・-10%。鉄壁などの単語動画と同じ声。edge-tts は古いと 403 で弾かれる）。間は英→日0.8秒・意味と意味0.4秒・次の語へ0.7秒
 - 単語の発音：ElevenLabs のアメリカ英語の声（Bella）、モデルは eleven_v3（multilingual_v2 は according to の語尾が上がった）。作ったあと①文字起こしで違う語に聞こえないか ②声の高さで語尾が上がっていないか ③声の高さがほかの語と大きく違わないか（v3 は声色がぶれる）を確かめ、だめなら作り直す。セリフはキャラの声（edu/cast.json）
 - 声・絵・表紙は edu/public/tango/ に貯めて使い回す（git には入れない）
 - 購入リンク：data/tango_book.json。空のあいだ、説明文は「近日発売（発売したらここにリンクを載せます）」。動画の中の札は「くわしくは概要欄へ」なので、発売後も作り直さなくてよい

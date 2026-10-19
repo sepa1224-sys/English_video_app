@@ -56,8 +56,11 @@ OUTRO = [("master", "よくぞやりきった！ 言えなかった単語は、�
 # 間の長さも以前と同じ（英語→日本語 0.4秒、意味と意味 0.4秒、次の語へ 0.7秒）
 LISTEN_SERIES = "英単語 聞き流し"
 LISTEN_PLAYLIST = "英単語 聞き流し（気合の英単語 初段）"
-JA_WHO = "megane"  # 日本語の意味を読むキャラ（落ち着いた声）
-G_EJ, G_JJ, G_NEXT = 0.4, 0.4, 0.7
+# 日本語の意味は、鉄壁などの単語動画と同じ Microsoft の Keita（落ち着いた男性の声）。キャラの声ではなく（2026-10-19 坂本さんの指示）。
+# 以前の動画は速さ±0%。少しゆっくり読む。edge-tts は古いと 403 で弾かれるので新しくしておく（7.3.1 で動いた）
+JA_VOICE, JA_RATE = "ja-JP-KeitaNeural", "-10%"
+# 英語→日本語の間は以前（0.4秒）より空ける（坂本さんの指示）
+G_EJ, G_JJ, G_NEXT = 0.8, 0.4, 0.7
 OUTRO_LISTEN = [("master", "稽古{keiko}、聞き流し完了じゃ！")]
 
 
@@ -284,6 +287,30 @@ def hint(headword: str) -> list[str]:
     return [w[0] + "_" * (len(w) - 1) for w in headword.split()]
 
 
+def ja_audio(text: str) -> dict:
+    """日本語の意味を Keita で読む。同じ文は作り置きを使う"""
+    say = ja_reading(text)
+    key = hashlib.sha256(f"{JA_VOICE}|{JA_RATE}|{say}".encode()).hexdigest()[:12]  # ファイル名を決めるだけ
+    p = PUB / "ja_keita" / f"{key}.mp3"
+    if not p.exists():
+        p.parent.mkdir(parents=True, exist_ok=True)
+        raw = p.with_suffix(".raw.mp3")
+        for i in range(3):
+            r = subprocess.run([sys.executable, "-m", "edge_tts", "--voice", JA_VOICE, f"--rate={JA_RATE}",
+                                "--text", say, "--write-media", str(raw)], capture_output=True, text=True)
+            if r.returncode == 0 and raw.exists() and raw.stat().st_size > 500:
+                break
+            import time
+            time.sleep(3 * (i + 1))
+        else:
+            raise RuntimeError(f"Keita の声を作れませんでした（edge-tts を新しくすると直ることがある）: {say}\n{r.stderr[-300:]}")
+        trim = "silenceremove=start_periods=1:start_threshold=-60dB,areverse,silenceremove=start_periods=1:start_threshold=-60dB,areverse"
+        ff("-i", str(raw), "-af", f"aresample=44100,{trim}", "-c:a", "libmp3lame", "-b:a", "160k", str(p))
+        raw.unlink()
+        peak_normalize(p)
+    return {"audio": f"tango/ja_keita/{p.name}", "dur": duration(p)}
+
+
 def ja_reading(text: str) -> str:
     """意味の読み上げ用。「～によれば」の ～ と（家族を）の括弧は読まない記号なので外す（括弧の中身は読む）"""
     return re.sub(r"[～〜~（）()]", "", text).replace("・", "、").strip()
@@ -369,8 +396,7 @@ def build_props(keiko: int, limit: int | None, kind: str = "exercise") -> dict:
         for w in p["words"]:
             w["ja"] = []
             for s in senses[w["headword"]]:
-                x = line_audio(JA_WHO, "、".join(s), ja_reading("、".join(s)))
-                w["ja"].append({"audio": x["audio"], "dur": x["dur"]})
+                w["ja"].append(ja_audio("、".join(s)))
         p.update(series=LISTEN_SERIES, thumbTop="聞き流し", howto=[],
                  outro=[line_audio(w, t.format(keiko=keiko)) for w, t in OUTRO_LISTEN])
         p["plan"] = listen_plan(p)
