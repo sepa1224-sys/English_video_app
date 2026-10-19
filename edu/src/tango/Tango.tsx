@@ -9,15 +9,15 @@ import {
 import { DELA, ROUNDED } from '../fonts';
 import { type Line, type TangoData, type Who, type Word, AFTER1, LINE_GAP, THINK, sec, sections } from './types';
 
-const BROWN = '#1b0a04';
-const BROWN2 = '#2e1409';
-const CREAM = '#fff3d6';
-const GOLD = '#ffd23f';
-const RED = '#d7262e';
-const EMBER = 'radial-gradient(ellipse at 50% 62%, #ffb43a 0%, #f2701f 32%, #d7262e 68%, #a8141c 100%)';
-const DOJO = `radial-gradient(ellipse at 50% 45%, ${BROWN2} 0%, ${BROWN} 70%)`;
+export const BROWN = '#1b0a04';
+export const BROWN2 = '#2e1409';
+export const CREAM = '#fff3d6';
+export const GOLD = '#ffd23f';
+export const RED = '#d7262e';
+export const EMBER = 'radial-gradient(ellipse at 50% 62%, #ffb43a 0%, #f2701f 32%, #d7262e 68%, #a8141c 100%)';
+export const DOJO = `radial-gradient(ellipse at 50% 45%, ${BROWN2} 0%, ${BROWN} 70%)`;
 // 表紙の文字と同じ、こげ茶の段の影
-const SLAB = (n: number) => Array.from({ length: n }, (_, i) => `${i + 1}px ${i + 1}px 0 #5a1208`).join(',');
+export const SLAB = (n: number) => Array.from({ length: n }, (_, i) => `${i + 1}px ${i + 1}px 0 #5a1208`).join(',');
 
 const NAMES: Record<Who, string> = {
   master: '仙人', nekketsu: '熱血', megane: 'メガネ', tsundere: 'ツンデレ',
@@ -36,13 +36,13 @@ const COACH: { who: Who; think: string; repeat: string }[] = [
 ];
 
 /** キャラの立ち絵。仙人は話している間だけ口を開け閉めする */
-const Chara: React.FC<{ who: Who; size: number; talking?: boolean; style?: React.CSSProperties }> = ({ who, size, talking, style }) => {
+export const Chara: React.FC<{ who: Who; size: number; talking?: boolean; style?: React.CSSProperties }> = ({ who, size, talking, style }) => {
   const f = useCurrentFrame();
   const file = who === 'master' ? (talking && Math.floor(f / 4) % 2 ? 'sennin_04_point_open' : 'sennin_03_point') : who;
   return <Img src={staticFile(`chara/cut/${file}.png`)} style={{ width: size, height: size, ...style }} />;
 };
 
-const pop = (f: number, fps: number, delay = 0) => spring({ frame: f - delay, fps, config: { damping: 12, stiffness: 160 } });
+export const pop = (f: number, fps: number, delay = 0) => spring({ frame: f - delay, fps, config: { damping: 12, stiffness: 160 } });
 const fadeIn = (f: number, a: number, b: number) => interpolate(f, [a, b], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
 /** セリフの字幕（画面の下） */
@@ -83,7 +83,7 @@ const BookTitle: React.FC<{ scale?: number }> = ({ scale = 1 }) => (
 );
 
 // ───────────────────────── 冒頭：単語帳の紹介 ─────────────────────────
-const Intro: React.FC<{ d: TangoData }> = ({ d }) => {
+export const Intro: React.FC<{ d: TangoData }> = ({ d }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { line, talking } = useLines(d.intro);
@@ -258,7 +258,7 @@ const WordCard: React.FC<{ d: TangoData; w: Word; i: number }> = ({ d, w, i }) =
 };
 
 /** 上の帯：シリーズ名・稽古・進み具合 */
-const TopBar: React.FC<{ d: TangoData; i: number; within: number; len: number }> = ({ d, i, within, len }) => {
+export const TopBar: React.FC<{ d: TangoData; i: number; within: number; len: number }> = ({ d, i, within, len }) => {
   const done = (i + Math.min(1, within / len)) / d.words.length;
   return (
     <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 120 }}>
@@ -296,7 +296,7 @@ const Words: React.FC<{ d: TangoData }> = ({ d }) => {
 };
 
 // ───────────────────────── 締め ─────────────────────────
-const Outro: React.FC<{ d: TangoData }> = ({ d }) => {
+export const Outro: React.FC<{ d: TangoData }> = ({ d }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { line, talking } = useLines(d.outro);
@@ -355,11 +355,11 @@ export const TangoThumb: React.FC<{ data: TangoData }> = ({ data: d }) => (
       <Img src={staticFile(d.thumbs[0])} style={{ width: 422, height: 422 }} />
     </div>
     <div style={{ position: 'absolute', right: 70, top: 70, width: 140, height: 140, borderRadius: 999, background: RED, border: `7px solid ${CREAM}`,
-      color: CREAM, fontFamily: DELA, fontSize: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(10deg)' }}>?</div>
+      color: CREAM, fontFamily: DELA, fontSize: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(10deg)' }}>{d.thumbTop === '聞き流し' ? '♪' : '?'}</div>
     {/* 左：題 */}
     <div style={{ position: 'absolute', left: 50, top: 36, fontFamily: DELA, lineHeight: 1 }}>
       <div style={{ fontSize: 30, color: CREAM, marginBottom: 18 }}>気合イングリッシュ</div>
-      <div style={{ fontSize: 92, color: CREAM, textShadow: SLAB(7) }}>イメージで</div>
+      <div style={{ fontSize: 92, color: CREAM, textShadow: SLAB(7) }}>{d.thumbTop ?? 'イメージで'}</div>
       <div style={{ fontSize: 150, color: GOLD, textShadow: SLAB(9), marginTop: 6 }}>英単語</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 18 }}>
         <span style={{ fontSize: 62, color: BROWN, background: GOLD, padding: '10px 20px', borderRadius: 14 }}>稽古{d.keiko}</span>

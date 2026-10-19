@@ -3,7 +3,8 @@ import { Episode } from './Episode';
 import { Sheet } from './chara/Sheet';
 import { FPS, totalFrames, type Episode as Ep } from './types';
 import { ChannelBanner, ChannelIcon, TangoExercise, TangoThumb } from './tango/Tango';
-import { sections, type TangoData } from './tango/types';
+import { TangoListen } from './tango/Listen';
+import { sections, type ListenData, type TangoData } from './tango/types';
 
 // 台本は書き出し時に --props で渡す（scripts/render.mjs）。長さは台本から決める
 const SAMPLE: Ep = {
@@ -21,6 +22,11 @@ const TANGO_SAMPLE: TangoData = {
     img: 'tango/art/likely.jpg', voice: 'tango/voice/likely.mp3', voiceDur: 0.6 }],
 };
 const tangoMeta = ({ props }: { props: { data: TangoData } }) => ({ durationInFrames: sections(props.data).total });
+const LISTEN_SAMPLE: ListenData = {
+  ...TANGO_SAMPLE, words: TANGO_SAMPLE.words.map((w) => ({ ...w, ja: [] })),
+  plan: { intro: 0, words: [{ start: 0, len: 90, ja: [30] }], outro: 90, total: 90 },
+};
+const listenMeta = ({ props }: { props: { data: ListenData } }) => ({ durationInFrames: props.data.plan.total });
 
 export const Root = () => (
   <>
@@ -30,6 +36,8 @@ export const Root = () => (
       width={1920} height={1080} fps={FPS} durationInFrames={90} calculateMetadata={meta} />
     <Composition id="TangoExercise" component={TangoExercise} defaultProps={{ data: TANGO_SAMPLE }}
       width={1920} height={1080} fps={FPS} durationInFrames={90} calculateMetadata={tangoMeta} />
+    <Composition id="TangoListen" component={TangoListen} defaultProps={{ data: LISTEN_SAMPLE }}
+      width={1920} height={1080} fps={FPS} durationInFrames={90} calculateMetadata={listenMeta} />
     <Composition id="TangoThumb" component={TangoThumb} defaultProps={{ data: TANGO_SAMPLE }} width={1280} height={720} fps={FPS} durationInFrames={1} />
     <Composition id="ChannelIcon" component={ChannelIcon} width={800} height={800} fps={FPS} durationInFrames={1} />
     <Composition id="ChannelBanner" component={ChannelBanner} width={2560} height={1440} fps={FPS} durationInFrames={1} />

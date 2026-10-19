@@ -13,7 +13,18 @@ export type TangoData = {
   book: { label: string };
   intro: Line[]; howto: Line[]; outro: Line[];
   words: Word[]; thumbs: string[];
+  thumbTop?: string; // サムネの題の1行目（既定「イメージで」）
 };
+
+// 聞き流し（英語→日本語）。時間割は tango_exercise.py が1回だけ計算してコマで渡す（ずれないように）
+export type ListenWord = Word & { ja: { audio: string; dur: number }[] };
+export type ListenPlan = {
+  intro: number; // 冒頭の長さ（コマ）
+  words: { start: number; len: number; ja: number[] }[]; // 語の始まり・長さ・意味を読み始めるコマ（語の頭から）
+  outro: number; // 締めの始まり
+  total: number;
+};
+export type ListenData = Omit<TangoData, 'words'> & { words: ListenWord[]; plan: ListenPlan };
 
 // 1語の時間割（秒）。tango_exercise.py の timeline() と同じ式
 export const THINK = 3.5; // 絵とヒントだけを見せる時間（最後の3秒が秒読み）

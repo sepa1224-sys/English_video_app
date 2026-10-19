@@ -7,6 +7,7 @@
   python3 tango_exercise.py 1 --words 12      … 試しに最初の12語だけ（見た目の確認用）
   python3 tango_exercise.py --channel-art     … チャンネルのアイコンとバナー
   python3 tango_exercise.py 1 --upload        … 作った動画を非公開でアップ（坂本さんの OK のあと）
+  python3 tango_exercise.py 1 --kind listen   … 聞き流し（英単語の発音→日本語の意味。以前ターゲット1900などで作っていた形式）
 
 単語帳の購入リンクは data/tango_book.json に書く（空なら「近日発売」と出す）。
 声：単語の発音は ElevenLabs の英語ネイティブの声（ondoku_audio.py と同じ Alice）、
@@ -50,6 +51,14 @@ HOWTO = [
     ("master", "稽古{keiko}、100語。はじめッ！"),
 ]
 OUTRO = [("master", "よくぞやりきった！ 言えなかった単語は、もう一度稽古じゃ。")]
+
+# 聞き流し（英語→日本語）。以前ターゲット1900などで作っていた形式を、自前の単語帳で作り直したもの。
+# 間の長さも以前と同じ（英語→日本語 0.4秒、意味と意味 0.4秒、次の語へ 0.7秒）
+LISTEN_SERIES = "英単語 聞き流し"
+LISTEN_PLAYLIST = "英単語 聞き流し（気合の英単語 初段）"
+JA_WHO = "megane"  # 日本語の意味を読むキャラ（落ち着いた声）
+G_EJ, G_JJ, G_NEXT = 0.4, 0.4, 0.7
+OUTRO_LISTEN = [("master", "稽古{keiko}、聞き流し完了じゃ！")]
 
 
 def ff(*args: str) -> None:
@@ -275,6 +284,11 @@ def hint(headword: str) -> list[str]:
     return [w[0] + "_" * (len(w) - 1) for w in headword.split()]
 
 
+def ja_reading(text: str) -> str:
+    """意味の読み上げ用。「～によれば」の ～ と（家族を）の括弧は読まない記号なので外す（括弧の中身は読む）"""
+    return re.sub(r"[～〜~（）()]", "", text).replace("・", "、").strip()
+
+
 def meanings(e: dict) -> list[str]:
     senses = e.get("senses") or [e["meanings"]]
     marks = "①②③④⑤"
@@ -307,7 +321,7 @@ def common_assets() -> None:
         shutil.copy(TANGO / "fonts" / "OFL-DelaGothicOne.txt", font.with_name("DelaGothicOne-OFL.txt"))
 
 
-def build_props(keiko: int, limit: int | None) -> dict:
+def build_props(keiko: int, limit: int | None, kind: str = "exercise") -> dict:
     entries = [e for e in json.loads(ENTRIES.read_text(encoding="utf-8")) if e["keiko"] == keiko]
     if not entries:
         raise SystemExit(f"稽古{keiko} の単語がありません")
@@ -339,7 +353,7 @@ def build_props(keiko: int, limit: int | None) -> dict:
         words.append({"no": e["no"], "headword": e["headword"], "pos": e["pos"], "meanings": meanings(e),
                       "hint": hint(e["headword"]), "img": art(e["headword"]), "voice": v, "voiceDur": d})
         print(f"  {e['no']:04d} {e['headword']:<16} {d:4.2f}s  {' / '.join(meanings(e))}")
-    return {
+    p = {
         "keiko": keiko,
         "range": [entries[0]["no"], entries[-1]["no"]],
         "series": SERIES,
@@ -350,6 +364,17 @@ def build_props(keiko: int, limit: int | None) -> dict:
         "words": words,
         "thumbs": [w["img"] for w in words[:4]],
     }
+    if kind == "listen":
+        senses = {e["headword"]: e.get("senses") or [e["meanings"]] for e in entries}
+        for w in p["words"]:
+            w["ja"] = []
+            for s in senses[w["headword"]]:
+                x = line_audio(JA_WHO, "、".join(s), ja_reading("、".join(s)))
+                w["ja"].append({"audio": x["audio"], "dur": x["dur"]})
+        p.update(series=LISTEN_SERIES, thumbTop="聞き流し", howto=[],
+                 outro=[line_audio(w, t.format(keiko=keiko)) for w, t in OUTRO_LISTEN])
+        p["plan"] = listen_plan(p)
+    return p
 
 
 # 動画の時間割。edu/src/tango/types.ts の sections() と同じ式で、コマ（1/30秒）単位に丸める。
@@ -394,6 +419,50 @@ def timeline(p: dict) -> dict:
     return {**marks, "starts": starts}
 
 
+def listen_plan(p: dict) -> dict:
+    """聞き流しの時間割（コマ）。ここで1回だけ計算して Remotion に渡す（両方で計算すると丸めでずれた）"""
+    lines_len = lambda ls: sum(x["dur"] + LINE_GAP for x in ls) + 0.6
+    t = fr(max(3.0, lines_len(p["intro"])))
+    plan = {"intro": t, "words": []}
+    for w in p["words"]:
+        # 語の中の位置は、語の頭からの秒を足していってからコマに直す（1つずつ丸めると積み重なってずれる）
+        sec, ja = 0.1 + w["voiceDur"] + G_EJ, []
+        for k, x in enumerate(w["ja"]):
+            ja.append(fr(sec))
+            sec += x["dur"] + (G_JJ if k + 1 < len(w["ja"]) else 0)
+        n = fr(sec + G_NEXT)
+        plan["words"].append({"start": t, "len": n, "ja": ja})
+        t += n
+    plan["outro"] = t
+    plan["total"] = t + fr(lines_len(p["outro"]) + 1.5)
+    return plan
+
+
+def exercise_events(p: dict) -> tuple[int, list[tuple[str, int, float]]]:
+    """エクササイズの音（どの音を何コマ目に、どの大きさで）"""
+    tl = timeline(p)
+    ev = []
+    for key in ("intro", "howto", "outro"):
+        for x, at in zip(p[key], line_starts(p[key])):
+            ev.append((x["audio"], tl[key] + at, 1.0))
+    for w, st in zip(p["words"], tl["starts"]):
+        for k in (3, 2, 1):
+            ev.append(("tango/tick.mp3", st + fr(THINK - k), 0.45))
+        v1 = st + fr(THINK + 0.1)
+        ev += [(w["voice"], v1, 1.0), (w["voice"], v1 + fr(w["voiceDur"] + AFTER1), 1.0)]
+    return tl["total"], ev
+
+
+def listen_events(p: dict) -> tuple[int, list[tuple[str, int, float]]]:
+    P = p["plan"]
+    ev = [(x["audio"], at, 1.0) for x, at in zip(p["intro"], line_starts(p["intro"]))]
+    ev += [(x["audio"], P["outro"] + at, 1.0) for x, at in zip(p["outro"], line_starts(p["outro"]))]
+    for w, pw in zip(p["words"], P["words"]):
+        ev.append((w["voice"], pw["start"] + fr(0.1), 1.0))
+        ev += [(x["audio"], pw["start"] + at, 1.0) for x, at in zip(w["ja"], pw["ja"])]
+    return P["total"], ev
+
+
 # 音は Remotion で混ぜない。<Audio> が500個近くあると、Remotion は部品ごとに動画1本ぶんの
 # 一時 WAV を作ってディスクを使い切った（2026-10-17、空き8GBで失敗）。
 # ここで1本に混ぜ、Remotion は映像だけ（--muted）を書き出して最後に合わせる。
@@ -407,10 +476,8 @@ def decode(path: Path) -> "np.ndarray":
     return np.frombuffer(raw, dtype=np.float32).reshape(-1, 2)
 
 
-def mix_audio(p: dict, out: Path) -> None:
+def mix_audio(total: int, events: list[tuple[str, int, float]], out: Path) -> None:
     import numpy as np
-    tl = timeline(p)
-    total = tl["total"]
     buf = np.zeros((int(total / FPS * SR) + SR, 2), dtype=np.float32)
     cache: dict[str, np.ndarray] = {}
 
@@ -422,15 +489,8 @@ def mix_audio(p: dict, out: Path) -> None:
         n = min(len(a), len(buf) - i)
         buf[i:i + n] += a[:n] * vol
 
-    for key, sec_start in (("intro", tl["intro"]), ("howto", tl["howto"]), ("outro", tl["outro"])):
-        for x, at in zip(p[key], line_starts(p[key])):
-            put(x["audio"], sec_start + at)
-    for w, st in zip(p["words"], tl["starts"]):
-        for k in (3, 2, 1):
-            put("tango/tick.mp3", st + fr(THINK - k), 0.45)
-        v1 = st + fr(THINK + 0.1)
-        put(w["voice"], v1)
-        put(w["voice"], v1 + fr(w["voiceDur"] + AFTER1))
+    for rel, frame, vol in events:
+        put(rel, frame, vol)
     # BGM（解説ショートと同じレトロRPG風・村）を小さく流し、最初と最後はフェード
     bgm = decode(EDU / "public" / "bgm" / "03_village.mp3")
     reps = int(np.ceil(len(buf) / len(bgm)))
@@ -453,31 +513,47 @@ def ts(frame: int) -> str:
 
 def title(p: dict) -> str:
     a, b = p["range"]
-    return f"【気合イングリッシュ】{SERIES} 稽古{p['keiko']}（No.{a}〜{b}）"
+    return f"【気合イングリッシュ】{p['series']} 稽古{p['keiko']}（No.{a}〜{b}）"
 
 
 def description(p: dict) -> str:
     a, b = p["range"]
-    tl = timeline(p)
+    listen = "plan" in p
     bk = book()
-    chapters = [f"{ts(tl['intro'])} 単語帳『気合の英単語 初段』", f"{ts(tl['howto'])} やり方"]
+    if listen:
+        starts, outro = [w["start"] for w in p["plan"]["words"]], p["plan"]["outro"]
+        chapters = [f"{ts(0)} 単語帳『気合の英単語 初段』"]
+    else:
+        tl = timeline(p)
+        starts, outro = tl["starts"], tl["outro"]
+        chapters = [f"{ts(tl['intro'])} 単語帳『気合の英単語 初段』", f"{ts(tl['howto'])} やり方"]
     for i in range(0, len(p["words"]), 10):
         grp = p["words"][i:i + 10]
-        chapters.append(f"{ts(tl['starts'][i])} No.{grp[0]['no']}〜{grp[-1]['no']}")
-    chapters.append(f"{ts(tl['outro'])} おわり")
+        chapters.append(f"{ts(starts[i])} No.{grp[0]['no']}〜{grp[-1]['no']}")
+    chapters.append(f"{ts(outro)} おわり")
     if bk.get("kindle_url") or bk.get("paperback_url"):
         buy = "\n".join(x for x in [
             f"Kindle版：{bk['kindle_url']}" if bk.get("kindle_url") else "",
             f"紙の本：{bk['paperback_url']}" if bk.get("paperback_url") else ""] if x)
     else:
         buy = "Kindle版・紙の本：近日発売（発売したら、ここに購入リンクを載せます）"
-    return f"""単語帳『気合の英単語 初段』（大学入試 頻出1000語）の稽古{p['keiko']}（No.{a}〜{b}）を、イラストだけを見て英語で答えるエクササイズです。
+    if listen:
+        head = f"""単語帳『気合の英単語 初段』（大学入試 頻出1000語）の稽古{p['keiko']}（No.{a}〜{b}）の聞き流しです。英単語の発音のあとに、日本語の意味を読み上げます。
+
+■ 使い方
+1. 通学中や寝る前に、流して聞く
+2. 慣れてきたら、日本語が流れる前に意味を言ってみる
+3. 絵を見て意味を思い出す練習は「イメージで英単語エクササイズ」で
+"""
+    else:
+        head = f"""単語帳『気合の英単語 初段』（大学入試 頻出1000語）の稽古{p['keiko']}（No.{a}〜{b}）を、イラストだけを見て英語で答えるエクササイズです。
 
 ■ やり方
 1. 絵と頭文字のヒントを見て、3秒以内に英単語を声に出す
 2. 答えが出たら、発音を聞いて、あとについて2回まねする
 3. 言えなかった単語は、もう一度この動画で稽古する
-
+"""
+    return head + f"""
 ■ 単語帳『気合の英単語 初段』
 大学入試によく出る1000語を、100語ずつ10の稽古に分けた単語帳です。この動画のイラストは、本と同じものです。
 {buy}
@@ -506,11 +582,11 @@ def render(comp: str, out: Path, props: Path | None = None, still: bool = False,
     subprocess.run(cmd, cwd=EDU, check=True)
 
 
-def upload(keiko: int, privacy: str) -> None:
+def upload(keiko: int, privacy: str, kind: str = "exercise") -> None:
     from book_guard import check
     from ondoku_upload import service, upload as yt_upload
     from googleapiclient.http import MediaFileUpload
-    base = OUT / f"keiko{keiko}"
+    base = OUT / (f"keiko{keiko}" + ("_listen" if kind == "listen" else ""))
     meta = json.loads((base.with_suffix(".meta.json")).read_text(encoding="utf-8"))
     check(meta["title"], meta["description"], meta["tags"])
     yt = service()
@@ -524,19 +600,55 @@ def upload(keiko: int, privacy: str) -> None:
     pid, req = None, yt.playlists().list(part="snippet", mine=True, maxResults=50)
     while req and not pid:
         r = req.execute()
-        pid = next((x["id"] for x in r["items"] if x["snippet"]["title"] == PLAYLIST), None)
+        pid = next((x["id"] for x in r["items"] if x["snippet"]["title"] == meta["playlist"]), None)
         req = yt.playlists().list_next(req, r)
     if not pid:
-        pid = yt.playlists().insert(part="snippet,status", body={"snippet": {"title": PLAYLIST},
+        pid = yt.playlists().insert(part="snippet,status", body={"snippet": {"title": meta["playlist"]},
                                     "status": {"privacyStatus": privacy}}).execute()["id"]
     yt.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": pid,
                               "resourceId": {"kind": "youtube#video", "videoId": vid}}}).execute()
-    print(f"✅ https://www.youtube.com/watch?v={vid}（{privacy}）／再生リスト「{PLAYLIST}」に追加")
+    print(f"✅ https://www.youtube.com/watch?v={vid}（{privacy}）／再生リスト「{meta["playlist"]}」に追加")
+
+
+def produce(p: dict, name: str, comp: str, total: int, events: list, props: Path) -> Path:
+    """音を混ぜ、映像を区切って書き出し、1本にする"""
+    tmp = ROOT / ".tmp" / "tango"
+    tmp.mkdir(parents=True, exist_ok=True)
+    audio = tmp / f"{name}.m4a"
+    mix_audio(total, events, audio)
+    # 音（Python の時間割）と映像（Remotion）の長さが1コマでも違えば、音と絵がずれるので止める
+    r = subprocess.run(["npx", "remotion", "compositions", "src/index.ts", f"--props={props}"],
+                       cwd=EDU, capture_output=True, text=True, check=True)
+    m = re.search(rf"{comp}\s+\d+\s+\S+\s+(\d+)", r.stdout)
+    if not m or int(m[1]) != total:
+        raise SystemExit(f"長さが合いません：Python {total}コマ／Remotion {m[1] if m else '?'}コマ")
+    # Remotion は書き出し中の1コマずつの画像を一時フォルダに貯める。13分ぶん（2万3千コマ）だと
+    # 空き5GBほどのディスクを使い切った（2026-10-18）。3,000コマずつに分けて書き出し、最後につなぐ
+    video, step, parts = tmp / f"{name}.video.mp4", 3000, []
+    for a in range(0, total, step):
+        part = tmp / f"{name}.part{a // step:02d}.mp4"
+        if not part.exists():
+            render(comp, part.with_suffix(".tmp.mp4"), props, frames=f"{a}-{min(a + step, total) - 1}")
+            part.with_suffix(".tmp.mp4").replace(part)  # 途中で止まっても、できた区切りは作り直さない
+        parts.append(part)
+    lst = tmp / f"{name}.parts.txt"
+    lst.write_text("".join(f"file '{x}'\n" for x in parts), encoding="utf-8")
+    ff("-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(video))
+    for x in [*parts, lst]:
+        x.unlink()
+    out = OUT / f"{name}.mp4"
+    ff("-i", str(video), "-i", str(audio), "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy",
+       "-movflags", "+faststart", str(out))  # -shortest は最後の3コマを落としたので付けない（音は mix_audio で同じ長さに切ってある）
+    video.unlink()
+    audio.unlink()
+    return out
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("keiko", type=int, nargs="?")
+    ap.add_argument("--kind", default="exercise", choices=["exercise", "listen"],
+                    help="exercise＝絵を見て答える／listen＝英語→日本語の聞き流し")
     ap.add_argument("--words", type=int, help="最初のN語だけで作る（試作用）")
     ap.add_argument("--channel-art", action="store_true", help="チャンネルのアイコンとバナーを作る")
     ap.add_argument("--upload", action="store_true")
@@ -551,14 +663,17 @@ def main() -> int:
     if not a.keiko:
         ap.error("稽古の番号を指定してください")
     if a.upload:
-        upload(a.keiko, a.privacy)
+        upload(a.keiko, a.privacy, a.kind)
         return 0
 
-    p = build_props(a.keiko, a.words)
+    listen = a.kind == "listen"
+    p = build_props(a.keiko, a.words, a.kind)
     from book_guard import check
-    meta = {"title": title(p), "description": description(p), "tags": TAGS, "playlist": PLAYLIST}
+    tags = [t.replace("英単語エクササイズ", "英単語 聞き流し") for t in TAGS] if listen else TAGS
+    meta = {"title": title(p), "description": description(p), "tags": tags,
+            "playlist": LISTEN_PLAYLIST if listen else PLAYLIST}
     check(meta["title"], meta["description"], meta["tags"])
-    name = f"keiko{a.keiko}" + (f"_try{a.words}" if a.words else "")
+    name = f"keiko{a.keiko}" + ("_listen" if listen else "") + (f"_try{a.words}" if a.words else "")
     OUT.mkdir(parents=True, exist_ok=True)
     props = OUT / f"{name}.props.json"
     props.write_text(json.dumps({"data": p}, ensure_ascii=False), encoding="utf-8")
@@ -566,36 +681,9 @@ def main() -> int:
     (OUT / f"{name}_description.txt").write_text(meta["description"], encoding="utf-8")
     render("TangoThumb", OUT / f"{name}.png", props, still=True)
     Image.open(OUT / f"{name}.png").convert("RGB").save(OUT / f"{name}.jpg", quality=90)
-    tmp = ROOT / ".tmp" / "tango"
-    tmp.mkdir(parents=True, exist_ok=True)
-    audio = tmp / f"{name}.m4a"
-    mix_audio(p, audio)
-    # Remotion は書き出し中の1コマずつの画像を一時フォルダに貯める。13分ぶん（2万3千コマ）だと
-    # 空き5GBほどのディスクを使い切った（2026-10-18）。3,000コマずつに分けて書き出し、最後につなぐ
-    video = tmp / f"{name}.video.mp4"
-    total, step, parts = timeline(p)["total"], 3000, []
-    # 音（Python の時間割）と映像（Remotion）の長さが1コマでも違えば、音と絵がずれるので止める
-    r = subprocess.run(["npx", "remotion", "compositions", "src/index.ts", f"--props={props}"],
-                       cwd=EDU, capture_output=True, text=True, check=True)
-    m = re.search(r"TangoExercise\s+\d+\s+\S+\s+(\d+)", r.stdout)
-    if not m or int(m[1]) != total:
-        raise SystemExit(f"長さが合いません：Python {total}コマ／Remotion {m[1] if m else '?'}コマ（types.ts と timeline() を見比べる）")
-    for a in range(0, total, step):
-        part = tmp / f"{name}.part{a // step:02d}.mp4"
-        if not part.exists():
-            render("TangoExercise", part.with_suffix(".tmp.mp4"), props, frames=f"{a}-{min(a + step, total) - 1}")
-            part.with_suffix(".tmp.mp4").replace(part)  # 途中で止まっても、できた区切りは作り直さない
-        parts.append(part)
-    lst = tmp / f"{name}.parts.txt"
-    lst.write_text("".join(f"file '{x}'\n" for x in parts), encoding="utf-8")
-    ff("-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(video))
-    for x in [*parts, lst]:
-        x.unlink()
-    ff("-i", str(video), "-i", str(audio), "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "copy",
-       "-movflags", "+faststart", str(OUT / f"{name}.mp4"))  # -shortest は最後の3コマを落としたので付けない（音は mix_audio で同じ長さに切ってある）
-    video.unlink()
-    audio.unlink()
-    print(f"✅ {OUT / name}.mp4 （{ts(timeline(p)['total'])}）\n   {meta['title']}")
+    total, events = listen_events(p) if listen else exercise_events(p)
+    out = produce(p, name, "TangoListen" if listen else "TangoExercise", total, events, props)
+    print(f"✅ {out} （{ts(total)}）\n   {meta['title']}")
     return 0
 
 
