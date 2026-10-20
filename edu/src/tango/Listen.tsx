@@ -1,5 +1,5 @@
 // 「英単語 聞き流し」（横長・稽古ごと100語）。英単語の発音 → 日本語の意味を①②と読み、読むのに合わせて出す。
-// 以前ターゲット1900などで作っていた形式（英語→日本語）を、自前の単語帳『気合の英単語 初段』と道場の色で作り直したもの。
+// 以前ターゲット1900などで作っていた形式（英語→日本語）を、自前の単語帳『気合の英単語 必修』と道場の色で作り直したもの。
 // 時間割は tango_exercise.py が計算して data.plan（コマ）で渡す。ここでは計算しない（音とずれないように）
 import React from 'react';
 import { AbsoluteFill, Img, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';

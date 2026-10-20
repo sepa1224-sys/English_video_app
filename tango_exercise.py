@@ -1,6 +1,6 @@
 """「イメージで英単語エクササイズ」を稽古ごと（100語）に作る。
 
-自前の単語帳「気合の英単語 初段」（~/kiai-tango）の絵を見て英単語を答える横長の動画。
+自前の単語帳「気合の英単語 必修」（~/kiai-tango）の絵を見て英単語を答える横長の動画。
   冒頭：単語帳の紹介（表紙）→ やり方 → 100語（絵と頭文字のヒント → 3秒 → 答え・意味・発音2回）→ 締め
 
   python3 tango_exercise.py 1                 … 稽古1の 声→動画→サムネ→説明文 を output/tango/ に作る
@@ -33,7 +33,7 @@ BOOK = ROOT / "data" / "tango_book.json"
 CAST = json.loads((EDU / "cast.json").read_text(encoding="utf-8"))
 
 SERIES = "イメージで英単語エクササイズ"
-PLAYLIST = "イメージで英単語エクササイズ（気合の英単語 初段）"
+PLAYLIST = "イメージで英単語エクササイズ（気合の英単語 必修）"
 # 単語の発音はアメリカ英語の声（Bella・教育向け）。最初は Alice（イギリス英語）だったが、
 # source が sauce に聞こえるなど入試の発音と違うので替えた（2026-10-18 坂本さんの指示）
 WORD_VOICE = "hpp4J3VqNfWAUOO0d1Us"
@@ -55,7 +55,7 @@ OUTRO = [("master", "よくぞやりきった！ 言えなかった単語は、�
 # 聞き流し（英語→日本語）。以前ターゲット1900などで作っていた形式を、自前の単語帳で作り直したもの。
 # 間の長さも以前と同じ（英語→日本語 0.4秒、意味と意味 0.4秒、次の語へ 0.7秒）
 LISTEN_SERIES = "英単語 聞き流し"
-LISTEN_PLAYLIST = "英単語 聞き流し（気合の英単語 初段）"
+LISTEN_PLAYLIST = "英単語 聞き流し（気合の英単語 必修）"
 # 日本語の意味は、鉄壁などの単語動画と同じ Microsoft の Keita（落ち着いた男性の声）。キャラの声ではなく（2026-10-19 坂本さんの指示）。
 # 以前の動画は速さ±0%。少しゆっくり読む。edge-tts は古いと 403 で弾かれるので新しくしておく（7.3.1 で動いた）
 JA_VOICE, JA_RATE = "ja-JP-KeitaNeural", "-10%"
@@ -548,11 +548,11 @@ def description(p: dict) -> str:
     bk = book()
     if listen:
         starts, outro = [w["start"] for w in p["plan"]["words"]], p["plan"]["outro"]
-        chapters = [f"{ts(0)} 単語帳『気合の英単語 初段』"]
+        chapters = [f"{ts(0)} 単語帳『気合の英単語 必修』"]
     else:
         tl = timeline(p)
         starts, outro = tl["starts"], tl["outro"]
-        chapters = [f"{ts(tl['intro'])} 単語帳『気合の英単語 初段』", f"{ts(tl['howto'])} やり方"]
+        chapters = [f"{ts(tl['intro'])} 単語帳『気合の英単語 必修』", f"{ts(tl['howto'])} やり方"]
     for i in range(0, len(p["words"]), 10):
         grp = p["words"][i:i + 10]
         chapters.append(f"{ts(starts[i])} No.{grp[0]['no']}〜{grp[-1]['no']}")
@@ -564,7 +564,7 @@ def description(p: dict) -> str:
     else:
         buy = "Kindle版・紙の本：近日発売（発売したら、ここに購入リンクを載せます）"
     if listen:
-        head = f"""単語帳『気合の英単語 初段』（大学入試 頻出1000語）の稽古{p['keiko']}（No.{a}〜{b}）の聞き流しです。英単語の発音のあとに、日本語の意味を読み上げます。
+        head = f"""単語帳『気合の英単語 必修』（大学入試 頻出1000語）の稽古{p['keiko']}（No.{a}〜{b}）の聞き流しです。英単語の発音のあとに、日本語の意味を読み上げます。
 
 ■ 使い方
 1. 通学中や寝る前に、流して聞く
@@ -572,7 +572,7 @@ def description(p: dict) -> str:
 3. 絵を見て意味を思い出す練習は「イメージで英単語エクササイズ」で
 """
     else:
-        head = f"""単語帳『気合の英単語 初段』（大学入試 頻出1000語）の稽古{p['keiko']}（No.{a}〜{b}）を、イラストだけを見て英語で答えるエクササイズです。
+        head = f"""単語帳『気合の英単語 必修』（大学入試 頻出1000語）の稽古{p['keiko']}（No.{a}〜{b}）を、イラストだけを見て英語で答えるエクササイズです。
 
 ■ やり方
 1. 絵と頭文字のヒントを見て、3秒以内に英単語を声に出す
@@ -580,7 +580,7 @@ def description(p: dict) -> str:
 3. 言えなかった単語は、もう一度この動画で稽古する
 """
     return head + f"""
-■ 単語帳『気合の英単語 初段』
+■ 単語帳『気合の英単語 必修』
 大学入試によく出る1000語を、100語ずつ10の稽古に分けた単語帳です。この動画のイラストは、本と同じものです。
 {buy}
 

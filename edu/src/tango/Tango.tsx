@@ -70,13 +70,13 @@ const LineAudio: React.FC<{ lines: Line[] }> = ({ lines }) => {
   return <>{lines.map((l, i) => <Sequence key={i} from={at[i]}><Audio src={staticFile(l.audio)} /></Sequence>)}</>;
 };
 
-/** 表紙のタイトル（「気合の 英単語 ＋ 初段」）を横書きで */
+/** 表紙のタイトル（「気合の 英単語 ＋ 必修」）を横書きで */
 const BookTitle: React.FC<{ scale?: number }> = ({ scale = 1 }) => (
   <div style={{ fontFamily: DELA, lineHeight: 1, transform: `scale(${scale})`, transformOrigin: 'left top' }}>
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 22 }}>
       <span style={{ fontSize: 96, color: GOLD, textShadow: SLAB(6) }}>気合の</span>
       <span style={{ fontSize: 60, color: RED, background: GOLD, borderRadius: 16, padding: '10px 16px 14px',
-        border: `5px solid ${BROWN}`, transform: 'rotate(6deg)', marginBottom: 14 }}>初段</span>
+        border: `5px solid ${BROWN}`, transform: 'rotate(6deg)', marginBottom: 14 }}>必修</span>
     </div>
     <div style={{ fontSize: 190, color: CREAM, textShadow: SLAB(10), marginTop: 10, letterSpacing: 8 }}>英単語</div>
   </div>
@@ -267,7 +267,7 @@ export const TopBar: React.FC<{ d: TangoData; i: number; within: number; len: nu
         <span style={{ fontFamily: DELA, fontSize: 36, color: CREAM }}>{d.series}</span>
       </div>
       <div style={{ position: 'absolute', right: 110, top: 40, fontFamily: ROUNDED, fontSize: 34, color: '#e8cfa8' }}>
-        気合の英単語 初段　<span style={{ color: GOLD }}>{i + 1}</span> / {d.words.length}
+        気合の英単語 必修　<span style={{ color: GOLD }}>{i + 1}</span> / {d.words.length}
       </div>
       <div style={{ position: 'absolute', left: 110, right: 110, top: 104, height: 12, borderRadius: 99, background: '#3b2116' }}>
         <div style={{ width: `${done * 100}%`, height: '100%', borderRadius: 99, background: GOLD }} />
