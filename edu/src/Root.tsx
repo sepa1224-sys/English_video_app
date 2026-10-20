@@ -33,8 +33,9 @@ const QUIZ_SAMPLE: QuizData = {
   items: [{ q: 'likely', pos: '形', a: ['ありそうな、～しそうだ'] }],
   plan: { items: [{ start: 0, len: 150, think: 20, reveal: 110 }], outro: 150, total: 210 },
 };
-const quizMeta = ({ props }: { props: { data: QuizData } }) => ({ durationInFrames: props.data.plan.total });
-const listenMeta = ({ props }: { props: { data: ListenData } }) => ({ durationInFrames: props.data.plan.total });
+// --props はすべての Composition に渡るので、別の動画の中身（plan が無い）でも落ちないようにする
+const quizMeta = ({ props }: { props: { data: QuizData } }) => ({ durationInFrames: props.data.plan?.total ?? 90 });
+const listenMeta = ({ props }: { props: { data: ListenData } }) => ({ durationInFrames: props.data.plan?.total ?? 90 });
 
 export const Root = () => (
   <>
