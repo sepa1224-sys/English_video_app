@@ -365,11 +365,10 @@ export const TangoThumb: React.FC<{ data: TangoData }> = ({ data: d }) => {
         <span style={{ fontSize: 32, color: RED, background: GOLD, borderRadius: 10, padding: '6px 12px' }}>必修</span>
       </div>
       {/* 右：題 */}
-      <div style={{ position: 'absolute', left: 660, right: 30, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+      <div style={{ position: 'absolute', left: 650, right: 20, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center',
         fontFamily: DELA, lineHeight: 1.02 }}>
-        <div style={{ fontSize: 96, color: CREAM, textShadow: SLAB(7) }}>{listen ? '耳で' : 'イメージで'}</div>
-        <div style={{ fontSize: 96, color: CREAM, textShadow: SLAB(7), marginTop: 6 }}>覚える</div>
-        <div style={{ fontSize: 158, color: GOLD, textShadow: SLAB(10), marginTop: 10 }}>英単語</div>
+        <div style={{ fontSize: 80, color: CREAM, textShadow: SLAB(7), whiteSpace: 'nowrap' }}>{listen ? '耳で' : 'イメージで'}<br />覚える</div>
+        <div style={{ fontSize: 196, color: GOLD, textShadow: SLAB(12), marginTop: 8, marginLeft: -8, letterSpacing: -4, WebkitTextStroke: `4px ${BROWN}` }}>英単語</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 26 }}>
           <span style={{ fontSize: 48, color: BROWN, background: GOLD, padding: '8px 16px', borderRadius: 12 }}>稽古{d.keiko}</span>
           <span style={{ fontSize: 36, color: CREAM, textShadow: SLAB(4) }}>No.{d.range[0]}〜{d.range[1]}</span>
