@@ -343,39 +343,38 @@ export const TangoExercise: React.FC<{ data: TangoData }> = ({ data: d }) => {
 };
 
 // ───────────────────────── サムネ（1280×720） ─────────────────────────
-// 一面に本の絵を並べて「絵で覚える単語動画」とひと目で分かるように。左上に「気合の英単語」（2026-10-20 坂本さん）
+// 左に本の絵を4枚大きく、右に「イメージで覚える英単語」。左上に「気合の英単語 必修」（2026-10-20 坂本さん）
 export const TangoThumb: React.FC<{ data: TangoData }> = ({ data: d }) => {
-  const COLS = 8, TILE = 160;
-  const imgs = d.thumbs.length ? d.thumbs : [];
+  const imgs = d.thumbs.slice(0, 4);
   const listen = d.thumbTop === '聞き流し';
+  const tilt = [-4, 3, 3, -3];
   return (
-    <AbsoluteFill style={{ background: CREAM, overflow: 'hidden' }}>
-      {/* 背景：絵のタイル（8列×5段） */}
-      <div style={{ position: 'absolute', left: 0, top: -20, display: 'flex', flexWrap: 'wrap', width: COLS * TILE }}>
-        {Array.from({ length: COLS * 5 }, (_, k) => imgs[k % Math.max(1, imgs.length)]).map((src, k) => (
-          <div key={k} style={{ width: TILE, height: TILE, background: '#fff', border: '2px solid #eadfc8', boxSizing: 'border-box',
-            display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {src ? <Img src={staticFile(src)} style={{ width: TILE - 10, height: TILE - 10, objectFit: 'contain' }} /> : null}
+    <AbsoluteFill style={{ background: EMBER, overflow: 'hidden' }}>
+      {/* 左：絵を4枚（2×2） */}
+      <div style={{ position: 'absolute', left: 30, top: 118, width: 600, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 22 }}>
+        {imgs.map((src, k) => (
+          <div key={k} style={{ width: 280, height: 280, background: '#fff', borderRadius: 22, border: `7px solid ${CREAM}`, overflow: 'hidden',
+            transform: `rotate(${tilt[k]}deg)`, boxShadow: '0 14px 28px rgba(60,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Img src={staticFile(src)} style={{ width: 266, height: 266, objectFit: 'contain' }} />
           </div>
         ))}
       </div>
       {/* 左上：気合の英単語 */}
-      <div style={{ position: 'absolute', left: 26, top: 22, background: EMBER, border: `6px solid ${GOLD}`, borderRadius: 18, padding: '10px 22px',
-        fontFamily: DELA, lineHeight: 1, boxShadow: '0 10px 24px rgba(60,0,0,0.45)', display: 'flex', alignItems: 'center', gap: 14 }}>
-        <span style={{ fontSize: 46, color: CREAM, textShadow: SLAB(4) }}><span style={{ color: GOLD }}>気合</span>の英単語</span>
-        <span style={{ fontSize: 34, color: RED, background: GOLD, borderRadius: 10, padding: '6px 12px' }}>必修</span>
+      <div style={{ position: 'absolute', left: 28, top: 22, display: 'flex', alignItems: 'center', gap: 12, fontFamily: DELA, lineHeight: 1 }}>
+        <span style={{ fontSize: 44, color: CREAM, textShadow: SLAB(4) }}><span style={{ color: GOLD }}>気合</span>の英単語</span>
+        <span style={{ fontSize: 32, color: RED, background: GOLD, borderRadius: 10, padding: '6px 12px' }}>必修</span>
       </div>
-      {/* 真ん中：題 */}
-      <div style={{ position: 'absolute', left: 0, right: 0, top: 250, height: 260, background: 'rgba(40,12,6,0.8)',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: DELA, lineHeight: 1 }}>
-        <div style={{ fontSize: 76, color: CREAM, textShadow: SLAB(6) }}>{listen ? '英単語を耳で覚える' : 'イメージで覚える'}</div>
-        <div style={{ fontSize: 150, color: GOLD, textShadow: SLAB(9), marginTop: 14 }}>{listen ? '聞き流し' : '英単語'}</div>
-      </div>
-      {/* 右下：稽古 */}
-      <div style={{ position: 'absolute', right: 26, bottom: 24, display: 'flex', alignItems: 'center', gap: 14, fontFamily: DELA, lineHeight: 1,
-        background: EMBER, border: `6px solid ${GOLD}`, borderRadius: 18, padding: '10px 18px', boxShadow: '0 10px 24px rgba(60,0,0,0.45)' }}>
-        <span style={{ fontSize: 50, color: BROWN, background: GOLD, padding: '8px 16px', borderRadius: 12 }}>稽古{d.keiko}</span>
-        <span style={{ fontSize: 38, color: CREAM, textShadow: SLAB(4) }}>No.{d.range[0]}〜{d.range[1]}</span>
+      {/* 右：題 */}
+      <div style={{ position: 'absolute', left: 660, right: 30, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        fontFamily: DELA, lineHeight: 1.02 }}>
+        <div style={{ fontSize: 96, color: CREAM, textShadow: SLAB(7) }}>{listen ? '耳で' : 'イメージで'}</div>
+        <div style={{ fontSize: 96, color: CREAM, textShadow: SLAB(7), marginTop: 6 }}>覚える</div>
+        <div style={{ fontSize: 158, color: GOLD, textShadow: SLAB(10), marginTop: 10 }}>英単語</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 26 }}>
+          <span style={{ fontSize: 48, color: BROWN, background: GOLD, padding: '8px 16px', borderRadius: 12 }}>稽古{d.keiko}</span>
+          <span style={{ fontSize: 36, color: CREAM, textShadow: SLAB(4) }}>No.{d.range[0]}〜{d.range[1]}</span>
+        </div>
+        {listen ? <div style={{ fontSize: 40, color: CREAM, marginTop: 16, textShadow: SLAB(4) }}>♪ 聞き流し</div> : null}
       </div>
     </AbsoluteFill>
   );

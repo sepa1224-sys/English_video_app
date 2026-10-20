@@ -389,7 +389,7 @@ def build_props(keiko: int, limit: int | None, kind: str = "exercise") -> dict:
         "howto": [line_audio(w, t.format(keiko=keiko)) for w, t in HOWTO],
         "outro": [line_audio(w, t) for w, t in OUTRO],
         "words": words,
-        "thumbs": [w["img"] for w in words[:40]],  # サムネは一面に絵を並べる
+        "thumbs": [w["img"] for w in words[:4]],  # サムネは左に4枚大きく
     }
     if kind == "listen":
         senses = {e["headword"]: e.get("senses") or [e["meanings"]] for e in entries}
