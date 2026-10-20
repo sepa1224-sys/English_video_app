@@ -351,11 +351,11 @@ export const TangoThumb: React.FC<{ data: TangoData }> = ({ data: d }) => {
   return (
     <AbsoluteFill style={{ background: EMBER, overflow: 'hidden' }}>
       {/* 左：絵を4枚（2×2） */}
-      <div style={{ position: 'absolute', left: 30, top: 118, width: 600, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 22 }}>
+      <div style={{ position: 'absolute', left: 28, top: 124, width: 560, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         {imgs.map((src, k) => (
-          <div key={k} style={{ width: 280, height: 280, background: '#fff', borderRadius: 22, border: `7px solid ${CREAM}`, overflow: 'hidden',
+          <div key={k} style={{ width: 268, height: 268, background: '#fff', borderRadius: 22, border: `7px solid ${CREAM}`, overflow: 'hidden',
             transform: `rotate(${tilt[k]}deg)`, boxShadow: '0 14px 28px rgba(60,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Img src={staticFile(src)} style={{ width: 266, height: 266, objectFit: 'contain' }} />
+            <Img src={staticFile(src)} style={{ width: 254, height: 254, objectFit: 'contain' }} />
           </div>
         ))}
       </div>
@@ -365,10 +365,10 @@ export const TangoThumb: React.FC<{ data: TangoData }> = ({ data: d }) => {
         <span style={{ fontSize: 32, color: RED, background: GOLD, borderRadius: 10, padding: '6px 12px' }}>必修</span>
       </div>
       {/* 右：題 */}
-      <div style={{ position: 'absolute', left: 650, right: 20, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+      <div style={{ position: 'absolute', left: 612, right: 10, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center',
         fontFamily: DELA, lineHeight: 1.02 }}>
-        <div style={{ fontSize: 80, color: CREAM, textShadow: SLAB(7), whiteSpace: 'nowrap' }}>{listen ? '耳で' : 'イメージで'}<br />覚える</div>
-        <div style={{ fontSize: 196, color: GOLD, textShadow: SLAB(12), marginTop: 8, marginLeft: -8, letterSpacing: -4, WebkitTextStroke: `4px ${BROWN}` }}>英単語</div>
+        <div style={{ fontSize: 62, color: CREAM, textShadow: SLAB(6), whiteSpace: 'nowrap', marginTop: -40 }}>{listen ? '耳で覚える' : 'イメージで覚える'}</div>
+        <div style={{ fontSize: 218, color: GOLD, textShadow: SLAB(13), marginTop: 14, marginLeft: -10, letterSpacing: -6, whiteSpace: 'nowrap', WebkitTextStroke: `5px ${BROWN}` }}>英単語</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 26 }}>
           <span style={{ fontSize: 48, color: BROWN, background: GOLD, padding: '8px 16px', borderRadius: 12 }}>稽古{d.keiko}</span>
           <span style={{ fontSize: 36, color: CREAM, textShadow: SLAB(4) }}>No.{d.range[0]}〜{d.range[1]}</span>
