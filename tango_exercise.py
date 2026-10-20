@@ -32,8 +32,8 @@ COVER = TANGO / "out" / "cover_kindle.png"
 BOOK = ROOT / "data" / "tango_book.json"
 CAST = json.loads((EDU / "cast.json").read_text(encoding="utf-8"))
 
-SERIES = "イメージで英単語エクササイズ"
-PLAYLIST = "イメージで英単語エクササイズ（気合の英単語 必修）"
+SERIES = "イメージで覚える英単語"  # 2026-10-20 坂本さん：題は「イメージで覚える英単語」。中身は必修の番号順のままなので、題やサムネはあとで変えられる
+PLAYLIST = "イメージで覚える英単語（気合の英単語 必修）"
 # 単語の発音はアメリカ英語の声（Bella・教育向け）。最初は Alice（イギリス英語）だったが、
 # source が sauce に聞こえるなど入試の発音と違うので替えた（2026-10-18 坂本さんの指示）
 WORD_VOICE = "hpp4J3VqNfWAUOO0d1Us"
@@ -389,7 +389,7 @@ def build_props(keiko: int, limit: int | None, kind: str = "exercise") -> dict:
         "howto": [line_audio(w, t.format(keiko=keiko)) for w, t in HOWTO],
         "outro": [line_audio(w, t) for w, t in OUTRO],
         "words": words,
-        "thumbs": [w["img"] for w in words[:4]],
+        "thumbs": [w["img"] for w in words[:40]],  # サムネは一面に絵を並べる
     }
     if kind == "listen":
         senses = {e["headword"]: e.get("senses") or [e["meanings"]] for e in entries}
@@ -539,7 +539,7 @@ def ts(frame: int) -> str:
 
 def title(p: dict) -> str:
     a, b = p["range"]
-    return f"【気合イングリッシュ】{p['series']} 稽古{p['keiko']}（No.{a}〜{b}）"
+    return f"{p['series']}｜稽古{p['keiko']}（No.{a}〜{b}）【気合の英単語 必修】"
 
 
 def description(p: dict) -> str:

@@ -343,36 +343,43 @@ export const TangoExercise: React.FC<{ data: TangoData }> = ({ data: d }) => {
 };
 
 // ───────────────────────── サムネ（1280×720） ─────────────────────────
-export const TangoThumb: React.FC<{ data: TangoData }> = ({ data: d }) => (
-  <AbsoluteFill style={{ background: EMBER, overflow: 'hidden' }}>
-    {/* 右：単語の絵（後ろに2枚重ねて「たくさんある」感じ） */}
-    {d.thumbs[1] ? (
-      <Img src={staticFile(d.thumbs[1])} style={{ position: 'absolute', width: 300, height: 300, borderRadius: 18, border: `6px solid ${CREAM}`,
-        right: 40, top: 30, transform: 'rotate(8deg)', boxShadow: '0 12px 24px rgba(60,0,0,0.45)' }} />
-    ) : null}
-    <div style={{ position: 'absolute', right: 120, top: 120, width: 440, height: 440, borderRadius: 26, border: `9px solid ${GOLD}`,
-      overflow: 'hidden', transform: 'rotate(-3deg)', boxShadow: '0 18px 40px rgba(60,0,0,0.55)', background: CREAM }}>
-      <Img src={staticFile(d.thumbs[0])} style={{ width: 422, height: 422 }} />
-    </div>
-    <div style={{ position: 'absolute', right: 70, top: 70, width: 140, height: 140, borderRadius: 999, background: RED, border: `7px solid ${CREAM}`,
-      color: CREAM, fontFamily: DELA, fontSize: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(10deg)' }}>{d.thumbTop === '聞き流し' ? '♪' : '?'}</div>
-    {/* 左：題 */}
-    <div style={{ position: 'absolute', left: 50, top: 36, fontFamily: DELA, lineHeight: 1 }}>
-      <div style={{ fontSize: 30, color: CREAM, marginBottom: 18 }}>気合イングリッシュ</div>
-      <div style={{ fontSize: 92, color: CREAM, textShadow: SLAB(7) }}>{d.thumbTop ?? 'イメージで'}</div>
-      <div style={{ fontSize: 150, color: GOLD, textShadow: SLAB(9), marginTop: 6 }}>英単語</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 18 }}>
-        <span style={{ fontSize: 62, color: BROWN, background: GOLD, padding: '10px 20px', borderRadius: 14 }}>稽古{d.keiko}</span>
-        <span style={{ fontSize: 40, color: CREAM, textShadow: SLAB(4) }}>No.{d.range[0]}〜{d.range[1]}</span>
+// 一面に本の絵を並べて「絵で覚える単語動画」とひと目で分かるように。左上に「気合の英単語」（2026-10-20 坂本さん）
+export const TangoThumb: React.FC<{ data: TangoData }> = ({ data: d }) => {
+  const COLS = 8, TILE = 160;
+  const imgs = d.thumbs.length ? d.thumbs : [];
+  const listen = d.thumbTop === '聞き流し';
+  return (
+    <AbsoluteFill style={{ background: CREAM, overflow: 'hidden' }}>
+      {/* 背景：絵のタイル（8列×5段） */}
+      <div style={{ position: 'absolute', left: 0, top: -20, display: 'flex', flexWrap: 'wrap', width: COLS * TILE }}>
+        {Array.from({ length: COLS * 5 }, (_, k) => imgs[k % Math.max(1, imgs.length)]).map((src, k) => (
+          <div key={k} style={{ width: TILE, height: TILE, background: '#fff', border: '2px solid #eadfc8', boxSizing: 'border-box',
+            display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {src ? <Img src={staticFile(src)} style={{ width: TILE - 10, height: TILE - 10, objectFit: 'contain' }} /> : null}
+          </div>
+        ))}
       </div>
-    </div>
-    {/* 下：キャラが勢ぞろい */}
-    <div style={{ position: 'absolute', left: -20, bottom: -26, display: 'flex' }}>
-      {CREW.slice(0, 6).map((w) => <div key={w} style={{ width: 118 }}><Img src={staticFile(`chara/cut/${w}.png`)} style={{ width: 230, height: 230, marginLeft: -56 }} /></div>)}
-    </div>
-    <Img src={staticFile('chara/cut/sennin_03_point.png')} style={{ position: 'absolute', right: -60, bottom: -70, width: 400, height: 400 }} />
-  </AbsoluteFill>
-);
+      {/* 左上：気合の英単語 */}
+      <div style={{ position: 'absolute', left: 26, top: 22, background: EMBER, border: `6px solid ${GOLD}`, borderRadius: 18, padding: '10px 22px',
+        fontFamily: DELA, lineHeight: 1, boxShadow: '0 10px 24px rgba(60,0,0,0.45)', display: 'flex', alignItems: 'center', gap: 14 }}>
+        <span style={{ fontSize: 46, color: CREAM, textShadow: SLAB(4) }}><span style={{ color: GOLD }}>気合</span>の英単語</span>
+        <span style={{ fontSize: 34, color: RED, background: GOLD, borderRadius: 10, padding: '6px 12px' }}>必修</span>
+      </div>
+      {/* 真ん中：題 */}
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 250, height: 260, background: 'rgba(40,12,6,0.8)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: DELA, lineHeight: 1 }}>
+        <div style={{ fontSize: 76, color: CREAM, textShadow: SLAB(6) }}>{listen ? '英単語を耳で覚える' : 'イメージで覚える'}</div>
+        <div style={{ fontSize: 150, color: GOLD, textShadow: SLAB(9), marginTop: 14 }}>{listen ? '聞き流し' : '英単語'}</div>
+      </div>
+      {/* 右下：稽古 */}
+      <div style={{ position: 'absolute', right: 26, bottom: 24, display: 'flex', alignItems: 'center', gap: 14, fontFamily: DELA, lineHeight: 1,
+        background: EMBER, border: `6px solid ${GOLD}`, borderRadius: 18, padding: '10px 18px', boxShadow: '0 10px 24px rgba(60,0,0,0.45)' }}>
+        <span style={{ fontSize: 50, color: BROWN, background: GOLD, padding: '8px 16px', borderRadius: 12 }}>稽古{d.keiko}</span>
+        <span style={{ fontSize: 38, color: CREAM, textShadow: SLAB(4) }}>No.{d.range[0]}〜{d.range[1]}</span>
+      </div>
+    </AbsoluteFill>
+  );
+};
 
 // ───────────────────────── チャンネルのアイコン（800×800・丸く切られる） ─────────────────────────
 // 小さく表示されるので文字は入れず、仙人の顔だけ
