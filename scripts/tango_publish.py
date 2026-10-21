@@ -1,6 +1,8 @@
 """上げ済みの単語帳の動画を公開にする（坂本さんの OK が出た稽古だけ）。再生リストも公開にする。
 
   python3 scripts/tango_publish.py keiko1 keiko1_listen
+  python3 scripts/tango_publish.py --auto   … 稽古2〜30 を、上がったものから番号順に公開（前の稽古が公開済みのときだけ）
+                                            launchd com.kiai.tango.autopublish が30分ごとに動かす（2026-10-21 坂本さん「上がったら順番に公開していい」）
 """
 import json, os, sys
 from pathlib import Path
@@ -11,6 +13,15 @@ import tango_exercise as te
 
 names = sys.argv[1:]
 done = json.loads(te.UPLOADED.read_text(encoding="utf-8"))
+if names == ["--auto"]:
+    names = []
+    for k in range(2, 31):
+        pair = [f"keiko{k}", f"keiko{k}_listen"]
+        if not all(n in done for n in pair):
+            break  # 番号順：この稽古の2本がそろうまで先は出さない
+        names += [n for n in pair if done[n].get("privacy") != "public"]
+    if not names:
+        sys.exit(0)
 os.chdir(te.config_root())
 from ondoku_upload import service
 yt = service()
