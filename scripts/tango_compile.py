@@ -8,7 +8,8 @@
 いまは必修（稽古1〜10）だけ。突破の稽古はまだ動画が無い。
 """
 from __future__ import annotations
-import argparse, json, os, subprocess, sys
+import argparse, fcntl, json, os, subprocess, sys
+from contextlib import contextmanager
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -20,6 +21,41 @@ FIRST, LAST = 1, 10  # 必修の稽古
 
 class CompileError(RuntimeError):
     """作れない理由（そのまま会議の結果に書く）"""
+
+
+class UploadedButIncomplete(RuntimeError):
+    """動画は非公開で上がったが、そのあと（サムネ・再生リストなど）で失敗した。video_id は残す"""
+
+    def __init__(self, video_id: str, msg: str):
+        super().__init__(msg)
+        self.video_id = video_id
+
+
+LOCK = te.UPLOADED.with_name(".tango_uploaded.lock")
+
+
+@contextmanager
+def uploaded_lock():
+    """data/tango_uploaded.json の読み書きの間だけ持つ錠（tango_publish.py なども同じファイルに書くので、書く直前に読み直す）"""
+    LOCK.parent.mkdir(parents=True, exist_ok=True)
+    with open(LOCK, "w") as f:
+        fcntl.flock(f, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(f, fcntl.LOCK_UN)
+
+
+def uploaded() -> dict:
+    return json.loads(te.UPLOADED.read_text(encoding="utf-8")) if te.UPLOADED.exists() else {}
+
+
+def record_upload(name: str, entry: dict) -> None:
+    """上げた記録を1件足す。読み直し→足す→書く を錠の中で一気に（アップロードの数分のあいだに他が書いた分を消さない）"""
+    with uploaded_lock():
+        done = uploaded()
+        done[name] = entry
+        te.UPLOADED.write_text(json.dumps(done, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def name_of(a: int, b: int, kind: str) -> str:
@@ -125,9 +161,8 @@ def build(a: int, b: int, kind: str) -> tuple[Path, dict]:
 def upload(a: int, b: int, kind: str, video: Path, meta: dict) -> str:
     """非公開で上げる。上げ済みなら前の ID を返す。1日の上限なら te.QuotaExceeded"""
     from googleapiclient.errors import HttpError
-    from googleapiclient.http import MediaFileUpload
     name = name_of(a, b, kind)
-    done = json.loads(te.UPLOADED.read_text(encoding="utf-8")) if te.UPLOADED.exists() else {}
+    done = uploaded()
     if name in done:
         return done[name]["id"]
     privacy = "private"
@@ -144,9 +179,17 @@ def upload(a: int, b: int, kind: str, video: Path, meta: dict) -> str:
             raise
     finally:
         os.chdir(cwd)
-    done[name] = {"id": vid, "privacy": privacy, "title": meta["title"]}
-    te.UPLOADED.write_text(json.dumps(done, ensure_ascii=False, indent=1), encoding="utf-8")
-    # 稽古の1本ずつと同じ status・サムネ・再生リスト（tango_exercise.upload と同じ）
+    try:
+        record_upload(name, {"id": vid, "privacy": privacy, "title": meta["title"]})
+        finish_upload(yt, vid, privacy, meta)
+    except Exception as e:
+        raise UploadedButIncomplete(vid, f"{type(e).__name__}: {e}") from e
+    return vid
+
+
+def finish_upload(yt, vid: str, privacy: str, meta: dict) -> None:
+    """稽古の1本ずつと同じ status・サムネ・再生リスト（tango_exercise.upload と同じ）"""
+    from googleapiclient.http import MediaFileUpload
     yt.videos().update(part="status", body={"id": vid, "status": {
         "privacyStatus": privacy, "selfDeclaredMadeForKids": False, "containsSyntheticMedia": False,
         "embeddable": True, "publicStatsViewable": True, "license": "youtube"}}).execute()
@@ -161,7 +204,6 @@ def upload(a: int, b: int, kind: str, video: Path, meta: dict) -> str:
                                     "status": {"privacyStatus": privacy}}).execute()["id"]
     yt.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": pid,
                               "resourceId": {"kind": "youtube#video", "videoId": vid}}}).execute()
-    return vid
 
 
 def main() -> int:
@@ -184,6 +226,9 @@ def main() -> int:
     except te.QuotaExceeded as e:
         print(f"⏸ YouTube の1日の上限に達しました。明日もう一度上げてください：{e}")
         return 3
+    except UploadedButIncomplete as e:
+        print(f"⚠ https://www.youtube.com/watch?v={e.video_id} は非公開で上がったが、そのあとで失敗：{e}")
+        return 4
     print(f"✅ https://www.youtube.com/watch?v={vid}（非公開）／再生リスト「{meta['playlist']}」に追加")
     return 0
 
