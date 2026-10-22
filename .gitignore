@@ -58,3 +58,4 @@ logs/
 # ローカルだけの設定
 .claude/settings.local.json
 .agents/
+data/.tango_uploaded.lock
