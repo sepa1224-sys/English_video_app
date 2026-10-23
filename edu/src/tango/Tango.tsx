@@ -326,6 +326,41 @@ export const Outro: React.FC<{ d: TangoData }> = ({ d }) => {
   );
 };
 
+// ───────────────────────── 本の案内カード（締めの直前・約5秒） ─────────────────────────
+// 2026-10-23：動画から紙の本『気合の英単語 必修』へ。リンクは概要欄とピン留めコメント
+export const BookCard: React.FC<{ d: TangoData }> = ({ d }) => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const { line, talking } = useLines(d.outroBook ?? []);
+  const cover = pop(f, fps, 2);
+  return (
+    <AbsoluteFill style={{ background: EMBER }}>
+      <LineAudio lines={d.outroBook ?? []} />
+      <Img src={staticFile('tango/cover.jpg')} style={{
+        position: 'absolute', left: 170, top: 90, width: 520, height: 832, borderRadius: 18, border: `6px solid ${CREAM}`,
+        boxShadow: '0 30px 60px rgba(60,0,0,0.55)',
+        transform: `translateY(${(1 - cover) * 240}px) rotate(${-4 + cover * 1}deg) scale(${0.85 + cover * 0.15})` }} />
+      <div style={{ position: 'absolute', left: 780, top: 130, width: 1060, opacity: fadeIn(f, 6, 18) }}>
+        <div style={{ fontFamily: ROUNDED, fontSize: 56, color: CREAM, textShadow: '0 3px 0 #5a1208' }}>この100語は</div>
+        <div style={{ fontFamily: DELA, fontSize: 84, color: GOLD, textShadow: SLAB(7), lineHeight: 1.25, marginTop: 14 }}>
+          『気合の英単語 必修』
+        </div>
+        <div style={{ fontFamily: DELA, fontSize: 56, color: CREAM, textShadow: SLAB(5), marginTop: 6 }}>の</div>
+        <div style={{ fontFamily: DELA, fontSize: 170, color: CREAM, textShadow: SLAB(10), lineHeight: 1.1,
+          transform: `scale(${pop(f, fps, 10)})`, transformOrigin: 'left center' }}>稽古{d.keiko}</div>
+      </div>
+      <div style={{ position: 'absolute', left: 780, top: 660, transform: `scale(${pop(f, fps, 22)})`, transformOrigin: 'left center' }}>
+        <span style={{ fontFamily: DELA, fontSize: 64, color: BROWN, background: GOLD, borderRadius: 999, padding: '14px 44px',
+          border: `5px solid ${BROWN}`, boxShadow: '0 8px 0 rgba(60,0,0,0.45)' }}>本は概要欄から</span>
+      </div>
+      <div style={{ position: 'absolute', right: 40, bottom: 110 }}>
+        <Chara who="master" size={300} talking={talking} />
+      </div>
+      <Caption line={line} bottom={30} />
+    </AbsoluteFill>
+  );
+};
+
 // BGM は解説ショートと同じレトロRPG風（村）を小さく
 export const TangoExercise: React.FC<{ data: TangoData }> = ({ data: d }) => {
   const S = sections(d);
@@ -338,6 +373,9 @@ export const TangoExercise: React.FC<{ data: TangoData }> = ({ data: d }) => {
       <Sequence from={S.intro} durationInFrames={S.howto}><HowTo d={d} /></Sequence>
       <Sequence from={S.intro + S.howto} durationInFrames={S.wordsTotal}><Words d={d} /></Sequence>
       <Sequence from={S.intro + S.howto + S.wordsTotal} durationInFrames={S.outro}><Outro d={d} /></Sequence>
+      {S.book > 0 && (
+        <Sequence from={S.intro + S.howto + S.wordsTotal + S.outro} durationInFrames={S.book}><BookCard d={d} /></Sequence>
+      )}
     </AbsoluteFill>
   );
 };

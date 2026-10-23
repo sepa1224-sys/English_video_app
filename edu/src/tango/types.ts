@@ -12,6 +12,7 @@ export type TangoData = {
   keiko: number; range: [number, number]; series: string;
   book: { label: string };
   intro: Line[]; howto: Line[]; outro: Line[];
+  outroBook?: Line[]; // 締めの直前の「本の案内」カード（無ければ出さない＝以前の動画と同じ長さ）
   words: Word[]; thumbs: string[];
   thumbTop?: string; // サムネの題の1行目（既定「イメージで」）
 };
@@ -22,6 +23,7 @@ export type ListenPlan = {
   intro: number; // 冒頭の長さ（コマ）
   words: { start: number; len: number; ja: number[] }[]; // 語の始まり・長さ・意味を読み始めるコマ（語の頭から）
   outro: number; // 締めの始まり
+  book?: number; // 本の案内カードの始まり（無ければ出さない）
   total: number;
 };
 export type ListenData = Omit<TangoData, 'words'> & { words: ListenWord[]; plan: ListenPlan };
@@ -37,11 +39,16 @@ export const wordLen = (w: Word) => THINK + 0.1 + w.voiceDur + AFTER1 + w.voiceD
 export const linesLen = (ls: Line[]) => ls.reduce((n, l) => n + l.dur + LINE_GAP, 0) + 0.6;
 export const introLen = (d: TangoData) => Math.max(3, linesLen(d.intro)); // 冒頭は短く（一言だけ）
 
+export const BOOK_CARD_MIN = 5; // 本の案内カードの最短（秒）
+export const bookLen = (d: { outroBook?: Line[] }) =>
+  d.outroBook?.length ? sec(Math.max(BOOK_CARD_MIN, linesLen(d.outroBook) + 0.8)) : 0;
+
 export const sections = (d: TangoData) => {
   const intro = sec(introLen(d));
   const howto = sec(linesLen(d.howto));
   const words = d.words.map((w) => sec(wordLen(w)));
   const outro = sec(linesLen(d.outro) + 1.5);
   const wordsTotal = words.reduce((a, b) => a + b, 0);
-  return { intro, howto, words, wordsTotal, outro, total: intro + howto + wordsTotal + outro };
+  const book = bookLen(d);
+  return { intro, howto, words, wordsTotal, outro, book, total: intro + howto + wordsTotal + outro + book };
 };

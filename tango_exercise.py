@@ -54,6 +54,11 @@ HOWTO = [
     ("master", "稽古{keiko}、100語。はじめッ！"),
 ]
 OUTRO = [("master", "よくぞやりきった！ 言えなかった単語は、もう一度稽古じゃ。")]
+# 締めの直前の「本の案内」カード（約5秒・2026-10-23）。冒頭の宣伝と同じ仙人の声で、本へ誘う。
+# 紙の本のリンクは概要欄の上のほうとピン留めコメントに置く（scripts/tango_comment.py）
+OUTRO_BOOK = [("master", "この100語は、本の稽古{keiko}じゃ。続きは本で！概要欄からじゃ！",
+               "このひゃくごは、ほんのけいこ{keiko}じゃ。つづきは、ほんで！がいようらんからじゃ！")]
+BOOK_CARD_MIN = 5.0  # edu/src/tango/types.ts の BOOK_CARD_MIN と同じ
 
 # 聞き流し（英語→日本語）。以前ターゲット1900などで作っていた形式を、自前の単語帳で作り直したもの。
 # 間の長さも以前と同じ（英語→日本語 0.4秒、意味と意味 0.4秒、次の語へ 0.7秒）
@@ -391,6 +396,7 @@ def build_props(keiko: int, limit: int | None, kind: str = "exercise") -> dict:
         "intro": [line_audio(*x) for x in INTRO],
         "howto": [line_audio(w, t.format(keiko=keiko)) for w, t in HOWTO],
         "outro": [line_audio(w, t) for w, t in OUTRO],
+        "outroBook": [line_audio(w, t.format(keiko=keiko), r.format(keiko=keiko)) for w, t, r in OUTRO_BOOK],
         "words": words,
         "thumbs": [w["img"] for w in words[:4]],  # サムネは左に4枚大きく
     }
@@ -424,6 +430,17 @@ def line_starts(lines: list[dict]) -> list[int]:
     return out
 
 
+def book_len(p: dict) -> int:
+    """本の案内カードの長さ（コマ）。outroBook が無ければ 0"""
+    ls = p.get("outroBook")
+    if not ls:
+        return 0
+    n = 0.0
+    for x in ls:
+        n = n + x["dur"] + LINE_GAP
+    return fr(max(BOOK_CARD_MIN, n + 0.6 + 0.8))
+
+
 def timeline(p: dict) -> dict:
     """各場面の始まり（コマ）"""
     def lines_len(ls: list[dict]) -> float:
@@ -444,7 +461,9 @@ def timeline(p: dict) -> dict:
         starts.append(t)
         t += fr(THINK + 0.1 + w["voiceDur"] + AFTER1 + w["voiceDur"] + AFTER2)
     marks["outro"] = t
-    marks["total"] = t + fr(lines_len(p["outro"]) + 1.5)
+    t += fr(lines_len(p["outro"]) + 1.5)
+    marks["book"] = t  # 本の案内カードの始まり（types.ts の bookLen と同じ式）
+    marks["total"] = t + book_len(p)
     return {**marks, "starts": starts}
 
 
@@ -463,7 +482,10 @@ def listen_plan(p: dict) -> dict:
         plan["words"].append({"start": t, "len": n, "ja": ja})
         t += n
     plan["outro"] = t
-    plan["total"] = t + fr(lines_len(p["outro"]) + 1.5)
+    t += fr(lines_len(p["outro"]) + 1.5)
+    if p.get("outroBook"):
+        plan["book"] = t
+    plan["total"] = t + book_len(p)
     return plan
 
 
@@ -471,9 +493,9 @@ def exercise_events(p: dict) -> tuple[int, list[tuple[str, int, float]]]:
     """エクササイズの音（どの音を何コマ目に、どの大きさで）"""
     tl = timeline(p)
     ev = []
-    for key in ("intro", "howto", "outro"):
-        for x, at in zip(p[key], line_starts(p[key])):
-            ev.append((x["audio"], tl[key] + at, 1.0))
+    for key, mark in (("intro", "intro"), ("howto", "howto"), ("outro", "outro"), ("outroBook", "book")):
+        for x, at in zip(p.get(key, []), line_starts(p.get(key, []))):
+            ev.append((x["audio"], tl[mark] + at, 1.0))
     for w, st in zip(p["words"], tl["starts"]):
         for k in (3, 2, 1):
             ev.append(("tango/tick.mp3", st + fr(THINK - k), 0.45))
@@ -486,6 +508,8 @@ def listen_events(p: dict) -> tuple[int, list[tuple[str, int, float]]]:
     P = p["plan"]
     ev = [(x["audio"], at, 1.0) for x, at in zip(p["intro"], line_starts(p["intro"]))]
     ev += [(x["audio"], P["outro"] + at, 1.0) for x, at in zip(p["outro"], line_starts(p["outro"]))]
+    if "book" in P:
+        ev += [(x["audio"], P["book"] + at, 1.0) for x, at in zip(p["outroBook"], line_starts(p["outroBook"]))]
     for w, pw in zip(p["words"], P["words"]):
         ev.append((w["voice"], pw["start"] + fr(0.1), 1.0))
         ev += [(x["audio"], pw["start"] + at, 1.0) for x, at in zip(w["ja"], pw["ja"])]
@@ -587,7 +611,10 @@ def description(p: dict) -> str:
 {APP_URL}
 
 """
-    return promo + head + f"""
+    # 本の購入リンクは概要欄の上のほう（1行目の次）に置く。YouTube は先頭の数行しか「もっと見る」の前に出さない（2026-10-23）
+    first, _, rest = head.partition("\n")
+    top = (f"{first}\n📕 この動画の{len(p['words'])}語は、単語帳『気合の英単語 必修』の稽古{p['keiko']}（No.{a}〜{b}）です。\n{buy}\n\n")
+    return top + promo + rest.lstrip("\n") + f"""
 ■ 単語帳『気合の英単語 必修』
 大学入試によく出る1000語を、100語ずつ10の稽古に分けた単語帳です。この動画のイラストは、本と同じものです。
 {buy}

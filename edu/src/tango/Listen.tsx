@@ -5,7 +5,7 @@ import React from 'react';
 import { AbsoluteFill, Img, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 
 import { DELA, ROUNDED } from '../fonts';
-import { BROWN, CREAM, Chara, DOJO, GOLD, Intro, Outro, RED, SLAB, TopBar, pop } from './Tango';
+import { BROWN, BookCard, CREAM, Chara, DOJO, GOLD, Intro, Outro, RED, SLAB, TopBar, pop } from './Tango';
 import type { ListenData, ListenWord, Who } from './types';
 
 // 10語ごとに横で一緒に聞くキャラ（エクササイズと同じ順）
@@ -84,7 +84,8 @@ export const TangoListen: React.FC<{ data: ListenData }> = ({ data: d }) => {
     <AbsoluteFill style={{ background: BROWN }}>
       <Sequence durationInFrames={P.intro}><Intro d={d} /></Sequence>
       <Sequence from={P.intro} durationInFrames={wordsEnd - P.intro}><Words d={d} /></Sequence>
-      <Sequence from={P.outro} durationInFrames={P.total - P.outro}><Outro d={d} /></Sequence>
+      <Sequence from={P.outro} durationInFrames={(P.book ?? P.total) - P.outro}><Outro d={d} /></Sequence>
+      {P.book != null && <Sequence from={P.book} durationInFrames={P.total - P.book}><BookCard d={d} /></Sequence>}
     </AbsoluteFill>
   );
 };
