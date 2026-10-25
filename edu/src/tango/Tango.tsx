@@ -263,7 +263,7 @@ export const TopBar: React.FC<{ d: TangoData; i: number; within: number; len: nu
   return (
     <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 120 }}>
       <div style={{ position: 'absolute', left: 110, top: 34, display: 'flex', alignItems: 'center', gap: 22 }}>
-        <span style={{ fontFamily: DELA, fontSize: 36, color: BROWN, background: GOLD, borderRadius: 10, padding: '4px 18px' }}>稽古{d.keiko}</span>
+        <span style={{ fontFamily: DELA, fontSize: 36, color: BROWN, background: GOLD, borderRadius: 10, padding: '4px 18px' }}>{d.label ?? `稽古${d.keiko}`}</span>
         <span style={{ fontFamily: DELA, fontSize: 36, color: CREAM }}>{d.series}</span>
       </div>
       <div style={{ position: 'absolute', right: 110, top: 40, fontFamily: ROUNDED, fontSize: 34, color: '#e8cfa8' }}>
@@ -304,7 +304,7 @@ export const Outro: React.FC<{ d: TangoData }> = ({ d }) => {
     <AbsoluteFill style={{ background: EMBER }}>
       <LineAudio lines={d.outro} />
       <div style={{ position: 'absolute', top: 90, width: '100%', textAlign: 'center', fontFamily: DELA, fontSize: 130, color: CREAM,
-        textShadow: SLAB(9), transform: `scale(${pop(f, fps, 0)})` }}>稽古{d.keiko} 完了！</div>
+        textShadow: SLAB(9), transform: `scale(${pop(f, fps, 0)})` }}>{d.outroTitle ?? `稽古${d.keiko} 完了！`}</div>
       <div style={{ position: 'absolute', top: 280, width: '100%', textAlign: 'center', fontFamily: ROUNDED, fontSize: 44, color: CREAM }}>
         チャンネル登録で、次の稽古へ
       </div>
@@ -345,9 +345,9 @@ export const BookCard: React.FC<{ d: TangoData }> = ({ d }) => {
         <div style={{ fontFamily: DELA, fontSize: 84, color: GOLD, textShadow: SLAB(7), lineHeight: 1.25, marginTop: 14 }}>
           『気合の英単語 必修』
         </div>
-        <div style={{ fontFamily: DELA, fontSize: 56, color: CREAM, textShadow: SLAB(5), marginTop: 6 }}>の</div>
+        <div style={{ fontFamily: DELA, fontSize: 56, color: CREAM, textShadow: SLAB(5), marginTop: 6 }}>{d.bookOf ?? 'の'}</div>
         <div style={{ fontFamily: DELA, fontSize: 170, color: CREAM, textShadow: SLAB(10), lineHeight: 1.1,
-          transform: `scale(${pop(f, fps, 10)})`, transformOrigin: 'left center' }}>稽古{d.keiko}</div>
+          transform: `scale(${pop(f, fps, 10)})`, transformOrigin: 'left center' }}>{d.bookBig ?? `稽古${d.keiko}`}</div>
       </div>
       <div style={{ position: 'absolute', left: 780, top: 660, transform: `scale(${pop(f, fps, 22)})`, transformOrigin: 'left center' }}>
         <span style={{ fontFamily: DELA, fontSize: 64, color: BROWN, background: GOLD, borderRadius: 999, padding: '14px 44px',
@@ -408,8 +408,8 @@ export const TangoThumb: React.FC<{ data: TangoData }> = ({ data: d }) => {
         <div style={{ fontSize: 62, color: CREAM, textShadow: SLAB(6), whiteSpace: 'nowrap', marginTop: -40 }}>{listen ? '耳で覚える' : 'イメージで覚える'}</div>
         <div style={{ fontSize: 218, color: GOLD, textShadow: SLAB(13), marginTop: 14, marginLeft: -10, letterSpacing: -6, whiteSpace: 'nowrap', WebkitTextStroke: `5px ${BROWN}` }}>英単語</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 26 }}>
-          <span style={{ fontSize: 48, color: BROWN, background: GOLD, padding: '8px 16px', borderRadius: 12 }}>稽古{d.keiko}</span>
-          <span style={{ fontSize: 36, color: CREAM, textShadow: SLAB(4) }}>No.{d.range[0]}〜{d.range[1]}</span>
+          <span style={{ fontSize: 48, color: BROWN, background: GOLD, padding: '8px 16px', borderRadius: 12 }}>{d.label ?? `稽古${d.keiko}`}</span>
+          {d.label ? null : <span style={{ fontSize: 36, color: CREAM, textShadow: SLAB(4) }}>No.{d.range[0]}〜{d.range[1]}</span>}
         </div>
         {listen ? <div style={{ fontSize: 40, color: CREAM, marginTop: 16, textShadow: SLAB(4) }}>♪ 聞き流し</div> : null}
       </div>

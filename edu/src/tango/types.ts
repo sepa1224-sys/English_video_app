@@ -15,6 +15,10 @@ export type TangoData = {
   outroBook?: Line[]; // 締めの直前の「本の案内」カード（無ければ出さない＝以前の動画と同じ長さ）
   words: Word[]; thumbs: string[];
   thumbTop?: string; // サムネの題の1行目（既定「イメージで」）
+  // 大学別（scripts/tango_group.py）など、稽古ではない100語のとき。無ければ今までどおり「稽古N」
+  label?: string; // 「稽古N」の札の代わり（上の帯・サムネ）。サムネの No. の範囲も出さない
+  outroTitle?: string; // 締めの大きい字（既定「稽古N 完了！」）
+  bookOf?: string; bookBig?: string; // 本の案内カードの「の」「稽古N」の代わり
 };
 
 // 聞き流し（英語→日本語）。時間割は tango_exercise.py が1回だけ計算してコマで渡す（ずれないように）
