@@ -69,7 +69,12 @@ def build_props(g: str, limit: int | None, kind: str) -> dict:
                 checks = json.loads(te.CHECKS.read_text(encoding="utf-8"))
                 checks.pop(h, None)
                 te.CHECKS.write_text(json.dumps(checks, ensure_ascii=False, indent=1), encoding="utf-8")
+                # 消してから作る（word_audio は残っているファイルを1回目にそのまま確かめるので、消さないと作り直されない）
+                (te.VOICE_DIR / f"{te.slug(h)}.mp3").unlink(missing_ok=True)
                 te.word_audio(h)
+                m2 = te.median_f0(te.VOICE_DIR / f"{te.slug(h)}.mp3")
+                if m2 and abs(m2 / center - 1) > 0.2:
+                    print(f"    ⚠ 要確認：{h} は作り直しても声の高さが {m2:.0f}Hz")
                 checks = json.loads(te.CHECKS.read_text(encoding="utf-8"))
                 checks[h]["pitch_redo"] = True
                 te.CHECKS.write_text(json.dumps(checks, ensure_ascii=False, indent=1), encoding="utf-8")
