@@ -3,6 +3,7 @@ import { Episode } from './Episode';
 import { Sheet } from './chara/Sheet';
 import { FPS, totalFrames, type Episode as Ep } from './types';
 import { ChannelBanner, ChannelIcon, TangoExercise, TangoThumb } from './tango/Tango';
+import { TangoGroupThumb } from './tango/GroupThumb';
 import { TangoListen } from './tango/Listen';
 import { TangoQuiz, type QuizData } from './tango/Quiz';
 import { sections, type ListenData, type TangoData } from './tango/types';
@@ -50,6 +51,8 @@ export const Root = () => (
     <Composition id="TangoQuiz" component={TangoQuiz} defaultProps={{ data: QUIZ_SAMPLE }}
       width={1080} height={1920} fps={FPS} durationInFrames={90} calculateMetadata={quizMeta} />
     <Composition id="TangoThumb" component={TangoThumb} defaultProps={{ data: TANGO_SAMPLE }} width={1280} height={720} fps={FPS} durationInFrames={1} />
+    {/* 大学グループ別のサムネ（グループ名をいちばん大きく）。group は省くと data.label（「GMARCH頻出100」）から取る */}
+    <Composition id="TangoGroupThumb" component={TangoGroupThumb} defaultProps={{ data: TANGO_SAMPLE, group: 'GMARCH', variant: 'A' as const }} width={1280} height={720} fps={FPS} durationInFrames={1} />
     <Composition id="ChannelIcon" component={ChannelIcon} width={800} height={800} fps={FPS} durationInFrames={1} />
     <Composition id="ChannelBanner" component={ChannelBanner} width={2560} height={1440} fps={FPS} durationInFrames={1} />
     <Composition id="CharaSheet" component={Sheet} width={1620} height={2020} fps={FPS} durationInFrames={60} />
