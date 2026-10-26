@@ -1,0 +1,23 @@
+#!/bin/zsh
+# 動画づくりの順番待ち。Mac が再起動しても launchd（com.kiai.video-queue）が最初から流し直す。
+# どの段も「作り終えた・上げ終えた分は飛ばす」ので、何度動かしても同じ結果になる。毎朝3時にも流し直す（上限で上げ残した分）。
+#   1. 稽古4〜10（tango_batch.sh）
+#   2. 大学群の動画（GMARCH・早慶 × エクササイズ・聞き流し）
+#   3. 稽古1〜10 がそろったら、まとめ版（tango_after_batch.sh）
+cd "$(dirname "$0")/.."
+export PYTHONUNBUFFERED=1
+log() { echo "[$(date '+%m-%d %H:%M')] $*"; }
+up() { python3 -c "import json,sys;d=json.load(open('data/tango_uploaded.json'));sys.exit(0 if '$1' in d else 1)"; }
+log "順番待ちを始める"
+scripts/tango_batch.sh 4 10 >> .tmp/tango_batch.log 2>&1
+for g in GMARCH 早慶; do
+  for k in exercise listen; do
+    name="group_$g"; [ $k = listen ] && name="${name}_listen"
+    up $name && continue
+    log "$name を作って上げる"
+    /usr/bin/caffeinate -i python3 scripts/tango_group.py $g --kind $k --upload >> .tmp/tango_group.log 2>&1 || log "$name は失敗（次に流し直すとき続ける）"
+    up $name && rm -f output/tango/$name.mp4
+  done
+done
+up keiko10_listen && scripts/tango_after_batch.sh >> .tmp/tango_after.log 2>&1
+log "順番待ちおわり"
