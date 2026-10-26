@@ -196,7 +196,10 @@ def make(g: str, kind: str, limit: int | None, force: bool) -> int:
     props.write_text(json.dumps({"data": p}, ensure_ascii=False), encoding="utf-8")
     (te.OUT / f"{name}.meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
     (te.OUT / f"{name}_description.txt").write_text(meta["description"], encoding="utf-8")
-    te.render("TangoThumb", te.OUT / f"{name}.png", props, still=True)
+    # サムネは大学群の名前をいちばん大きく（B案。2026-10-26 坂本さん「Bでいこう」）
+    thumb_props = te.OUT / f"{name}.thumbprops.json"
+    thumb_props.write_text(json.dumps({"data": p, "group": g, "variant": "B"}, ensure_ascii=False), encoding="utf-8")
+    te.render("TangoGroupThumb", te.OUT / f"{name}.png", thumb_props, still=True)
     Image.open(te.OUT / f"{name}.png").convert("RGB").save(te.OUT / f"{name}.jpg", quality=90)
     (te.OUT / f"{name}.png").unlink()
     total, events = te.listen_events(p) if listen else te.exercise_events(p)
