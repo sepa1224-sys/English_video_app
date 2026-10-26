@@ -13,10 +13,10 @@ scripts/tango_batch.sh 4 10 >> .tmp/tango_batch.log 2>&1
 for g in GMARCH 早慶; do
   for k in exercise listen; do
     name="group_$g"; [ $k = listen ] && name="${name}_listen"
-    up $name && continue
+    if up $name; then python3 scripts/tango_publish.py $name >/dev/null 2>&1; continue; fi
     log "$name を作って上げる"
     /usr/bin/caffeinate -i python3 scripts/tango_group.py $g --kind $k --upload >> .tmp/tango_group.log 2>&1 || log "$name は失敗（次に流し直すとき続ける）"
-    up $name && rm -f output/tango/$name.mp4
+    up $name && { rm -f output/tango/$name.mp4; python3 scripts/tango_publish.py $name; }  # 上がったら公開（2026-10-26 坂本さん OK）
   done
 done
 up keiko10_listen && scripts/tango_after_batch.sh >> .tmp/tango_after.log 2>&1
