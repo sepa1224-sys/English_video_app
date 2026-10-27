@@ -7,6 +7,7 @@ import { TangoGroupThumb } from './tango/GroupThumb';
 import { TangoListen } from './tango/Listen';
 import { TangoQuiz, type QuizData } from './tango/Quiz';
 import { sections, type ListenData, type TangoData } from './tango/types';
+import { AD_SAMPLE, BookAd, BookAdThumb, type AdData } from './ad/BookAd';
 
 // 台本は書き出し時に --props で渡す（scripts/render.mjs）。長さは台本から決める
 const SAMPLE: Ep = {
@@ -36,6 +37,8 @@ const QUIZ_SAMPLE: QuizData = {
 };
 // --props はすべての Composition に渡るので、別の動画の中身（plan が無い）でも落ちないようにする
 const quizMeta = ({ props }: { props: { data: QuizData } }) => ({ durationInFrames: props.data.plan?.total ?? 90 });
+// 単語帳の YouTube 広告（scripts/book_ad.py が --props で { ad } を渡す）。ad が無いときは見本の長さ
+const adMeta = ({ props }: { props: { ad?: AdData } }) => ({ durationInFrames: props.ad?.total ?? AD_SAMPLE.total });
 const listenMeta = ({ props }: { props: { data: ListenData } }) => ({ durationInFrames: props.data.plan?.total ?? 90 });
 
 export const Root = () => (
@@ -53,6 +56,9 @@ export const Root = () => (
     <Composition id="TangoThumb" component={TangoThumb} defaultProps={{ data: TANGO_SAMPLE }} width={1280} height={720} fps={FPS} durationInFrames={1} />
     {/* 大学グループ別のサムネ（グループ名をいちばん大きく）。group は省くと data.label（「GMARCH頻出100」）から取る */}
     <Composition id="TangoGroupThumb" component={TangoGroupThumb} defaultProps={{ data: TANGO_SAMPLE, group: 'GMARCH', variant: 'A' as const }} width={1280} height={720} fps={FPS} durationInFrames={1} />
+    <Composition id="BookAd" component={BookAd} defaultProps={{ ad: AD_SAMPLE }}
+      width={1920} height={1080} fps={FPS} durationInFrames={AD_SAMPLE.total} calculateMetadata={adMeta} />
+    <Composition id="BookAdThumb" component={BookAdThumb} defaultProps={{ ad: AD_SAMPLE }} width={1280} height={720} fps={FPS} durationInFrames={1} />
     <Composition id="ChannelIcon" component={ChannelIcon} width={800} height={800} fps={FPS} durationInFrames={1} />
     <Composition id="ChannelBanner" component={ChannelBanner} width={2560} height={1440} fps={FPS} durationInFrames={1} />
     <Composition id="CharaSheet" component={Sheet} width={1620} height={2020} fps={FPS} durationInFrames={60} />
