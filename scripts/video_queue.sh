@@ -29,5 +29,6 @@ for g in GMARCH 早慶 関関同立 国公立大; do
 done
 up keiko10_listen && scripts/tango_after_batch.sh >> .tmp/tango_after.log 2>&1
 # 単語帳の案内コメント（1日60件まで。2026-10-27 坂本さん「全部やろう」）
+python3 scripts/add_book_link.py --apply >> .tmp/book_link.log 2>&1
 python3 scripts/book_comment.py --apply --limit 60 >> .tmp/book_comment.log 2>&1
 log "順番待ちおわり"

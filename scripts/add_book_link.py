@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 import tango_exercise as te
 
+FREE = "🎁 稽古1（100語）を無料で試せます → https://kiaienglish.com/go/tango?src=yt_desc\n"
 BLOCK = ("📕 単語帳『気合の英単語 必修』（大学入試 頻出1000語・イラストつき）は Amazon で発売中\n"
          "https://kiaienglish.com/go/amazon?src=yt_desc\n\n")
 HAS = ("go/amazon", "amazon.co.jp")
@@ -32,9 +33,11 @@ def main(apply: bool):
     for i in range(0, len(ids), 50):
         for v in yt.videos().list(part="snippet,status", id=",".join(ids[i:i + 50])).execute()["items"]:
             sn, priv = v["snippet"], v["status"]["privacyStatus"]
-            if priv != "public" or any(h in sn.get("description", "") for h in HAS):
+            cur = sn.get("description", "")
+            if priv != "public" or "go/tango" in cur:
                 skip += 1; continue
-            desc = BLOCK + sn.get("description", "")
+            # 無料の案内をいちばん上に。Amazon の案内がまだ無ければ一緒に足す（2026-10-27 坂本さん）
+            desc = FREE + (cur if any(h in cur for h in HAS) else BLOCK + cur)
             if len(desc) > 5000:
                 print("長すぎて飛ばす", v["id"], sn["title"]); skip += 1; continue
             todo += 1
