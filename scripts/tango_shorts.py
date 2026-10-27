@@ -3,7 +3,7 @@
 以前いちばん見られたショート（他社の単語帳で作っていた shorts_quiz.py の形式・著作権の警告で非公開にした）と
 同じ作り・同じ間で、中身だけ自分の本にしたもの。
   1問 = 絵と英単語と本の番号（No.xxx）→ 発音 → 3・2・1 → 意味（日本語で読む）
-  最後 = 本の表紙と仙人の声「全部 単語帳『気合の英単語 必修』に入っておる。概要欄からじゃ！」
+  最後 = 本の表紙と、稽古1の無料見本への QR。仙人の声「全部 単語帳に入っておる。稽古1は無料じゃ！概要欄からじゃ！」（2026-10-27）
 
   python3 scripts/tango_shorts.py --part 1            … output/tango_shorts/shorts1.mp4（と .meta.json）
   python3 scripts/tango_shorts.py --part 1 --upload   … 作って非公開で上げる（上げ済みなら何もしない）
@@ -37,8 +37,11 @@ LABEL = "気合の英単語"
 COUNT = 5
 MAX_PART = 10  # この番号までは語が重ならない
 
-END_LINE = ("master", "全部 単語帳『気合の英単語 必修』に入っておる。概要欄からじゃ！",
-            "ぜんぶ、たんごちょう、きあいのえいたんご、ひっしゅうに、はいっておる。がいようらんからじゃ！")
+# 2026-10-27 坂本さん「仙人のセリフとQRとショート、全部入れて」：稽古1（100語）の無料見本へ誘う
+END_LINE = ("master", "全部 単語帳に入っておる。稽古1は無料じゃ！概要欄からじゃ！",
+            "ぜんぶ、たんごちょうに、はいっておる。けいこいちは、むりょうじゃ！がいようらんからじゃ！")
+FREE = te.FREE_URL.format(src="yt_shorts")
+QR_SRC = "yt_shorts_qr"
 AMAZON = "https://kiaienglish.com/go/amazon?src=yt_shorts"
 APP = "https://kiaienglish.com/go/line?src=yt_shorts"
 TAGS = ["気合の英単語", "英単語", "大学受験", "英単語クイズ", "受験英語", "shorts"]
@@ -160,18 +163,30 @@ class Frames:
         return img
 
     def end(self) -> Image.Image:
+        """表紙（左）と、稽古1の無料見本への QR（右）。大事な文字は縦 1500 より上に"""
         img, d = self.base(None)
         centered(d, 545, "何問言えた？", font(FONT_BLACK, 84), "white")
         cover = Image.open(te.COVER).convert("RGB")
-        cw = 330
+        cw, cy = 290, 690
         cover = cover.resize((cw, int(cover.height * cw / cover.width)), Image.LANCZOS)
-        cy = 680
-        ImageDraw.Draw(img).rectangle([(W - cw) // 2 - 6, cy - 6, (W + cw) // 2 + 5, cy + cover.height + 5], fill="white")
-        img.paste(cover, ((W - cw) // 2, cy))
-        y = cy + cover.height + 40
-        centered(d, y, "全部 単語帳", font(FONT_BOLD, 54), "white")
-        centered(d, y + 80, "『気合の英単語 必修』に", fit(d, "『気合の英単語 必修』に", FONT_BLACK, 66, SAFE_W), YELLOW)
-        centered(d, y + 175, "入っておる。概要欄からじゃ！", fit(d, "入っておる。概要欄からじゃ！", FONT_BOLD, 54, SAFE_W), "white")
+        cx = 140
+        d.rectangle([cx - 6, cy - 6, cx + cw + 5, cy + cover.height + 5], fill="white")
+        img.paste(cover, (cx, cy))
+        # QR の札（白地・余白込みの QR を、ドットのまま大きくする）
+        qs = 360
+        qr = Image.open(te.qr_png(QR_SRC)).convert("RGB").resize((qs, qs), Image.NEAREST)
+        kx, ky, kw = 490, cy - 10, 430
+        lf, sf = fit(d, "無料で稽古1（100語）", FONT_BLACK, 40, kw - 30, 30), font(FONT_BOLD, 32)
+        kh = 22 + 48 + qs + 12 + 40 + 18
+        d.rounded_rectangle([kx, ky, kx + kw, ky + kh], 28, fill="white", outline=YELLOW, width=8)
+        lw = d.textlength("無料で稽古1（100語）", font=lf)
+        d.text((kx + (kw - lw) / 2, ky + 20), "無料で稽古1（100語）", font=lf, fill="#C0262E")
+        img.paste(qr, (kx + (kw - qs) // 2, ky + 22 + 48))
+        sw = d.textlength("スマホで読み取り", font=sf)
+        d.text((kx + (kw - sw) / 2, ky + 22 + 48 + qs + 8), "スマホで読み取り", font=sf, fill="#1a1a1a")
+        y = max(cy + cover.height, ky + kh) + 40
+        centered(d, y, "全部 単語帳に入っておる。", font(FONT_BOLD, 56), "white")
+        centered(d, y + 85, "稽古1は無料じゃ！概要欄からじゃ！", fit(d, "稽古1は無料じゃ！概要欄からじゃ！", FONT_BLACK, 64, SAFE_W), YELLOW)
         return img
 
 
@@ -270,6 +285,7 @@ def metadata(part: int, words: list[dict]) -> dict:
     title = f"【{LABEL}】3秒で意味言える？ ランダム{COUNT}問 Part.{part} #shorts"
     answers = "\n".join(f"No.{e['no']} {e['headword']} … {'、'.join(answer_lines(e))}" for e in words)
     desc = "\n".join([
+        f"🎁 稽古1（100語）を無料で試せます → {FREE}",
         f"📕 単語帳『気合の英単語 必修』は Amazon で発売中 {AMAZON}",
         f"📱 アプリで毎日テスト（気合イングリッシュ）{APP}",
         "",

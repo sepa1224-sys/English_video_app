@@ -46,7 +46,12 @@ TAGS = ["英単語", "大学受験", "英語学習", "気合イングリッシ�
 # 冒頭と締めのセリフ（誰が・何を）。キャラは edu/cast.json の名前
 INTRO = [("master", "気合の英単語！", "きあいのえいたんご！"),  # 字幕・読み
          # 冒頭の宣伝（3秒ほど・2026-10-20 坂本さん）。概要欄の一番上にも同じ案内を出す
-         ("master", "アプリで毎日テストもできるぞ。概要欄からじゃ！", "アプリで、まいにちテストもできるぞ。がいようらんからじゃ！")]
+         # 2026-10-27 坂本さん「仙人のセリフとQRとショート、全部入れて」：アプリの案内から、稽古1（100語）の無料見本の案内に替えた
+         ("master", "稽古1は無料でもらえるぞ。概要欄からじゃ！", "けいこいちは、むりょうでもらえるぞ。がいようらんからじゃ！")]
+# 稽古1（100語）の無料見本（PDF）の入口。src で動画のどこから来たかを数える（kiai-coaching-app の /go/tango）
+FREE_URL = "https://kiaienglish.com/go/tango?src={src}"
+FREE_LINE = "🎁 稽古1（100語）を無料で試せます → " + FREE_URL.format(src="yt_desc")  # 概要欄の1行目
+QR_LABEL, QR_SUB = "無料で稽古1（100語）", "スマホで読み取り"  # 締めの QR の札
 APP_URL = "https://kiaienglish.com/go/line?src=yt_tango"  # 気合イングリッシュ（LINE で始める）。出どころは yt_tango
 HOWTO = [
     ("nekketsu", "絵を見たら、3秒以内に英語で言ってみろ！"),
@@ -336,6 +341,26 @@ def book() -> dict:
     return {"label": "くわしくは概要欄へ", **b}
 
 
+def qr_png(src: str) -> Path:
+    """無料見本への QR（白地に黒・余白4マス）。edu/public/tango は git に入らないので、無ければここで作る"""
+    p = PUB / f"qr_{src}.png"
+    if not p.exists():
+        import qrcode
+        q = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=12, border=4)
+        q.add_data(FREE_URL.format(src=src))
+        q.make(fit=True)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        tmp = p.with_suffix(".tmp.png")
+        q.make_image(fill_color="black", back_color="white").convert("RGB").save(tmp)
+        tmp.replace(p)
+    return p
+
+
+def qr_prop(src: str = "yt_qr") -> dict:
+    """締め（Outro と本の案内カード）に出す QR。edu/src/tango/types.ts の qr"""
+    return {"src": f"tango/{qr_png(src).name}", "label": QR_LABEL, "sub": QR_SUB}
+
+
 def common_assets() -> None:
     PUB.mkdir(parents=True, exist_ok=True)
     cover = PUB / "cover.jpg"
@@ -397,6 +422,7 @@ def build_props(keiko: int, limit: int | None, kind: str = "exercise") -> dict:
         "howto": [line_audio(w, t.format(keiko=keiko)) for w, t in HOWTO],
         "outro": [line_audio(w, t) for w, t in OUTRO],
         "outroBook": [line_audio(w, t.format(keiko=keiko), r.format(keiko=keiko)) for w, t, r in OUTRO_BOOK],
+        "qr": qr_prop(),
         "words": words,
         "thumbs": [w["img"] for w in words[:4]],  # サムネは左に4枚大きく
     }
@@ -614,7 +640,7 @@ def description(p: dict) -> str:
     # 本の購入リンクは概要欄の上のほう（1行目の次）に置く。YouTube は先頭の数行しか「もっと見る」の前に出さない（2026-10-23）
     first, _, rest = head.partition("\n")
     top = (f"{first}\n📕 この動画の{len(p['words'])}語は、単語帳『気合の英単語 必修』の稽古{p['keiko']}（No.{a}〜{b}）です。\n{buy}\n\n")
-    return top + promo + rest.lstrip("\n") + f"""
+    return f"{FREE_LINE}\n" + top + promo + rest.lstrip("\n") + f"""
 ■ 単語帳『気合の英単語 必修』
 大学入試によく出る1000語を、100語ずつ10の稽古に分けた単語帳です。この動画のイラストは、本と同じものです。
 {buy}

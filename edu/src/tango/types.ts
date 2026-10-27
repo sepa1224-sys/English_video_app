@@ -19,6 +19,8 @@ export type TangoData = {
   label?: string; // 「稽古N」の札の代わり（上の帯・サムネ）。サムネの No. の範囲も出さない
   outroTitle?: string; // 締めの大きい字（既定「稽古N 完了！」）
   bookOf?: string; bookBig?: string; // 本の案内カードの「の」「稽古N」の代わり
+  // 締め（Outro と本の案内カード）に出す QR（2026-10-27 稽古1の無料見本へ）。無ければ出さない＝以前の動画と同じ見た目
+  qr?: { src: string; label?: string; sub?: string };
 };
 
 // 聞き流し（英語→日本語）。時間割は tango_exercise.py が1回だけ計算してコマで渡す（ずれないように）

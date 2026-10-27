@@ -296,6 +296,17 @@ const Words: React.FC<{ d: TangoData }> = ({ d }) => {
   );
 };
 
+// ───────────────────────── 締めの QR（稽古1の無料見本へ・2026-10-27） ─────────────────────────
+// 白地に黒の QR（PNG に白い余白＝クワイエットゾーン込み）。読み取りやすいよう動かさず、拡大はドットのまま
+export const QrCard: React.FC<{ qr: NonNullable<TangoData['qr']>; size?: number; style?: React.CSSProperties }> = ({ qr, size = 300, style }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: CREAM, border: `6px solid ${BROWN}`,
+    borderRadius: 26, padding: '16px 22px 14px', boxShadow: '0 12px 0 rgba(60,0,0,0.45)', ...style }}>
+    <div style={{ fontFamily: DELA, fontSize: 36, color: RED, marginBottom: 10, whiteSpace: 'nowrap' }}>{qr.label ?? '無料で稽古1（100語）'}</div>
+    <Img src={staticFile(qr.src)} style={{ width: size, height: size, imageRendering: 'pixelated', display: 'block', background: '#fff' }} />
+    <div style={{ fontFamily: ROUNDED, fontSize: 30, color: BROWN, marginTop: 8, whiteSpace: 'nowrap' }}>{qr.sub ?? 'スマホで読み取り'}</div>
+  </div>
+);
+
 // ───────────────────────── 締め ─────────────────────────
 export const Outro: React.FC<{ d: TangoData }> = ({ d }) => {
   const f = useCurrentFrame();
@@ -317,11 +328,15 @@ export const Outro: React.FC<{ d: TangoData }> = ({ d }) => {
           </div>;
         })}
       </div>
-      <div style={{ position: 'absolute', right: 120, top: 330, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
-        <Img src={staticFile('tango/cover.jpg')} style={{ width: 300, height: 480, borderRadius: 12, border: `5px solid ${CREAM}`,
-          boxShadow: '0 20px 40px rgba(60,0,0,0.5)', transform: 'rotate(3deg)' }} />
-        <span style={{ fontFamily: DELA, fontSize: 34, color: BROWN, background: GOLD, borderRadius: 999, padding: '8px 26px' }}>{d.book.label}</span>
-      </div>
+      {d.qr ? (
+        <QrCard qr={d.qr} style={{ position: 'absolute', right: 70, top: 370 }} />
+      ) : (
+        <div style={{ position: 'absolute', right: 120, top: 330, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
+          <Img src={staticFile('tango/cover.jpg')} style={{ width: 300, height: 480, borderRadius: 12, border: `5px solid ${CREAM}`,
+            boxShadow: '0 20px 40px rgba(60,0,0,0.5)', transform: 'rotate(3deg)' }} />
+          <span style={{ fontFamily: DELA, fontSize: 34, color: BROWN, background: GOLD, borderRadius: 999, padding: '8px 26px' }}>{d.book.label}</span>
+        </div>
+      )}
       <Caption line={line} />
     </AbsoluteFill>
   );
@@ -334,6 +349,7 @@ export const BookCard: React.FC<{ d: TangoData }> = ({ d }) => {
   const { fps } = useVideoConfig();
   const { line, talking } = useLines(d.outroBook ?? []);
   const cover = pop(f, fps, 2);
+  const big = d.bookBig ?? `稽古${d.keiko}`;
   return (
     <AbsoluteFill style={{ background: EMBER }}>
       <LineAudio lines={d.outroBook ?? []} />
@@ -347,16 +363,24 @@ export const BookCard: React.FC<{ d: TangoData }> = ({ d }) => {
           『気合の英単語 必修』
         </div>
         <div style={{ fontFamily: DELA, fontSize: 56, color: CREAM, textShadow: SLAB(5), marginTop: 6 }}>{d.bookOf ?? 'の'}</div>
-        <div style={{ fontFamily: DELA, fontSize: 170, color: CREAM, textShadow: SLAB(10), lineHeight: 1.1,
-          transform: `scale(${pop(f, fps, 10)})`, transformOrigin: 'left center' }}>{d.bookBig ?? `稽古${d.keiko}`}</div>
+        {/* QR があるときは右に QR の札が来るので、大きい字は札の手前（幅 590）に収める */}
+        <div style={{ fontFamily: DELA, fontSize: d.qr ? Math.min(170, Math.floor(590 / [...big].length)) : 170, color: CREAM, textShadow: SLAB(10), lineHeight: 1.1,
+          whiteSpace: 'nowrap', transform: `scale(${pop(f, fps, 10)})`, transformOrigin: 'left center' }}>{big}</div>
       </div>
       <div style={{ position: 'absolute', left: 780, top: 660, transform: `scale(${pop(f, fps, 22)})`, transformOrigin: 'left center' }}>
         <span style={{ fontFamily: DELA, fontSize: 64, color: BROWN, background: GOLD, borderRadius: 999, padding: '14px 44px',
           border: `5px solid ${BROWN}`, boxShadow: '0 8px 0 rgba(60,0,0,0.45)' }}>本は概要欄から</span>
       </div>
-      <div style={{ position: 'absolute', right: 40, bottom: 110 }}>
-        <Chara who="master" size={300} talking={talking} />
-      </div>
+      {d.qr ? (<>
+        <QrCard qr={d.qr} style={{ position: 'absolute', right: 70, top: 370 }} />
+        <div style={{ position: 'absolute', right: 440, bottom: 120 }}>
+          <Chara who="master" size={240} talking={talking} />
+        </div>
+      </>) : (
+        <div style={{ position: 'absolute', right: 40, bottom: 110 }}>
+          <Chara who="master" size={300} talking={talking} />
+        </div>
+      )}
       <Caption line={line} bottom={30} />
     </AbsoluteFill>
   );

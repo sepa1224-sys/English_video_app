@@ -98,6 +98,7 @@ def build_props(g: str, limit: int | None, kind: str) -> dict:
         "howto": howto(g),
         "outro": [te.line_audio(w, t) for w, t in te.OUTRO],
         "outroBook": outro_book(),
+        "qr": te.qr_prop(),
         "words": words,
         "thumbs": [w["img"] for w in words[:4]],
     }
@@ -150,7 +151,8 @@ def description(g: str, p: dict) -> str:
 3. 言えなかった単語は、もう一度この動画で練習する
 """
         kind_line = "イラストだけを見て、英語で答えるエクササイズです。"
-    return f"""▼ アプリで毎日テスト（気合イングリッシュ）
+    return f"""{te.FREE_LINE}
+▼ アプリで毎日テスト（気合イングリッシュ）
 まちがえた単語は苦手リストに入り、日を空けてまた出てきます。本と同じ番号でテストできます。
 {te.APP_URL}
 
