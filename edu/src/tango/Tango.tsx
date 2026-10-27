@@ -90,7 +90,7 @@ export const Intro: React.FC<{ d: TangoData }> = ({ d }) => {
   const { line, talking } = useLines(d.intro);
   const cover = pop(f, fps, 4);
   return (
-    <AbsoluteFill style={{ background: EMBER }}>
+    <AbsoluteFill style={{ background: (thumbKind(d) === 'listen' ? THEMES.listen : THEMES.exercise).bg }}>
       <LineAudio lines={d.intro} />
       <div style={{ position: 'absolute', left: 130, top: 110, opacity: fadeIn(f, 0, 10) }}>
         <div style={{ fontFamily: ROUNDED, fontSize: 40, color: CREAM, marginBottom: 26 }}>気合イングリッシュの単語帳</div>
@@ -313,7 +313,7 @@ export const Outro: React.FC<{ d: TangoData }> = ({ d }) => {
   const { fps } = useVideoConfig();
   const { line, talking } = useLines(d.outro);
   return (
-    <AbsoluteFill style={{ background: EMBER }}>
+    <AbsoluteFill style={{ background: (thumbKind(d) === 'listen' ? THEMES.listen : THEMES.exercise).bg }}>
       <LineAudio lines={d.outro} />
       <div style={{ position: 'absolute', top: 90, width: '100%', textAlign: 'center', fontFamily: DELA, fontSize: 130, color: CREAM,
         textShadow: SLAB(9), transform: `scale(${pop(f, fps, 0)})` }}>{d.outroTitle ?? `稽古${d.keiko} 完了！`}</div>
@@ -351,7 +351,7 @@ export const BookCard: React.FC<{ d: TangoData }> = ({ d }) => {
   const cover = pop(f, fps, 2);
   const big = d.bookBig ?? `稽古${d.keiko}`;
   return (
-    <AbsoluteFill style={{ background: EMBER }}>
+    <AbsoluteFill style={{ background: (thumbKind(d) === 'listen' ? THEMES.listen : THEMES.exercise).bg }}>
       <LineAudio lines={d.outroBook ?? []} />
       <Img src={staticFile('tango/cover.jpg')} style={{
         position: 'absolute', left: 170, top: 90, width: 520, height: 832, borderRadius: 18, border: `6px solid ${CREAM}`,
