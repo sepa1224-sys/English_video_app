@@ -8,6 +8,7 @@ import { TangoListen } from './tango/Listen';
 import { TangoQuiz, type QuizData } from './tango/Quiz';
 import { sections, type ListenData, type TangoData } from './tango/types';
 import { AD_SAMPLE, BookAd, BookAdThumb, type AdData } from './ad/BookAd';
+import { AD15_SAMPLE, BookAd15, type Ad15Data } from './ad/BookAd15';
 
 // 台本は書き出し時に --props で渡す（scripts/render.mjs）。長さは台本から決める
 const SAMPLE: Ep = {
@@ -38,6 +39,7 @@ const QUIZ_SAMPLE: QuizData = {
 // --props はすべての Composition に渡るので、別の動画の中身（plan が無い）でも落ちないようにする
 const quizMeta = ({ props }: { props: { data: QuizData } }) => ({ durationInFrames: props.data.plan?.total ?? 90 });
 // 単語帳の YouTube 広告（scripts/book_ad.py が --props で { ad } を渡す）。ad が無いときは見本の長さ
+const ad15Meta = ({ props }: { props: { ad15?: Ad15Data } }) => ({ durationInFrames: props.ad15?.total ?? AD15_SAMPLE.total });
 const adMeta = ({ props }: { props: { ad?: AdData } }) => ({ durationInFrames: props.ad?.total ?? AD_SAMPLE.total });
 const listenMeta = ({ props }: { props: { data: ListenData } }) => ({ durationInFrames: props.data.plan?.total ?? 90 });
 
@@ -58,6 +60,11 @@ export const Root = () => (
     <Composition id="TangoGroupThumb" component={TangoGroupThumb} defaultProps={{ data: TANGO_SAMPLE, group: 'GMARCH', variant: 'A' as const }} width={1280} height={720} fps={FPS} durationInFrames={1} />
     <Composition id="BookAd" component={BookAd} defaultProps={{ ad: AD_SAMPLE }}
       width={1920} height={1080} fps={FPS} durationInFrames={AD_SAMPLE.total} calculateMetadata={adMeta} />
+    {/* 15秒版（横＝動画の前の広告／縦＝ショートの広告）。scripts/book_ad15.py */}
+    <Composition id="BookAd15" component={BookAd15} defaultProps={{ ad15: AD15_SAMPLE }}
+      width={1920} height={1080} fps={FPS} durationInFrames={AD15_SAMPLE.total} calculateMetadata={ad15Meta} />
+    <Composition id="BookAd15V" component={BookAd15} defaultProps={{ ad15: AD15_SAMPLE }}
+      width={1080} height={1920} fps={FPS} durationInFrames={AD15_SAMPLE.total} calculateMetadata={ad15Meta} />
     <Composition id="BookAdThumb" component={BookAdThumb} defaultProps={{ ad: AD_SAMPLE }} width={1280} height={720} fps={FPS} durationInFrames={1} />
     <Composition id="ChannelIcon" component={ChannelIcon} width={800} height={800} fps={FPS} durationInFrames={1} />
     <Composition id="ChannelBanner" component={ChannelBanner} width={2560} height={1440} fps={FPS} durationInFrames={1} />
