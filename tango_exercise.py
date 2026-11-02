@@ -52,7 +52,7 @@ INTRO = [("master", "気合の英単語！", "きあいのえいたんご！"), 
 FREE_URL = "https://kiaienglish.com/go/tango?src={src}"
 FREE_LINE = "🎁 稽古1（100語）を無料で試せます → " + FREE_URL.format(src="yt_desc")  # 概要欄の1行目
 QR_LABEL, QR_SUB = "無料で稽古1（100語）", "スマホで読み取り"  # 締めの QR の札
-APP_URL = "https://kiaienglish.com/go/line?src=yt_tango"  # 気合イングリッシュ（LINE で始める）。出どころは yt_tango
+APP_URL = "https://kiaienglish.com/go/app?src=yt_tango"  # 気合イングリッシュ（/app：iPhone は App Store、ほかは LINE で始める。2026-11-02 App Store 公開）。出どころは yt_tango
 HOWTO = [
     ("nekketsu", "絵を見たら、3秒以内に英語で言ってみろ！"),
     ("megane", "答えが出たら、発音のあとについて声に出しましょう。"),
