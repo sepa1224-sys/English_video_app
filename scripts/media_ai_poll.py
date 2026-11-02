@@ -87,6 +87,10 @@ def main() -> int:
     if not url or not secret:
         print("✖ .env に KIAI_APP_URL と KIAI_FACTORY_SECRET がありません")
         return 2
+    # ログインの鍵がまだないときは、仕事を取らない（取ると失敗して坂本さん待ちに戻るだけ）
+    if not claude_env().get("CLAUDE_CODE_OAUTH_TOKEN"):
+        print("… .env に CLAUDE_CODE_OAUTH_TOKEN がないので待つ（claude setup-token で作る）")
+        return 0
     # 前の回がまだ動いているときは何もしない（1件に最大30分かかる）
     LOCK.parent.mkdir(exist_ok=True)
     if LOCK.exists() and LOCK.stat().st_mtime > time.time() - TIMEOUT_S - 300:
