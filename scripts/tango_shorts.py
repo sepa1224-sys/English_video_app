@@ -15,6 +15,7 @@
 """
 from __future__ import annotations
 import argparse, json, random, shutil, subprocess, sys
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import numpy as np
@@ -45,6 +46,15 @@ QR_SRC = "yt_shorts_qr"
 AMAZON = "https://kiaienglish.com/go/amazon?src=yt_shorts"
 APP = "https://kiaienglish.com/go/app?src=yt_shorts"  # iPhone は App Store、ほかは LINE（/app が振り分ける）
 TAGS = ["気合の英単語", "英単語", "大学受験", "英単語クイズ", "受験英語", "shorts"]
+
+EXAM_DAY = date(2027, 1, 16)  # 共通テストの1日目（令和9年度）。過ぎたら「あと◯日」は出ない
+
+
+def exam_days_left(today: date | None = None) -> int | None:
+    """共通テストまであと何日か（日本時間）。当日からは None"""
+    today = today or datetime.now(timezone(timedelta(hours=9))).date()
+    n = (EXAM_DAY - today).days
+    return n if n > 0 else None
 
 
 # ---------- 出題 ----------
@@ -187,6 +197,9 @@ class Frames:
         y = max(cy + cover.height, ky + kh) + 40
         centered(d, y, "全部 単語帳に入っておる。", font(FONT_BOLD, 56), "white")
         centered(d, y + 85, "稽古1は無料じゃ！概要欄からじゃ！", fit(d, "稽古1は無料じゃ！概要欄からじゃ！", FONT_BLACK, 64, SAFE_W), YELLOW)
+        left = exam_days_left()
+        if left:
+            centered(d, y + 190, f"共通テストまで あと{left}日", font(FONT_BLACK, 70), "white")
         return img
 
 
@@ -284,7 +297,9 @@ def metadata(part: int, words: list[dict]) -> dict:
     from book_guard import check
     title = f"【{LABEL}】3秒で意味言える？ ランダム{COUNT}問 Part.{part} #shorts"
     answers = "\n".join(f"No.{e['no']} {e['headword']} … {'、'.join(answer_lines(e))}" for e in words)
+    left = exam_days_left()
     desc = "\n".join([
+        *([f"⏰ 共通テストまであと{left}日。今日の単語テストはアプリで → {APP}"] if left else []),
         f"🎁 稽古1（100語）を無料で試せます → {FREE}",
         f"📕 単語帳『気合の英単語 必修』は Amazon で発売中 {AMAZON}",
         f"📱 アプリで毎日テスト（気合イングリッシュ）{APP}",
