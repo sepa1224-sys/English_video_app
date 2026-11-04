@@ -43,7 +43,7 @@ END_LINE = ("master", "全部 単語帳に入っておる。稽古1は無料じ�
 FREE = te.FREE_URL.format(src="yt_shorts")
 QR_SRC = "yt_shorts_qr"
 AMAZON = "https://kiaienglish.com/go/amazon?src=yt_shorts"
-APP = "https://kiaienglish.com/go/line?src=yt_shorts"
+APP = "https://kiaienglish.com/go/app?src=yt_shorts"  # iPhone は App Store、ほかは LINE（/app が振り分ける）
 TAGS = ["気合の英単語", "英単語", "大学受験", "英単語クイズ", "受験英語", "shorts"]
 
 

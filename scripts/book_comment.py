@@ -18,7 +18,7 @@ TEXT = ("🎁 稽古1（100語）を無料で試せます（登録なし）→ h
         "📕 この動画の単語は、単語帳『気合の英単語 必修』で覚えられます。\n"
         "大学入試によく出る1000語を、イラストつき・100語ずつの稽古で。動画と本が同じ番号です。\n"
         "▶ Amazon：https://kiaienglish.com/go/amazon?src=yt_comment\n"
-        "▶ アプリで毎日テスト：https://kiaienglish.com/go/line?src=yt_comment")
+        "▶ アプリで毎日テスト：https://kiaienglish.com/go/app?src=yt_comment")
 
 
 def main(apply: bool, limit: int):
